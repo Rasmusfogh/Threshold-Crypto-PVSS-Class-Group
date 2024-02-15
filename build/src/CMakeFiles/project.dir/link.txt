@@ -1,0 +1,2 @@
+/usr/bin/ar qc libproject.a CMakeFiles/project.dir/qclpvss.cpp.o CMakeFiles/project.dir/qclpvss_utils.cpp.o CMakeFiles/project.dir/nizkpok_dl.cpp.o
+/usr/bin/ranlib libproject.a
