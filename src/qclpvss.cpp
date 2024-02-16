@@ -35,12 +35,12 @@ PublicKey QCLPVSS::keyGen(const SecretKey &sk) const
 
 NizkPoK_DL QCLPVSS::keyGen(RandGen &randgen, const PublicKey &pk, const SecretKey & sk) const
 {
-  return NizkPoK_DL(hash_, randgen, this->cl_hsmqk_, lambda(), pk, sk);
+  return NizkPoK_DL(hash_, randgen, this->cl_hsmqk_, lambda(), pk, sk, 30);
 }
 
 bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const 
 {
-  return pf.Verify(this->cl_hsmqk_, pk);
+  return pf.Verify(this->cl_hsmqk_, pk, 30);
 }
 
 const SecLevel & QCLPVSS::lambda() const {

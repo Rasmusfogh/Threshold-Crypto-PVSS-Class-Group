@@ -25,6 +25,21 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   endif()
 endif ()
 
+##############################################################################
+# Set flags and build type (release or debug)
+##############################################################################
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message (STATUS "Setting build type to 'Debug' as none was specified.")
+  set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose type of build" FORCE)
+  set_property (CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+  set (CMAKE_CXX_FLAGS_DEBUG "-O3 -g -Wall -Wextra -DDEBUG")
+endif ()
+
+# if(NOT MSVC)
+#   set (CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -DNDEBUG")
+#   set (CMAKE_CXX_FLAGS_DEBUG "-O3 -g -Wall -Wextra -DDEBUG")
+# endif()
+
 ################################################################################
 # Looking for GMP and OpenSSL
 ################################################################################
