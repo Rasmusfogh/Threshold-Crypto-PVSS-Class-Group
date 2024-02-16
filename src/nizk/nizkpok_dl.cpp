@@ -7,17 +7,22 @@ using namespace NIZKPOK_DL_;
 
 
 NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
-                const SecLevel & seclevel, const PublicKey &x, const SecretKey &w, const size_t l) : h_(hash), b_(l), u_(l)
+                const SecLevel & seclevel, const PublicKey &x, const SecretKey &w) : 
+                h_(hash), 
+                b_(hash.digest_nbits()), 
+                u_(hash.digest_nbits()),
+                A_(cl_hsm.Cl_Delta().class_number_bound()) //What should A be?
 {
-    std::vector<Mpz> r(l);
-    std::vector<QFI> t(l);
+    //l = h_digest_nbits() = hash function output bitsize
+    std::vector<Mpz> r(h_.digest_nbits());
+    std::vector<QFI> t(h_.digest_nbits());
 
-    //bound = upper_bound*2^(seclevel-2)
-    Mpz::mulby2k(A_, cl_hsm.encrypt_randomness_bound(), seclevel.soundness() - 2UL);
+    //TODO set value of A_, maybe in member initialization list
+
 
     // //Could be parallelized I think
-    for(size_t i = 0; i < l; i++) {
-        // r = [1 ... upper_bound*2^(seclevel-2)]
+    for(size_t i = 0; i < h_.digest_nbits(); i++) {
+        // r = [1 ... A_]
         Mpz::add(r[i], randgen.random_mpz(A_), Mpz(1UL));
         cl_hsm.power_of_h(t[i], r[i]);
 
@@ -31,21 +36,20 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm
     }
 }
 
-bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x, const size_t l) const 
+bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const 
 {
-    
-    Mpz bound;
-
     //bound = [A + S]
+    Mpz bound;
     Mpz::add(bound, A_, cl_hsm.encrypt_randomness_bound());
 
+    for(size_t i = 0; i < h_.digest_nbits(); i++) {
 
-    for(size_t i = 0; i < l; i++) {
-        if (u_[i] > bound)
+        if (u_[i] > bound) {
             return false;
+        }
         
         QFI t1, t2;
-
+        
         Mpz b_temp(b_[i]);
         b_temp.neg();
 
@@ -63,8 +67,9 @@ bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x, const size_t
                     x.get().a(), x.get().b(), x.get().c(), 
                     t1.a(), t1.b(), t1.c()));
         
-        if (h != b_[i])
+        if (h != b_[i]) {
             return false;
+        }
     }
 
     return true;

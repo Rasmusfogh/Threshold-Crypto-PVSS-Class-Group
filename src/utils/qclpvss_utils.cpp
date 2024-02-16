@@ -3,31 +3,40 @@
 using namespace UTILS;
 using namespace BICYCL;
 
+/**
+ * shiftDistBy1 is used as the randomness sampled in random_mpz is in 
+ * the range [0 ... secretkey_bound() - 1]. We need the
+ * randomness to be [1 ... secretkey_bound()] as stated in
+ * preliminary of paper XXX.
+*/
 SecretKey::SecretKey(const CL_HSMqk &cl_hsm, RandGen &r) 
-: Mpz(r.random_mpz(cl_hsm.secretkey_bound())) {}
+  : Mpz(shiftDistBy1(r.random_mpz(cl_hsm.secretkey_bound())))
+{ }
 
-SecretKey::SecretKey(const CL_HSMqk &cl_hsm, const Mpz &v) : Mpz(v)
-{
-    if (!(v.sgn() >= 0 && v < cl_hsm.secretkey_bound()))
-        throw std::range_error ("Secret key is negative or too large");
+Mpz SecretKey::shiftDistBy1(const Mpz &m) {
+  Mpz r;
+  Mpz::add(r, m, 1UL);
+  return r;
 }
+
 
 PublicKey::PublicKey(const CL_HSMqk &cl_hsm, const SecretKey &sk)
 {
-    cl_hsm.power_of_h(pk_, sk);
+  cl_hsm.power_of_h(pk_, sk);
 
-    d_ = (cl_hsm.encrypt_randomness_bound().nbits() + 1)/2;
-    e_ = d_/2 + 1;
+  //not sure what below is yet
+  d_ = (cl_hsm.encrypt_randomness_bound().nbits() + 1)/2;
+  e_ = d_/2 + 1;
 
-    pk_de_precomp_ = pk_;
-    for (size_t i = 0; i < d_+e_; i++)
-    {
-        if (i == e_)
-        pk_e_precomp_ = pk_de_precomp_;
-        if (i == d_)
-        pk_d_precomp_ = pk_de_precomp_;
-        cl_hsm.Cl_G().nudupl (pk_de_precomp_, pk_de_precomp_);
-    }
+  pk_de_precomp_ = pk_;
+  for (size_t i = 0; i < d_+e_; i++)
+  {
+      if (i == e_)
+      pk_e_precomp_ = pk_de_precomp_;
+      if (i == d_)
+      pk_d_precomp_ = pk_de_precomp_;
+      cl_hsm.Cl_G().nudupl (pk_de_precomp_, pk_de_precomp_);
+  }
 }
 
 const QFI & PublicKey::get () const

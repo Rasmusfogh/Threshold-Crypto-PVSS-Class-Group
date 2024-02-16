@@ -13,7 +13,7 @@ namespace UTILS
         public:
             /* constructors */
             SecretKey (const CL_HSMqk &, RandGen &);
-            SecretKey (const CL_HSMqk &, const Mpz &);
+            Mpz shiftDistBy1(const Mpz &);
     };
 
     class PublicKey 
@@ -37,7 +37,7 @@ namespace UTILS
             const QFI & get () const;
 
             /* */
-            void exponentiation (const CL_HSMqk &, QFI &r, const Mpz &n) const;
+            void exponentiation (const CL_HSMqk &, QFI &, const Mpz &) const;
     }; 
 }
 
