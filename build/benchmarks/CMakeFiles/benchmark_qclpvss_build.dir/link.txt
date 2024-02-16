@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/benchmark_qclpvss_build.dir/benchmark_qclpvss.cpp.o -o benchmark_qclpvss  ../src/libproject.a /usr/lib/x86_64-linux-gnu/libgmp.so /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libcrypto.so 
