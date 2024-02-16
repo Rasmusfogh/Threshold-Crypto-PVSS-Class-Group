@@ -184,7 +184,7 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
   /usr/include/c++/11/ctime \
   /usr/include/c++/11/bits/parse_numbers.h \
   ../src/qclpvss.hpp \
-  ../src/qclpvss_utils.hpp \
+  ../src/utils/qclpvss_utils.hpp \
   ../lib/include/bicycl.hpp \
   ../lib/include/bicycl/gmp_extras.hpp \
   /usr/include/x86_64-linux-gnu/gmp.h \
@@ -285,10 +285,8 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
   ../lib/include/bicycl/CL_HSMqk.hpp \
   ../lib/include/bicycl/threshold_ECDSA.inl \
   ../lib/include/bicycl/seclevel.inl \
-  ../src/nizkpok_dl.hpp
+  ../src/nizk/nizkpok_dl.hpp
 
-
-../src/nizkpok_dl.hpp:
 
 /usr/include/c++/11/bits/unordered_map.h:
 
@@ -329,6 +327,8 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
 /usr/include/c++/11/bits/cxxabi_forced.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
+../src/nizk/nizkpok_dl.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
 
@@ -477,6 +477,10 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
 /usr/include/c++/11/bits/stl_function.h:
 
 /usr/include/c++/11/bits/memoryfwd.h:
+
+/usr/include/openssl/core_dispatch.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/time_t.h:
 
@@ -730,13 +734,7 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
 
 /usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
-/usr/include/openssl/core_dispatch.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
-../src/qclpvss_utils.hpp:
-
-/usr/include/openssl/stack.h:
+../src/utils/qclpvss_utils.hpp:
 
 /usr/include/c++/11/bits/uniform_int_dist.h:
 
@@ -807,6 +805,8 @@ tests/CMakeFiles/qclpvss_test.dir/qclpvss_test.cpp.o: ../tests/qclpvss_test.cpp 
 /usr/include/openssl/types.h:
 
 /usr/include/openssl/safestack.h:
+
+/usr/include/openssl/stack.h:
 
 /usr/include/c++/11/stdlib.h:
 

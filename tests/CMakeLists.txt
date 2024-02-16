@@ -1,17 +1,21 @@
-add_custom_target (benchs_build COMMAND ${CMAKE_COMMAND} -E sleep 0)
-add_custom_target (benchs COMMAND ${CMAKE_COMMAND} -E sleep 0)
-add_dependencies (benchs benchs_build)
+include (CTest)
+if ("${CMAKE_GENERATOR}" STREQUAL "Unix Makefiles")
+  set (_cmd ${CMAKE_CTEST_COMMAND} --output-on-failure $(ARGS))
+else ()
+  set (_cmd ${CMAKE_CTEST_COMMAND} --output-on-failure)
+endif ()
+add_custom_target (tests COMMAND ${_cmd} COMMENT "Running the tests")
 
-### List of benchmarks
-set (BENCHS_LIST qclpvss_test
-                 )
+### List of tests
+set (TESTS_LIST qclpvss_test
+                )
 
 ### Automatically create target and test from TESTS_LIST
-foreach (bench ${BENCHS_LIST})
-  add_executable (${bench}_build ${bench}.cpp)
-  set_target_properties (${bench}_build PROPERTIES OUTPUT_NAME ${bench})
-  target_link_libraries (${bench}_build bicycl project)
-  add_custom_target (${bench} COMMAND ${bench}_build COMMENT "Running ${bench}")
-  add_dependencies (benchs_build ${bench}_build)
-  add_dependencies (benchs ${bench})
+foreach (test ${TESTS_LIST})
+  # /!\ The test and the target building the executable have the same name
+  add_executable (${test} ${test}.cpp)
+  target_link_libraries (${test} PUBLIC bicycl project)
+  add_dependencies (tests ${test})
+  add_test (NAME ${test} COMMAND ${test}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach ()

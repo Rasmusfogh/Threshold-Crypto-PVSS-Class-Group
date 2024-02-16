@@ -130,29 +130,29 @@ project/fast:
 	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/build
 .PHONY : project/fast
 
-nizkpok_dl.o: nizkpok_dl.cpp.o
-.PHONY : nizkpok_dl.o
+nizk/nizkpok_dl.o: nizk/nizkpok_dl.cpp.o
+.PHONY : nizk/nizkpok_dl.o
 
 # target to build an object file
-nizkpok_dl.cpp.o:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizkpok_dl.cpp.o
-.PHONY : nizkpok_dl.cpp.o
+nizk/nizkpok_dl.cpp.o:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o
+.PHONY : nizk/nizkpok_dl.cpp.o
 
-nizkpok_dl.i: nizkpok_dl.cpp.i
-.PHONY : nizkpok_dl.i
+nizk/nizkpok_dl.i: nizk/nizkpok_dl.cpp.i
+.PHONY : nizk/nizkpok_dl.i
 
 # target to preprocess a source file
-nizkpok_dl.cpp.i:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizkpok_dl.cpp.i
-.PHONY : nizkpok_dl.cpp.i
+nizk/nizkpok_dl.cpp.i:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.i
+.PHONY : nizk/nizkpok_dl.cpp.i
 
-nizkpok_dl.s: nizkpok_dl.cpp.s
-.PHONY : nizkpok_dl.s
+nizk/nizkpok_dl.s: nizk/nizkpok_dl.cpp.s
+.PHONY : nizk/nizkpok_dl.s
 
 # target to generate assembly for a file
-nizkpok_dl.cpp.s:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizkpok_dl.cpp.s
-.PHONY : nizkpok_dl.cpp.s
+nizk/nizkpok_dl.cpp.s:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.s
+.PHONY : nizk/nizkpok_dl.cpp.s
 
 qclpvss.o: qclpvss.cpp.o
 .PHONY : qclpvss.o
@@ -178,29 +178,29 @@ qclpvss.cpp.s:
 	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/qclpvss.cpp.s
 .PHONY : qclpvss.cpp.s
 
-qclpvss_utils.o: qclpvss_utils.cpp.o
-.PHONY : qclpvss_utils.o
+utils/qclpvss_utils.o: utils/qclpvss_utils.cpp.o
+.PHONY : utils/qclpvss_utils.o
 
 # target to build an object file
-qclpvss_utils.cpp.o:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/qclpvss_utils.cpp.o
-.PHONY : qclpvss_utils.cpp.o
+utils/qclpvss_utils.cpp.o:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o
+.PHONY : utils/qclpvss_utils.cpp.o
 
-qclpvss_utils.i: qclpvss_utils.cpp.i
-.PHONY : qclpvss_utils.i
+utils/qclpvss_utils.i: utils/qclpvss_utils.cpp.i
+.PHONY : utils/qclpvss_utils.i
 
 # target to preprocess a source file
-qclpvss_utils.cpp.i:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/qclpvss_utils.cpp.i
-.PHONY : qclpvss_utils.cpp.i
+utils/qclpvss_utils.cpp.i:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.i
+.PHONY : utils/qclpvss_utils.cpp.i
 
-qclpvss_utils.s: qclpvss_utils.cpp.s
-.PHONY : qclpvss_utils.s
+utils/qclpvss_utils.s: utils/qclpvss_utils.cpp.s
+.PHONY : utils/qclpvss_utils.s
 
 # target to generate assembly for a file
-qclpvss_utils.cpp.s:
-	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/qclpvss_utils.cpp.s
-.PHONY : qclpvss_utils.cpp.s
+utils/qclpvss_utils.cpp.s:
+	cd /home/rasmus/thesis/repos/qclpvss/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/project.dir/build.make src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.s
+.PHONY : utils/qclpvss_utils.cpp.s
 
 # Help Target
 help:
@@ -211,15 +211,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... project"
-	@echo "... nizkpok_dl.o"
-	@echo "... nizkpok_dl.i"
-	@echo "... nizkpok_dl.s"
+	@echo "... nizk/nizkpok_dl.o"
+	@echo "... nizk/nizkpok_dl.i"
+	@echo "... nizk/nizkpok_dl.s"
 	@echo "... qclpvss.o"
 	@echo "... qclpvss.i"
 	@echo "... qclpvss.s"
-	@echo "... qclpvss_utils.o"
-	@echo "... qclpvss_utils.i"
-	@echo "... qclpvss_utils.s"
+	@echo "... utils/qclpvss_utils.o"
+	@echo "... utils/qclpvss_utils.i"
+	@echo "... utils/qclpvss_utils.s"
 .PHONY : help
 
 

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/rasmus/thesis/repos/qclpvss/src -I/home/rasmus/thesis/repos/qclpvss/lib/include
+CXX_INCLUDES = -I/home/rasmus/thesis/repos/qclpvss/src -I/home/rasmus/thesis/repos/qclpvss/src/utils -I/home/rasmus/thesis/repos/qclpvss/src/nizk -I/home/rasmus/thesis/repos/qclpvss/lib/include
 
 CXX_FLAGS = -std=gnu++11
 

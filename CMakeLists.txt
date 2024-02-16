@@ -37,5 +37,6 @@ add_subdirectory(lib/include)
 # Add your own source code in the "src" folder
 add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(benchmarks)
 
 # Add any additional targets or configurations here if needed

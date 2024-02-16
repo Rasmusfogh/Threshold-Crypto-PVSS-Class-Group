@@ -1,8 +1,8 @@
 # Set the source files for your project in the "src" folder
 set(SRC_SOURCE_FILES
     qclpvss.cpp
-    qclpvss_utils.cpp 
-    nizkpok_dl.cpp
+    utils/qclpvss_utils.cpp 
+    nizk/nizkpok_dl.cpp
     # Add all your source files here
 )
 
@@ -14,7 +14,9 @@ target_link_libraries(project PUBLIC bicycl)
 
 # Optionally, specify any include directories needed for your project
 target_include_directories(project PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/nizk)
 
 # Optionally, specify any additional compiler options or flags
 # target_compile_options(project PRIVATE ...)

@@ -1,6 +1,4 @@
 #include "qclpvss.hpp"
-#include "qclpvss_utils.hpp"
-#include "nizkpok_dl.hpp"
 
 using namespace QCLPVSS_;
 using namespace NIZKPOK_DL_;
@@ -37,10 +35,14 @@ PublicKey QCLPVSS::keyGen(const SecretKey &sk) const
 
 NizkPoK_DL QCLPVSS::keyGen(RandGen &randgen, const PublicKey &pk, const SecretKey & sk) const
 {
-  return NizkPoK_DL(hash_, randgen, this->cl_hsmqk_, pk, sk);
+  return NizkPoK_DL(hash_, randgen, this->cl_hsmqk_, lambda(), pk, sk);
 }
 
 bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const 
 {
   return pf.Verify(this->cl_hsmqk_, pk);
+}
+
+const SecLevel & QCLPVSS::lambda() const {
+  return seclevel_;
 }

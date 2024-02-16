@@ -83,46 +83,46 @@ src/CMakeFiles/project.dir/qclpvss.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/project.dir/qclpvss.cpp.s"
 	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rasmus/thesis/repos/qclpvss/src/qclpvss.cpp -o CMakeFiles/project.dir/qclpvss.cpp.s
 
-src/CMakeFiles/project.dir/qclpvss_utils.cpp.o: src/CMakeFiles/project.dir/flags.make
-src/CMakeFiles/project.dir/qclpvss_utils.cpp.o: ../src/qclpvss_utils.cpp
-src/CMakeFiles/project.dir/qclpvss_utils.cpp.o: src/CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rasmus/thesis/repos/qclpvss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/project.dir/qclpvss_utils.cpp.o"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/project.dir/qclpvss_utils.cpp.o -MF CMakeFiles/project.dir/qclpvss_utils.cpp.o.d -o CMakeFiles/project.dir/qclpvss_utils.cpp.o -c /home/rasmus/thesis/repos/qclpvss/src/qclpvss_utils.cpp
+src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o: src/CMakeFiles/project.dir/flags.make
+src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o: ../src/utils/qclpvss_utils.cpp
+src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o: src/CMakeFiles/project.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rasmus/thesis/repos/qclpvss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o -MF CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o.d -o CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o -c /home/rasmus/thesis/repos/qclpvss/src/utils/qclpvss_utils.cpp
 
-src/CMakeFiles/project.dir/qclpvss_utils.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/project.dir/qclpvss_utils.cpp.i"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rasmus/thesis/repos/qclpvss/src/qclpvss_utils.cpp > CMakeFiles/project.dir/qclpvss_utils.cpp.i
+src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/project.dir/utils/qclpvss_utils.cpp.i"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rasmus/thesis/repos/qclpvss/src/utils/qclpvss_utils.cpp > CMakeFiles/project.dir/utils/qclpvss_utils.cpp.i
 
-src/CMakeFiles/project.dir/qclpvss_utils.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/project.dir/qclpvss_utils.cpp.s"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rasmus/thesis/repos/qclpvss/src/qclpvss_utils.cpp -o CMakeFiles/project.dir/qclpvss_utils.cpp.s
+src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/project.dir/utils/qclpvss_utils.cpp.s"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rasmus/thesis/repos/qclpvss/src/utils/qclpvss_utils.cpp -o CMakeFiles/project.dir/utils/qclpvss_utils.cpp.s
 
-src/CMakeFiles/project.dir/nizkpok_dl.cpp.o: src/CMakeFiles/project.dir/flags.make
-src/CMakeFiles/project.dir/nizkpok_dl.cpp.o: ../src/nizkpok_dl.cpp
-src/CMakeFiles/project.dir/nizkpok_dl.cpp.o: src/CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rasmus/thesis/repos/qclpvss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/project.dir/nizkpok_dl.cpp.o"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/project.dir/nizkpok_dl.cpp.o -MF CMakeFiles/project.dir/nizkpok_dl.cpp.o.d -o CMakeFiles/project.dir/nizkpok_dl.cpp.o -c /home/rasmus/thesis/repos/qclpvss/src/nizkpok_dl.cpp
+src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o: src/CMakeFiles/project.dir/flags.make
+src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o: ../src/nizk/nizkpok_dl.cpp
+src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o: src/CMakeFiles/project.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rasmus/thesis/repos/qclpvss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o -MF CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o.d -o CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o -c /home/rasmus/thesis/repos/qclpvss/src/nizk/nizkpok_dl.cpp
 
-src/CMakeFiles/project.dir/nizkpok_dl.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/project.dir/nizkpok_dl.cpp.i"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rasmus/thesis/repos/qclpvss/src/nizkpok_dl.cpp > CMakeFiles/project.dir/nizkpok_dl.cpp.i
+src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.i"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rasmus/thesis/repos/qclpvss/src/nizk/nizkpok_dl.cpp > CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.i
 
-src/CMakeFiles/project.dir/nizkpok_dl.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/project.dir/nizkpok_dl.cpp.s"
-	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rasmus/thesis/repos/qclpvss/src/nizkpok_dl.cpp -o CMakeFiles/project.dir/nizkpok_dl.cpp.s
+src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.s"
+	cd /home/rasmus/thesis/repos/qclpvss/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rasmus/thesis/repos/qclpvss/src/nizk/nizkpok_dl.cpp -o CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.s
 
 # Object files for target project
 project_OBJECTS = \
 "CMakeFiles/project.dir/qclpvss.cpp.o" \
-"CMakeFiles/project.dir/qclpvss_utils.cpp.o" \
-"CMakeFiles/project.dir/nizkpok_dl.cpp.o"
+"CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o" \
+"CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o"
 
 # External object files for target project
 project_EXTERNAL_OBJECTS =
 
 src/libproject.a: src/CMakeFiles/project.dir/qclpvss.cpp.o
-src/libproject.a: src/CMakeFiles/project.dir/qclpvss_utils.cpp.o
-src/libproject.a: src/CMakeFiles/project.dir/nizkpok_dl.cpp.o
+src/libproject.a: src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o
+src/libproject.a: src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o
 src/libproject.a: src/CMakeFiles/project.dir/build.make
 src/libproject.a: src/CMakeFiles/project.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/rasmus/thesis/repos/qclpvss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libproject.a"

@@ -47,6 +47,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/rasmus/thesis/repos/qclpvss/build/lib/include/cmake_install.cmake")
   include("/home/rasmus/thesis/repos/qclpvss/build/src/cmake_install.cmake")
   include("/home/rasmus/thesis/repos/qclpvss/build/tests/cmake_install.cmake")
+  include("/home/rasmus/thesis/repos/qclpvss/build/benchmarks/cmake_install.cmake")
 
 endif()
 

@@ -2,7 +2,7 @@ src/CMakeFiles/project.dir/qclpvss.cpp.o: \
  /home/rasmus/thesis/repos/qclpvss/src/qclpvss.cpp \
  /usr/include/stdc-predef.h \
  /home/rasmus/thesis/repos/qclpvss/src/qclpvss.hpp \
- /home/rasmus/thesis/repos/qclpvss/src/qclpvss_utils.hpp \
+ /home/rasmus/thesis/repos/qclpvss/src/utils/qclpvss_utils.hpp \
  /home/rasmus/thesis/repos/qclpvss/lib/include/bicycl.hpp \
  /home/rasmus/thesis/repos/qclpvss/lib/include/bicycl/gmp_extras.hpp \
  /usr/include/x86_64-linux-gnu/gmp.h /usr/include/c++/11/iosfwd \
@@ -224,4 +224,4 @@ src/CMakeFiles/project.dir/qclpvss.cpp.o: \
  /home/rasmus/thesis/repos/qclpvss/lib/include/bicycl/CL_HSMqk.hpp \
  /home/rasmus/thesis/repos/qclpvss/lib/include/bicycl/threshold_ECDSA.inl \
  /home/rasmus/thesis/repos/qclpvss/lib/include/bicycl/seclevel.inl \
- /home/rasmus/thesis/repos/qclpvss/src/nizkpok_dl.hpp
+ /home/rasmus/thesis/repos/qclpvss/src/nizk/nizkpok_dl.hpp

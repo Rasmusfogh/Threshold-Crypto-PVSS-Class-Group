@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/rasmus/thesis/repos/qclpvss/src/nizkpok_dl.cpp" "src/CMakeFiles/project.dir/nizkpok_dl.cpp.o" "gcc" "src/CMakeFiles/project.dir/nizkpok_dl.cpp.o.d"
+  "/home/rasmus/thesis/repos/qclpvss/src/nizk/nizkpok_dl.cpp" "src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o" "gcc" "src/CMakeFiles/project.dir/nizk/nizkpok_dl.cpp.o.d"
   "/home/rasmus/thesis/repos/qclpvss/src/qclpvss.cpp" "src/CMakeFiles/project.dir/qclpvss.cpp.o" "gcc" "src/CMakeFiles/project.dir/qclpvss.cpp.o.d"
-  "/home/rasmus/thesis/repos/qclpvss/src/qclpvss_utils.cpp" "src/CMakeFiles/project.dir/qclpvss_utils.cpp.o" "gcc" "src/CMakeFiles/project.dir/qclpvss_utils.cpp.o.d"
+  "/home/rasmus/thesis/repos/qclpvss/src/utils/qclpvss_utils.cpp" "src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o" "gcc" "src/CMakeFiles/project.dir/utils/qclpvss_utils.cpp.o.d"
   )
 
 # Targets to which this target links.

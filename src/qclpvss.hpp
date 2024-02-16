@@ -2,7 +2,7 @@
 #define QCLPVSS__
 
 #include "qclpvss_utils.hpp"
-#include "nizkpok_dl.hpp"
+#include "nizk/nizkpok_dl.hpp"
 
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -60,6 +60,8 @@ namespace QCLPVSS_
         //Reconstruction Verification
         void verifyDec();
         /**@}*/
+
+        const SecLevel & lambda() const;
     };
 }
 
