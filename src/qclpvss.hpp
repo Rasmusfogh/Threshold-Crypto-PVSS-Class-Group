@@ -1,6 +1,7 @@
 #ifndef QCLPVSS__
 #define QCLPVSS__
 
+#include <iostream>
 #include "qclpvss_utils.hpp"
 #include "nizk/nizkpok_dl.hpp"
 
@@ -19,11 +20,11 @@ namespace QCLPVSS_
         SecLevel seclevel_;
 
         /** number of parties. n + k <= q*/
-        size_t n_;
+        const size_t n_;
         /** privacy threshold. k + t <= n*/
-        size_t t_;
+        const size_t t_;
 
-        Mpz q_;
+        const Mpz q_;
 
         /** random number functions to generate random alphas [1...n] and betas [1...k] */
         /** OBS! Make sure default seed is not fixed, otherwise set seed somewhere*/
@@ -36,7 +37,7 @@ namespace QCLPVSS_
 
         /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of secret, @p t: privacy threshhold, @p n: number of parties  */
         QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen &alphas, RandGen &betas, 
-        Mpz &q, size_t k, size_t n, size_t t, bool compact_variant);
+        Mpz &q, const size_t k, const size_t n, const size_t t, bool compact_variant);
 
 
         /** @name Cryptographic functionalities 

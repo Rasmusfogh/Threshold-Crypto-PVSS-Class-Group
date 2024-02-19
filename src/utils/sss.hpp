@@ -14,13 +14,13 @@ namespace SSS_
         RandGen& randgen_;
 
         public:
-        size_t k_; //degree / threshold
-        size_t n_; //number of parties
-        Mpz q_; //modulo
+        const size_t k_; //degree / threshold
+        const size_t n_; //number of parties
+        const Mpz q_; //modulo
 
         SSS(RandGen &randgen, const size_t t, const size_t n, const Mpz&q);
-        const std::vector<Mpz> & shareSecret(const Mpz& s) const;
-        const Mpz & reconstructSecret(const std::vector<Mpz>& shares) const;
+        void shareSecret(const Mpz& s, std::vector<Mpz>& shares) const;
+        const Mpz & reconstructSecret(std::vector<Mpz>& shares, Mpz &s) const;
 
         private:
         void generatePolynomial(const Mpz & s, std::vector<Mpz>& coefficients) const;

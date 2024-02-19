@@ -1,7 +1,8 @@
 # Set the source files for your project in the "src" folder
 set(SRC_SOURCE_FILES
     qclpvss.cpp
-    utils/qclpvss_utils.cpp 
+    utils/qclpvss_utils.cpp
+    utils/sss.cpp
     nizk/nizkpok_dl.cpp
     # Add all your source files here
 )

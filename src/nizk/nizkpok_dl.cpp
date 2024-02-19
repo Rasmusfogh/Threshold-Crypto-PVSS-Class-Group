@@ -20,7 +20,7 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm
     // //Could be parallelized I think
     for(size_t i = 0; i < h_.digest_nbits(); i++) {
         // r = [1 ... A_]
-        Mpz::add(r[i], randgen.random_mpz(A_), Mpz(1UL));
+        r[i] = randgen.random_mpz(A_);
         cl_hsm.power_of_h(t[i], r[i]);
 
         b_[i] = h_(cl_hsm.h().a(), cl_hsm.h().b(), cl_hsm.h().c(), 

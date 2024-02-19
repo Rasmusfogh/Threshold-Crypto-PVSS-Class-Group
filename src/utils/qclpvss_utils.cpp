@@ -10,14 +10,8 @@ using namespace BICYCL;
  * preliminary of paper XXX.
 */
 SecretKey::SecretKey(const CL_HSMqk &cl_hsm, RandGen &r) 
-  : Mpz(shiftDistBy1(r.random_mpz(cl_hsm.secretkey_bound())))
+  : Mpz(r.random_mpz(cl_hsm.secretkey_bound()))
 { }
-
-Mpz SecretKey::shiftDistBy1(const Mpz &m) {
-  Mpz r;
-  Mpz::add(r, m, 1UL);
-  return r;
-}
 
 
 PublicKey::PublicKey(const CL_HSMqk &cl_hsm, const SecretKey &sk)

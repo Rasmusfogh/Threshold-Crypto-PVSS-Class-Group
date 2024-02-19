@@ -9,7 +9,7 @@ using namespace BICYCL;
 using namespace OpenSSL;
 
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen &alphas, RandGen &betas, 
-    Mpz &q, size_t k, size_t n, size_t t, bool compact_variant) :
+    Mpz &q, const size_t k, const size_t n, const size_t t, bool compact_variant) :
       cl_hsmqk_(CL_HSMqk (q, k, seclevel, alphas, compact_variant)),
       seclevel_(seclevel),
       alphas_(alphas),
@@ -48,9 +48,11 @@ bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const
 
 void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const 
 {
+  std::vector<Mpz> shares(n_);
   SSS shamir(randgen, t_, n_, q_);
-  const std::vector<Mpz>& shares = shamir.shareSecret(s); //figure out how to...
+  shamir.shareSecret(s, shares); //figure out how
 }
+
 
 const SecLevel & QCLPVSS::lambda() const {
   return seclevel_;

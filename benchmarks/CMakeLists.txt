@@ -3,8 +3,8 @@ add_custom_target (benchs COMMAND ${CMAKE_COMMAND} -E sleep 0)
 add_dependencies (benchs benchs_build)
 
 ### List of benchmarks
-set (BENCHS_LIST benchmark_qclpvss
-                 )
+set ( BENCHS_LIST #benchmark_qclpvss
+                 benchmark_sss)
 
 ### Automatically create target and test from TESTS_LIST
 foreach (bench ${BENCHS_LIST})
