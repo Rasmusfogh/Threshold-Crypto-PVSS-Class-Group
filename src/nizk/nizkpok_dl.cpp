@@ -17,9 +17,6 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm
     std::vector<Mpz> r(h_.digest_nbits());
     std::vector<QFI> t(h_.digest_nbits());
 
-    //TODO set value of A_, maybe in member initialization list
-
-
     // //Could be parallelized I think
     for(size_t i = 0; i < h_.digest_nbits(); i++) {
         // r = [1 ... A_]

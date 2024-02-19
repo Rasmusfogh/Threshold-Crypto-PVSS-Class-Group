@@ -1,7 +1,9 @@
 #include "qclpvss.hpp"
+#include "utils/sss.hpp"
 
 using namespace QCLPVSS_;
 using namespace NIZKPOK_DL_;
+using namespace SSS_;
 using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -14,7 +16,8 @@ QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen &alphas, RandGen &b
       betas_(betas),
       hash_(hash),
       n_(n),
-      t_(t)    
+      t_(t),
+      q_(q)    
 {
   /* Checks */
   if (Mpz(n + k) > q)
@@ -41,6 +44,12 @@ NizkPoK_DL QCLPVSS::keyGen(RandGen &randgen, const PublicKey &pk, const SecretKe
 bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const 
 {
   return pf.Verify(this->cl_hsmqk_, pk);
+}
+
+void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const 
+{
+  SSS shamir(randgen, t_, n_, q_);
+  const std::vector<Mpz>& shares = shamir.shareSecret(s); //figure out how to...
 }
 
 const SecLevel & QCLPVSS::lambda() const {

@@ -23,6 +23,8 @@ namespace QCLPVSS_
         /** privacy threshold. k + t <= n*/
         size_t t_;
 
+        Mpz q_;
+
         /** random number functions to generate random alphas [1...n] and betas [1...k] */
         /** OBS! Make sure default seed is not fixed, otherwise set seed somewhere*/
         RandGen alphas_;
@@ -48,7 +50,7 @@ namespace QCLPVSS_
         bool verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const;
 
         //Distribution
-        void dist();
+        void dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const;
 
         //Distribution Verification
         void verifySharing();
