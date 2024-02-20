@@ -3,12 +3,6 @@
 using namespace UTILS;
 using namespace BICYCL;
 
-/**
- * shiftDistBy1 is used as the randomness sampled in random_mpz is in 
- * the range [0 ... secretkey_bound() - 1]. We need the
- * randomness to be [1 ... secretkey_bound()] as stated in
- * preliminary of paper XXX.
-*/
 SecretKey::SecretKey(const CL_HSMqk &cl_hsm, RandGen &r) 
   : Mpz(r.random_mpz(cl_hsm.secretkey_bound()))
 { }

@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
     shamir.reconstructSecret(shares, s_);
 
     if (s == s_)
-        return 0;
+        return EXIT_SUCCESS;
 
-    return 1;
+    return EXIT_FAILURE;
 }

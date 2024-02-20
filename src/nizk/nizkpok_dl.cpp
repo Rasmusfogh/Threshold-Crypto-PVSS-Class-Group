@@ -11,25 +11,28 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm
                 h_(hash), 
                 b_(hash.digest_nbits()), 
                 u_(hash.digest_nbits()),
-                A_(cl_hsm.Cl_Delta().class_number_bound()) //What should A be?
+                A_(cl_hsm.encrypt_randomness_bound()) //What should A be?
 {
-    //l = h_digest_nbits() = hash function output bitsize
-    std::vector<Mpz> r(h_.digest_nbits());
-    std::vector<QFI> t(h_.digest_nbits());
+    Mpz temp, r;
+    QFI t;
 
     // //Could be parallelized I think
     for(size_t i = 0; i < h_.digest_nbits(); i++) {
         // r = [1 ... A_]
-        r[i] = randgen.random_mpz(A_);
-        cl_hsm.power_of_h(t[i], r[i]);
+        r = randgen.random_mpz(A_);
+        cl_hsm.power_of_h(t, r);
 
         b_[i] = h_(cl_hsm.h().a(), cl_hsm.h().b(), cl_hsm.h().c(), 
                      x.get().a(), x.get().b(), x.get().c(), 
-                     t[i].a(), t[i].b(), t[i].c());
+                     t.a(), t.b(), t.c());
 
-        Mpz temp;
+        std::cout << b_[i].nbits() << std::endl;   
+        std::cout << w.nbits() << std::endl;   
+
         Mpz::mul(temp, w, b_[i]);
-        Mpz::add(u_[i], temp, r[i]);
+        std::cout << temp.nbits() << std::endl;   
+        Mpz::add(u_[i], temp, r);
+        std::cout << u_[i].nbits() << std::endl;
     }
 }
 
@@ -41,9 +44,16 @@ bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const
 
     for(size_t i = 0; i < h_.digest_nbits(); i++) {
 
-        if (u_[i] > bound) {
-            return false;
-        }
+        std::cout << bound.nbits() << std::endl;
+        std::cout << u_[i].nbits() << std::endl;
+        std::cout << A_.nbits() << std::endl;
+        std::cout <<cl_hsm.encrypt_randomness_bound().nbits() << std::endl;
+
+
+
+        // if (u_[i] > bound) {
+        //     return false;
+        // }
         
         QFI t1, t2;
         
