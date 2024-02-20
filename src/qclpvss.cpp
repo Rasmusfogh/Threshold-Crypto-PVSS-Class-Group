@@ -46,11 +46,28 @@ bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const
   return pf.Verify(this->cl_hsmqk_, pk);
 }
 
-void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const 
+const vector<Share>& QCLPVSS::dist(RandGen &randgen, const Mpz &s) const 
 {
   vector<Share> shares(n_);
   SSS shamir(randgen, t_, n_, q_);
-  shamir.shareSecret(s, shares); //figure out how
+  shamir.shareSecret(s, shares);
+
+  return shares;
+}
+
+void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Share& share) const 
+{
+  QFI R, f, pkr, B;
+
+  Mpz r(randgen.random_mpz(cl_hsmqk_.secretkey_bound()));
+  cl_hsmqk_.power_of_h(R, r);
+  f = cl_hsmqk_.power_of_f(share.y());
+  pk.exponentiation(cl_hsmqk_, pkr, r);
+
+  //Could just put it into pkr or f instead of B. Just for the understanding of things
+  cl_hsmqk_.Cl_Delta().nucomp(B, pkr, f);
+
+  //Time for sharing proof!
 }
 
 

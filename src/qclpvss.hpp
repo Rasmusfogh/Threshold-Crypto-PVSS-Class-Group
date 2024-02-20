@@ -2,13 +2,16 @@
 #define QCLPVSS__
 
 #include <iostream>
-#include "qclpvss_utils.hpp"
+#include "utils/qclpvss_utils.hpp"
+#include "utils/sss.hpp"
 #include "nizk/nizkpok_dl.hpp"
 
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace UTILS;
 using namespace NIZKPOK_DL_;
+using namespace std;
+using namespace SSS_;
 
 namespace QCLPVSS_
 {   
@@ -51,7 +54,8 @@ namespace QCLPVSS_
         bool verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const;
 
         //Distribution
-        void dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const;
+        const vector<Share>& dist(RandGen &randgen, const Mpz &s) const;
+        void dist(RandGen&, const PublicKey&, const Share&) const;
 
         //Distribution Verification
         void verifySharing();
