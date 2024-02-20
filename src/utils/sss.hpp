@@ -5,6 +5,7 @@
 #include "bicycl.hpp"
 
 using namespace BICYCL;
+using namespace std;
 
 namespace SSS_
 {
@@ -19,12 +20,12 @@ namespace SSS_
         const Mpz q_; //modulo
 
         SSS(RandGen &randgen, const size_t t, const size_t n, const Mpz&q);
-        void shareSecret(const Mpz& s, std::vector<Mpz>& shares) const;
-        const Mpz & reconstructSecret(std::vector<Mpz>& shares, Mpz &s) const;
+        void shareSecret(const Mpz& s, vector<tuple<unsigned long, Mpz>>& shares) const;
+        const Mpz & reconstructSecret(vector<tuple<unsigned long, Mpz>>& shares, Mpz &s) const;
 
         private:
-        void generatePolynomial(const Mpz & s, std::vector<Mpz>& coefficients) const;
-        void evaluatePolynomial(size_t x, const std::vector<Mpz>& coefficients, Mpz & share) const;
+        void generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const;
+        void evaluatePolynomial(size_t x, const vector<Mpz>& coefficients, tuple<unsigned long, Mpz>& share) const;
         const size_t & degree() const;
         const size_t & parties() const;
     };

@@ -9,8 +9,8 @@ int main (int argc, char *argv[])
 {
     Mpz seed;
     RandGen randgen;
-    size_t t_ = 7;
-    size_t n_ = 15;
+    size_t t_ = 3;
+    size_t n_ = 6;
 
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
@@ -19,18 +19,21 @@ int main (int argc, char *argv[])
     std::cout << "# Using seed = " << seed << std::endl;
     randgen.set_seed (seed);
 
-    Mpz q_(randgen.random_prime(64));
+    Mpz q_(randgen.random_prime(32));
     Mpz s(123UL);
 
-    std::vector<Mpz> shares(n_);
+    std::vector<tuple<unsigned long, Mpz>> shares(n_);
     Mpz s_;
 
     SSS shamir(randgen, t_, n_, q_);
     shamir.shareSecret(s, shares); //figure out how
-    shamir.reconstructSecret(shares, s_);
+
+    std::vector<tuple< unsigned long, Mpz>> ss{shares[1], shares[3], shares[4]};
+
+    shamir.reconstructSecret(ss, s_);
 
     if (s == s_)
-        std::cout << "equal!" << std::endl;
+        return 0;
 
-    return 0;
+    return 1;
 }
