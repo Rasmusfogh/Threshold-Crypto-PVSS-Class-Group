@@ -48,7 +48,7 @@ bool QCLPVSS::verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const
 
 void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Mpz &s) const 
 {
-  vector<tuple<unsigned long, Mpz>> shares(n_);
+  vector<Share> shares(n_);
   SSS shamir(randgen, t_, n_, q_);
   shamir.shareSecret(s, shares); //figure out how
 }
