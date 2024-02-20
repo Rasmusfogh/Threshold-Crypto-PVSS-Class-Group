@@ -1,5 +1,5 @@
-#ifndef NIZKPOK_DL_HPP__
-#define NIZKPOK_DL_HPP__
+#ifndef NIZK_SH_HPP__
+#define NIZK_SH_HPP__
 
 #include "qclpvss_utils.hpp"
 #include "bicycl.hpp"
@@ -8,9 +8,9 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
-namespace NIZKPOK_DL_
+namespace NIZK_SH
 {
-    class NizkPoK_DL {
+    class Nizk_SH {
 
         protected:
         Mpz A_;
@@ -19,12 +19,11 @@ namespace NIZKPOK_DL_
 
         public:
 
-        NizkPoK_DL(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
+        Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
             const SecLevel & seclevel, const PublicKey &x, const SecretKey &w);
 
         bool Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const;
     };
-
 }
 
 #endif

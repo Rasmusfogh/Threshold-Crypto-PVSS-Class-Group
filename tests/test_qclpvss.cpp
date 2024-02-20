@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
     size_t n(8);
     size_t t(5);
 
-    QCLPVSS pvss(seclevel, H, randgen, randgen, q, k, n, t, compact_variant);
+    QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
 
     std::cout << pvss.cl_hsmqk_;
 

@@ -29,18 +29,14 @@ namespace QCLPVSS_
 
         const Mpz q_;
 
-        /** random number functions to generate random alphas [1...n] and betas [1...k] */
-        /** OBS! Make sure default seed is not fixed, otherwise set seed somewhere*/
-        RandGen alphas_;
-        RandGen betas_;
-
         HashAlgo & hash_;
+        RandGen & randgen_;
 
         public:
 
         /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of secret, @p t: privacy threshhold, @p n: number of parties  */
-        QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen &alphas, RandGen &betas, 
-        Mpz &q, const size_t k, const size_t n, const size_t t, bool compact_variant);
+        QCLPVSS (SecLevel, HashAlgo &, RandGen&, Mpz &q, const size_t k,
+             const size_t n, const size_t t, bool compact_variant);
 
 
         /** @name Cryptographic functionalities 

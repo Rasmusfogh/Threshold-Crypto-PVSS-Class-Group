@@ -8,12 +8,11 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
-QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen &alphas, RandGen &betas, 
-    Mpz &q, const size_t k, const size_t n, const size_t t, bool compact_variant) :
-      cl_hsmqk_(CL_HSMqk (q, k, seclevel, alphas, compact_variant)),
+QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
+  const size_t n, const size_t t, bool compact_variant) :
+      cl_hsmqk_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
       seclevel_(seclevel),
-      alphas_(alphas),
-      betas_(betas),
+      randgen_(randgen),
       hash_(hash),
       n_(n),
       t_(t),
