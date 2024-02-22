@@ -15,7 +15,8 @@ namespace NIZKPOK_DL_
         protected:
         Mpz A_;
         HashAlgo & h_;
-        std::vector<Mpz> b_, u_;
+        static const size_t rounds_ = 40;
+        std::array<Mpz, rounds_> b_, u_;
 
         public:
 

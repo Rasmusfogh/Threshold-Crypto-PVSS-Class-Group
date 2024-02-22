@@ -7,17 +7,16 @@ using namespace NIZKPOK_DL_;
 
 
 NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
-                const SecLevel & seclevel, const PublicKey &x, const SecretKey &w) : 
-                h_(hash), 
-                b_(hash.digest_nbits()), 
-                u_(hash.digest_nbits()),
-                A_(cl_hsm.encrypt_randomness_bound()) //What should A be?
+    const SecLevel & seclevel, const PublicKey &x, const SecretKey &w) : h_(hash)
 {
+    //Compute boundary to be
+    Mpz::mul(A_, cl_hsm.encrypt_randomness_bound(), cl_hsm.encrypt_randomness_bound());
+
     Mpz temp, r;
     QFI t;
 
     // //Could be parallelized I think
-    for(size_t i = 0; i < h_.digest_nbits(); i++) {
+    for(size_t i = 0; i < rounds_; i++) {
         // r = [1 ... A_]
         r = randgen.random_mpz(A_);
         cl_hsm.power_of_h(t, r);
@@ -26,13 +25,8 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo & hash, RandGen &randgen, const CL_HSMqk &cl_hsm
                      x.get().a(), x.get().b(), x.get().c(), 
                      t.a(), t.b(), t.c());
 
-        std::cout << b_[i].nbits() << std::endl;   
-        std::cout << w.nbits() << std::endl;   
-
         Mpz::mul(temp, w, b_[i]);
-        std::cout << temp.nbits() << std::endl;   
         Mpz::add(u_[i], temp, r);
-        std::cout << u_[i].nbits() << std::endl;
     }
 }
 
@@ -42,18 +36,10 @@ bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const
     Mpz bound;
     Mpz::add(bound, A_, cl_hsm.encrypt_randomness_bound());
 
-    for(size_t i = 0; i < h_.digest_nbits(); i++) {
+    for(size_t i = 0; i < rounds_; i++) {
 
-        std::cout << bound.nbits() << std::endl;
-        std::cout << u_[i].nbits() << std::endl;
-        std::cout << A_.nbits() << std::endl;
-        std::cout <<cl_hsm.encrypt_randomness_bound().nbits() << std::endl;
-
-
-
-        // if (u_[i] > bound) {
-        //     return false;
-        // }
+        if (u_[i] > bound)
+            return false;
         
         QFI t1, t2;
         
@@ -74,9 +60,8 @@ bool NizkPoK_DL::Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const
                     x.get().a(), x.get().b(), x.get().c(), 
                     t1.a(), t1.b(), t1.c()));
         
-        if (h != b_[i]) {
+        if (h != b_[i])
             return false;
-        }
     }
 
     return true;
