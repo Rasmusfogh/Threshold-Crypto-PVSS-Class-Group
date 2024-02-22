@@ -8,12 +8,12 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
-namespace NIZKPOK_DL_
+namespace NIZK
 {
     class NizkPoK_DL {
 
         protected:
-        Mpz A_;
+        Mpz A_, AS_;
         HashAlgo & h_;
         static const size_t rounds_ = 40;
         std::array<Mpz, rounds_> b_, u_;

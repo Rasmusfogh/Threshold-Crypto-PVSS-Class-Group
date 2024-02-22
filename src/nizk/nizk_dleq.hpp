@@ -8,7 +8,7 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
-namespace NIZK_DLEQ_
+namespace NIZK
 {
     class Nizk_DLEQ {
 

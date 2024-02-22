@@ -60,7 +60,7 @@ void SSS::generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const
 
 void SSS::evaluatePolynomial(size_t x, const vector<Mpz>& coefficients, Share& share) const 
 {
-    Mpz temp, share_val;
+    Mpz temp;
     share.first = x;
     share.second = coefficients[0];
 
@@ -69,10 +69,10 @@ void SSS::evaluatePolynomial(size_t x, const vector<Mpz>& coefficients, Share& s
     {
         Mpz::pow_mod(temp, Mpz(x), Mpz(i), q_);
         Mpz::mul(temp, temp, coefficients[i]);
-        Mpz::add(temp, share.y(), temp);
+        Mpz::add(share.second, share.second, temp);
     }
 
-    Mpz::mod(share.second, temp, q_);
+    Mpz::mod(share.second, share.second, q_);
 }
 
 const size_t & SSS::degree() const {

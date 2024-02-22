@@ -9,7 +9,8 @@ add_custom_target (tests COMMAND ${_cmd} COMMENT "Running the tests")
 ### List of tests
 set (TESTS_LIST test_qclpvss
                 test_sss
-                test_nizkpok_dl)
+                test_nizkpok_dl
+                test_randgen)
 
 ### Automatically create target and test from TESTS_LIST
 foreach (test ${TESTS_LIST})

@@ -4,6 +4,7 @@ set(SRC_SOURCE_FILES
     utils/qclpvss_utils.cpp
     utils/sss.cpp
     nizk/nizkpok_dl.cpp
+    nizk/nizk_sh.cpp
     # Add all your source files here
 )
 

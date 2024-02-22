@@ -5,11 +5,12 @@
 #include "utils/qclpvss_utils.hpp"
 #include "utils/sss.hpp"
 #include "nizk/nizkpok_dl.hpp"
+#include "nizk/nizk_sh.hpp"
 
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace UTILS;
-using namespace NIZKPOK_DL_;
+using namespace NIZK;
 using namespace std;
 using namespace SSS_;
 

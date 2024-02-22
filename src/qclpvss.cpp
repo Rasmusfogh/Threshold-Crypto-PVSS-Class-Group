@@ -1,8 +1,7 @@
 #include "qclpvss.hpp"
-#include "utils/sss.hpp"
 
 using namespace QCLPVSS_;
-using namespace NIZKPOK_DL_;
+using namespace NIZK;
 using namespace SSS_;
 using namespace UTILS;
 using namespace BICYCL;
@@ -66,7 +65,8 @@ void QCLPVSS::dist(RandGen &randgen, const PublicKey &pk, const Share& share) co
   //Could just put it into pkr or f instead of B. Just for the understanding of things
   cl_hsmqk_.Cl_Delta().nucomp(B, pkr, f);
 
-  //Time for sharing proof!
+  //Probably needs another hash function
+  Nizk_SH pf(hash_, randgen, this->cl_hsmqk_, seclevel_, pk, B, R, n_, t_, q_, share.x());
 }
 
 
