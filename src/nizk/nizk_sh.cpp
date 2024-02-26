@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <iterator>
 #include "nizk_sh.hpp"
 
 using namespace NIZK;
@@ -65,11 +67,25 @@ void Nizk_SH::randomOracle(RandGen& randgen, vector<unique_ptr<const PublicKey>>
  const QFI& R, size_t t, const Mpz& q, vector<Mpz>& coefficients) const
 {   
     //Calculate seed for the RNG
-    const Mpz seed(h_(pks[0]->get(), R, *Bs[0])); //probably doesnt work
+    const Mpz seed(h_(pks, R, Bs)); //probably doesnt work
 
     //Set seed to make coefficients deterministic
     randgen.set_seed(seed);
 
     for(size_t i = 0; i <=t; i++)
         coefficients[i] = randgen.random_mpz(q);
+}
+
+template<>
+void OpenSSL::HashAlgo::hash(const vector<unique_ptr<QFI>> &v)
+{
+    for(size_t i = 0; i < v.size(); i++)
+        hash (*v[i]);
+}
+
+template<>
+void OpenSSL::HashAlgo::hash(const vector<unique_ptr<const PublicKey>>& v)
+{
+    for(size_t i = 0; i < v.size(); i++)
+        hash (v[i]->get());
 }
