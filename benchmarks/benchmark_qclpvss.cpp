@@ -55,11 +55,11 @@ int main (int argc, char *argv[])
 
     std::cout << pvss.cl_hsmqk_;
 
-    SecretKey sk = pvss.keyGen(randgen);
-    PublicKey pk = pvss.keyGen(sk);
-    NizkPoK_DL pf = pvss.keyGen(randgen, pk, sk);
+    // SecretKey sk = pvss.keyGen(randgen);
+    // PublicKey pk = pvss.keyGen(sk);
+    // NizkPoK_DL pf = pvss.keyGen(randgen, pk, sk);
 
-    std::cout << pvss.verifyKey(sk, pk, pf) << std::endl;
+    // std::cout << pvss.verifyKey(sk, pk, pf) << std::endl;
 
     return 0;
 }

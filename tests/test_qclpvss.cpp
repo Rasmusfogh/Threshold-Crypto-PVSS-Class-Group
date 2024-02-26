@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <memory>
 #include "../src/qclpvss.hpp"
 
 using namespace BICYCL;
@@ -48,18 +49,30 @@ int main (int argc, char *argv[])
 
     OpenSSL::HashAlgo H (seclevel);
 
-    size_t n(8);
-    size_t t(5);
+    size_t n(10UL);
+    size_t t(5UL);
 
     QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
 
     std::cout << pvss.cl_hsmqk_;
 
-    SecretKey sk = pvss.keyGen(randgen);
-    PublicKey pk = pvss.keyGen(sk);
-    NizkPoK_DL pf = pvss.keyGen(randgen, pk, sk);
+    vector<unique_ptr<const SecretKey>> sks(n);
+    vector<unique_ptr<const PublicKey>> pks(n);
+    unique_ptr<vector<unique_ptr<const Share>>> shares;
+    const Mpz s(1234UL);
 
-    std::cout << pvss.verifyKey(sk, pk, pf) << std::endl;
+    for(size_t i = 0; i < n; i++) 
+    {
+        sks[i] = pvss.keyGen(randgen);
+        pks[i] = pvss.keyGen(*sks[i]);
+        unique_ptr<NizkPoK_DL> pf = pvss.keyGen(randgen, *pks[i], *sks[i]);
+        
+        if(!pvss.verifyKey(*pks[i], move(pf)))
+            return EXIT_FAILURE;
+    }
 
-    return 0;
+    shares = pvss.dist(randgen, s);
+    pvss.dist(randgen, pks, *shares);
+
+    return EXIT_SUCCESS;
 }

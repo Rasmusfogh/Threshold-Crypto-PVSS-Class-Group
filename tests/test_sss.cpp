@@ -19,12 +19,12 @@ int main (int argc, char *argv[])
     Mpz q_(randgen.random_prime(64));
     Mpz s(1234UL);
 
-    std::vector<Share> shares(n_);
+    unique_ptr<vector<unique_ptr<const Share>>> shares;
     Mpz s_;
 
     SSS shamir(randgen, t_, n_, q_);
-    shamir.shareSecret(s, shares); //figure out how
-    shamir.reconstructSecret(shares, s_);
+    shares = shamir.shareSecret(s); //figure out how
+    shamir.reconstructSecret(*shares, s_);
 
     if (s == s_)
         return EXIT_SUCCESS;

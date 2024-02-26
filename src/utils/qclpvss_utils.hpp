@@ -2,8 +2,10 @@
 #define QCLPVSS_UTILS_HPP__
 
 #include "bicycl.hpp"
+#include <memory>
 
 using namespace BICYCL;
+using namespace std;
 
 namespace UTILS
 {
@@ -13,7 +15,6 @@ namespace UTILS
         public:
             /* constructors */
             SecretKey (const CL_HSMqk &, RandGen &);
-            Mpz shiftDistBy1(const Mpz &);
     };
 
     class PublicKey 
@@ -31,7 +32,7 @@ namespace UTILS
 
         public:
             /* constructors */
-            PublicKey (const CL_HSMqk &, const SecretKey &);
+            PublicKey (const CL_HSMqk &, const SecretKey&);
 
             /* getters */
             const QFI & get () const;

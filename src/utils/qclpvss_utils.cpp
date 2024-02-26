@@ -8,7 +8,7 @@ SecretKey::SecretKey(const CL_HSMqk &cl_hsm, RandGen &r)
 { }
 
 
-PublicKey::PublicKey(const CL_HSMqk &cl_hsm, const SecretKey &sk)
+PublicKey::PublicKey(const CL_HSMqk &cl_hsm, const SecretKey& sk)
 {
   cl_hsm.power_of_h(pk_, sk);
 

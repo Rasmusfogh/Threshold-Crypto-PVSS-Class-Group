@@ -2,6 +2,7 @@
 #define QCLPVSS__
 
 #include <iostream>
+#include <memory>
 #include "utils/qclpvss_utils.hpp"
 #include "utils/sss.hpp"
 #include "nizk/nizkpok_dl.hpp"
@@ -21,17 +22,22 @@ namespace QCLPVSS_
         public:
 
         CL_HSMqk cl_hsmqk_;
-        SecLevel seclevel_;
+        SecLevel& seclevel_;
 
         /** number of parties. n + k <= q*/
         const size_t n_;
         /** privacy threshold. k + t <= n*/
         const size_t t_;
 
-        const Mpz q_;
+        const Mpz& q_;
 
         HashAlgo & hash_;
         RandGen & randgen_;
+
+        //Public parameters in dist
+        unique_ptr<QFI> R_;
+        vector<unique_ptr<QFI>> Bs_;
+
 
         public:
 
@@ -45,14 +51,14 @@ namespace QCLPVSS_
          * */ 
 
         //Setup
-        SecretKey keyGen(RandGen &randgen) const;
-        PublicKey keyGen(const SecretKey &sk) const;
-        NizkPoK_DL keyGen(RandGen &randgen, const PublicKey &pk, const SecretKey & sk) const;
-        bool verifyKey(SecretKey &sk, PublicKey &pk, NizkPoK_DL &pf) const;
+        unique_ptr<const SecretKey> keyGen(RandGen&) const;
+        unique_ptr<const PublicKey> keyGen(const SecretKey&) const;
+        unique_ptr<NizkPoK_DL> keyGen(RandGen&, const PublicKey&, const SecretKey&) const;
+        bool verifyKey(const PublicKey&, unique_ptr<NizkPoK_DL>) const;
 
         //Distribution
-        const vector<Share>& dist(RandGen &randgen, const Mpz &s) const;
-        void dist(RandGen&, const PublicKey&, const Share&) const;
+        unique_ptr<vector<unique_ptr<const Share>>> dist(RandGen&, const Mpz &s) const;
+        void dist(RandGen&, vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
 
         //Distribution Verification
         void verifySharing();
@@ -64,8 +70,6 @@ namespace QCLPVSS_
         //Reconstruction Verification
         void verifyDec();
         /**@}*/
-
-        const SecLevel & lambda() const;
     };
 }
 

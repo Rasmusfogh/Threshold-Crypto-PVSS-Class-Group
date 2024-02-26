@@ -54,12 +54,12 @@ int main (int argc, char *argv[])
 
     CL_HSMqk cl_hsm (q, k, seclevel, randgen, compact_variant);
     SecretKey sk(cl_hsm, randgen);
-    PublicKey pk(cl_hsm, sk);
+    //PublicKey pk(cl_hsm, sk);
 
-    NizkPoK_DL pf(H, randgen, cl_hsm, seclevel, pk, sk);
+    //NizkPoK_DL pf(H, randgen, cl_hsm, seclevel, pk, sk);
 
-    if(pf.Verify(cl_hsm, pk))
-        return EXIT_SUCCESS;
+    //if(pf.verify(cl_hsm, pk))
+        //return EXIT_SUCCESS;
 
     return EXIT_FAILURE;
 }

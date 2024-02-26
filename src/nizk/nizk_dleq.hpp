@@ -7,6 +7,7 @@
 using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
+using namespace std;
 
 namespace NIZK
 {
@@ -15,14 +16,14 @@ namespace NIZK
         protected:
         Mpz A_;
         HashAlgo & h_;
-        std::vector<Mpz> b_, u_;
+        std::vector<Mpz> u_, c_;
 
         public:
 
         Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
-            const SecLevel & seclevel, const PublicKey &x, const SecretKey &w);
+            const SecLevel & seclevel, vector<QFI>& Us, const QFI& R, vector<QFI>& Vs, const Mpz& r);
 
-        bool Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const;
+        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, Mpz& r) const;
     };
 
 }

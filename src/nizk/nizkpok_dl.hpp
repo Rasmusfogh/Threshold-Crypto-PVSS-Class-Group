@@ -20,10 +20,10 @@ namespace NIZK
 
         public:
 
-        NizkPoK_DL(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
-            const SecLevel & seclevel, const PublicKey &x, const SecretKey &w);
+        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&,
+            const SecLevel&, const PublicKey&, const SecretKey&);
 
-        bool Verify(const CL_HSMqk &cl_hsm, const PublicKey &x) const;
+        bool verify(const CL_HSMqk&, const PublicKey&) const;
     };
 
 }

@@ -3,6 +3,7 @@
 
 #include "qclpvss_utils.hpp"
 #include "bicycl.hpp"
+#include "nizk/nizk_dleq.hpp"
 
 using namespace UTILS;
 using namespace BICYCL;
@@ -14,19 +15,20 @@ namespace NIZK
     class Nizk_SH {
 
         protected:
-        Mpz A_;
-        HashAlgo & h_;
+        HashAlgo& h_;
+        Nizk_DLEQ* pf_;
 
         public:
 
-        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, const PublicKey&, 
-            const QFI& B, const QFI& R, const size_t n, const size_t t, const Mpz& q, const size_t ci);
+        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, vector<unique_ptr<const PublicKey>>&, 
+                const vector<unique_ptr<QFI>>& Bs, const QFI& R, const size_t& n, const size_t& t, const Mpz& q, const Mpz& r);
 
-        bool Verify(const CL_HSMqk&, const PublicKey&) const;
+        bool verify(const CL_HSMqk&, vector<const PublicKey>&, vector<const QFI>& Bs, 
+                    const QFI& R) const;
 
         private:
-        void RandomOracle(RandGen&, const PublicKey&, const QFI& R, 
-            const QFI& B, size_t t, const Mpz& q, vector<Mpz>& coefficients) const;
+        void randomOracle(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
+                            const QFI& R, size_t t, const Mpz& q, vector<Mpz>& coefficients) const;
     };
 }
 

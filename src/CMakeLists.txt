@@ -5,6 +5,7 @@ set(SRC_SOURCE_FILES
     utils/sss.cpp
     nizk/nizkpok_dl.cpp
     nizk/nizk_sh.cpp
+    nizk/nizk_dleq.cpp
     # Add all your source files here
 )
 
