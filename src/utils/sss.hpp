@@ -25,8 +25,8 @@ namespace SSS_
         RandGen& randgen_;
 
         public:
-        const size_t& k_; //degree / threshold
-        const size_t& n_; //number of parties
+        const size_t k_; //degree / threshold
+        const size_t n_; //number of parties
         const Mpz& q_; //modulo
 
         SSS(RandGen &randgen, const size_t& k, const size_t& n, const Mpz&q);

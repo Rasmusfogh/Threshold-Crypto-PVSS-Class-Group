@@ -20,10 +20,10 @@ Nizk_DLEQ::Nizk_DLEQ(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl_hsm, c
 
 bool Nizk_DLEQ::verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs,unique_ptr<Nizk_SH>& pf) const
 {
-
+    return true;
 }
 
 bool Nizk_DLEQ::verify(const CL_HSMqk &cl_hsm, QFI& R, const PublicKey& pki, QFI& Mi) const
 {
-
+    return true;
 }

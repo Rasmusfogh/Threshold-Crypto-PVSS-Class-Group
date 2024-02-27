@@ -12,7 +12,9 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm, const
     //Not sure if correct way to pass f
     initRNG(randgen, pks, Bs, R, cl_hsm.h(), cl_hsm.power_of_f(Mpz(1UL)));
 
-    Mpz vi(1UL), temp, poly_eval(randgen.random_mpz(q)); //first coefficient
+    Mpz vi(1UL);
+    Mpz temp;
+    Mpz poly_eval(randgen.random_mpz(q)); //first coefficient
 
     for(size_t i = 1; i <= n; i++)
     {
