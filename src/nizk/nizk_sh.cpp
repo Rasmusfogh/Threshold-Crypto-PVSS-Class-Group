@@ -1,22 +1,18 @@
-#include <algorithm>
-#include <iterator>
 #include "nizk_sh.hpp"
 
 using namespace NIZK;
 
 Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm, const SecLevel & seclevel,
-    vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const QFI& R, const size_t& n, const size_t& t, const Mpz& q, const Mpz& r) : h_(hash)
+    vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const QFI& R, 
+    const size_t& n, const size_t& t, const Mpz& q, const Mpz& r) : h_(hash), rand_(randgen)
 {
     // t = n - t- k - 1, where k = 1
     size_t degree = n - t - 1 - 1;
 
-    // <coefficients, ci> = random oracle output
-    vector<Mpz> coefficients(degree);
-    randomOracle(randgen, pks, Bs, R, degree, q, coefficients);
+    //Not sure if correct way to pass f
+    initRNG(randgen, pks, Bs, R, cl_hsm.h(), cl_hsm.power_of_f(Mpz(1UL)));
 
-    Mpz vi(1UL);
-    Mpz temp;
-    Mpz poly_eval(coefficients[0]);
+    Mpz vi(1UL), temp, poly_eval(randgen.random_mpz(q)); //first coefficient
 
     for(size_t i = 1; i <= n; i++)
     {
@@ -30,7 +26,7 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm, const
     for(size_t j = 1; j < degree; j++)
     {
         Mpz::pow_mod(temp, temp, Mpz(j), q); //not correct
-        Mpz::mul(temp, temp, coefficients[j]);
+        Mpz::mul(temp, temp, randgen.random_mpz(q)); //remainging coefficients
         Mpz::add(poly_eval, poly_eval, temp);
     }
 
@@ -53,27 +49,22 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm, const
 
     }
 
-    Nizk_DLEQ pf(hash, randgen, cl_hsm, seclevel, Us, R, Vs, r);
-    pf_ = &pf;
+    pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash, randgen, cl_hsm, seclevel, Us, R, Vs, r));
 }
 
-bool Nizk_SH::verify(const CL_HSMqk&, vector<const PublicKey>&, vector<const QFI>& Bs, 
-        const QFI& R) const
+bool Nizk_SH::verify(const CL_HSMqk& cl_hsm, vector<unique_ptr<const PublicKey>>& pks, 
+    const vector<unique_ptr<QFI>>& Bs, const QFI& R) const
 {
-    
+    initRNG(rand_, pks, Bs, R, cl_hsm.h(), cl_hsm.power_of_f(Mpz(1UL)));
+
 }
 
-void Nizk_SH::randomOracle(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
- const QFI& R, size_t t, const Mpz& q, vector<Mpz>& coefficients) const
+void Nizk_SH::initRNG(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, 
+    const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const
 {   
     //Calculate seed for the RNG
-    const Mpz seed(h_(pks, R, Bs)); //probably doesnt work
-
-    //Set seed to make coefficients deterministic
+    const Mpz seed(h_(pks, R, Bs, h, f));
     randgen.set_seed(seed);
-
-    for(size_t i = 0; i <=t; i++)
-        coefficients[i] = randgen.random_mpz(q);
 }
 
 template<>

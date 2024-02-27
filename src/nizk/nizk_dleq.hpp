@@ -3,6 +3,7 @@
 
 #include "qclpvss_utils.hpp"
 #include "bicycl.hpp"
+#include "nizk/nizk_sh.hpp"
 
 using namespace UTILS;
 using namespace BICYCL;
@@ -20,10 +21,13 @@ namespace NIZK
 
         public:
 
-        Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
-            const SecLevel & seclevel, vector<QFI>& Us, const QFI& R, vector<QFI>& Vs, const Mpz& r);
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, vector<QFI>& Us, 
+            const QFI& R, vector<QFI>& Vs, const Mpz& r);
 
-        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, Mpz& r) const;
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,const QFI& R, 
+            const PublicKey& pki, QFI& Mi, const SecretKey& sk);
+
+        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, Nizk_SH& pf) const;
     };
 
 }

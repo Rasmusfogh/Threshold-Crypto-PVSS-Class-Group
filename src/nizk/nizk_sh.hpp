@@ -16,19 +16,20 @@ namespace NIZK
 
         protected:
         HashAlgo& h_;
-        Nizk_DLEQ* pf_;
+        RandGen& rand_;
+        unique_ptr<Nizk_DLEQ> pf_;
 
         public:
 
         Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, vector<unique_ptr<const PublicKey>>&, 
                 const vector<unique_ptr<QFI>>& Bs, const QFI& R, const size_t& n, const size_t& t, const Mpz& q, const Mpz& r);
 
-        bool verify(const CL_HSMqk&, vector<const PublicKey>&, vector<const QFI>& Bs, 
+        bool verify(const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, const vector<unique_ptr<QFI>>& Bs, 
                     const QFI& R) const;
 
         private:
-        void randomOracle(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
-                            const QFI& R, size_t t, const Mpz& q, vector<Mpz>& coefficients) const;
+        void initRNG(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, 
+        const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const;
     };
 }
 
