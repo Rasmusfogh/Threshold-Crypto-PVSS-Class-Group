@@ -21,10 +21,12 @@ unique_ptr<vector<unique_ptr<const Share>>> SSS::shareSecret(const Mpz & s) cons
     return shares;
 }
 
-void SSS::reconstructSecret(vector<unique_ptr<const Share>>&shares, Mpz & s) const 
+unique_ptr<const Mpz> SSS::reconstructSecret(vector<unique_ptr<const Share>>&shares) const 
 {
     if (shares.size() < degree())
         throw std::invalid_argument ("Too few shares to reconstruct secret.");
+
+    unique_ptr<Mpz> s (new Mpz);
 
     for (size_t j = 0; j < degree(); j++)
     {
@@ -47,10 +49,12 @@ void SSS::reconstructSecret(vector<unique_ptr<const Share>>&shares, Mpz & s) con
         Mpz::mod_inverse(denominator, denominator, q_);
         Mpz::mul(numerator, numerator, denominator);
         Mpz::mul(numerator, numerator, shares[j]->y());
-        Mpz::add(s, s, numerator);
+        Mpz::add(*s, *s, numerator);
     }
 
-    Mpz::mod(s, s, q_);
+    Mpz::mod(*s, *s, q_);
+
+    return s;
 }
 
 void SSS::generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const

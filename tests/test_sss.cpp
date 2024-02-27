@@ -20,13 +20,13 @@ int main (int argc, char *argv[])
     Mpz s(1234UL);
 
     unique_ptr<vector<unique_ptr<const Share>>> shares;
-    Mpz s_;
+    unique_ptr<const Mpz> s_;
 
     SSS shamir(randgen, t_, n_, q_);
     shares = shamir.shareSecret(s); //figure out how
-    shamir.reconstructSecret(*shares, s_);
+    s_ = shamir.reconstructSecret(*shares);
 
-    if (s == s_)
+    if (s == *s_)
         return EXIT_SUCCESS;
 
     return EXIT_FAILURE;

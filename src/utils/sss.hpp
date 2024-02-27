@@ -31,7 +31,7 @@ namespace SSS_
 
         SSS(RandGen &randgen, const size_t& k, const size_t& n, const Mpz&q);
         unique_ptr<vector<unique_ptr<const Share>>> shareSecret(const Mpz& s) const;
-        void reconstructSecret(vector<unique_ptr<const Share>>& shares, Mpz &s) const;
+        unique_ptr<const Mpz> reconstructSecret(vector<unique_ptr<const Share>>& shares) const;
 
         private:
         void generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const;

@@ -12,12 +12,15 @@ using namespace std;
 
 namespace NIZK
 {
+    //Forward declaration
+    class Nizk_SH;
+    
     class Nizk_DLEQ {
 
         protected:
         Mpz A_;
         HashAlgo & h_;
-        std::vector<Mpz> u_, c_;
+        vector<Mpz> u_, c_;
 
         public:
 
@@ -27,7 +30,8 @@ namespace NIZK
         Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,const QFI& R, 
             const PublicKey& pki, QFI& Mi, const SecretKey& sk);
 
-        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, Nizk_SH& pf) const;
+        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, unique_ptr<Nizk_SH>& pf) const;
+        bool verify(const CL_HSMqk &cl_hsm, QFI& R, const PublicKey& pki, QFI& Mi) const;
     };
 
 }

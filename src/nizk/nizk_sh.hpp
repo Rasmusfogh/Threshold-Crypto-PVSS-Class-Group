@@ -12,6 +12,9 @@ using namespace std;
 
 namespace NIZK
 {
+    //Forward declaration
+    class Nizk_DLEQ;
+
     class Nizk_SH {
 
         protected:

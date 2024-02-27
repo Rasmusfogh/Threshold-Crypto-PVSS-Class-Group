@@ -65,14 +65,14 @@ int main (int argc, char *argv[])
     {
         sks[i] = pvss.keyGen(randgen);
         pks[i] = pvss.keyGen(*sks[i]);
-        unique_ptr<NizkPoK_DL> pf = pvss.keyGen(randgen, *pks[i], *sks[i]);
+        unique_ptr<NizkPoK_DL> pf = pvss.keyGen(*pks[i], *sks[i]);
         
         if(!pvss.verifyKey(*pks[i], move(pf)))
             return EXIT_FAILURE;
     }
 
-    shares = pvss.dist(randgen, s);
-    pvss.dist(randgen, pks, *shares);
+    shares = pvss.dist(s);
+    pvss.dist(pks, *shares);
 
     return EXIT_SUCCESS;
 }

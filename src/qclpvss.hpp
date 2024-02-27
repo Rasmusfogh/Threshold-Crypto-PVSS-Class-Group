@@ -21,6 +21,7 @@ namespace QCLPVSS_
     {
         public:
 
+        SSS sss_;
         CL_HSMqk cl_hsmqk_;
         SecLevel& seclevel_;
 
@@ -70,10 +71,10 @@ namespace QCLPVSS_
         //Reconstruction
         unique_ptr<const Share> decShare(const SecretKey&, size_t i) const;
         unique_ptr<Nizk_DLEQ> decShare(const PublicKey&, const SecretKey&, size_t i) const;
-        const Mpz& rec(vector<unique_ptr<const Share>>& Ais) const;
+        unique_ptr<const Mpz> rec(vector<unique_ptr<const Share>>& Ais) const;
 
         //Reconstruction Verification
-        void verifyDec();
+        bool verifyDec(const Share& Ai, const PublicKey& pki, unique_ptr<Nizk_DLEQ> pf, size_t i) const;
         /**@}*/
     };
 }
