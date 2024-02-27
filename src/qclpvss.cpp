@@ -13,6 +13,7 @@ QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, c
       seclevel_(seclevel),
       randgen_(randgen),
       hash_(hash),
+      k_(k),
       n_(n),
       t_(t),
       q_(q),
@@ -79,19 +80,37 @@ bool QCLPVSS::verifySharing(vector<unique_ptr<const PublicKey>>& pks, unique_ptr
   return pf->verify(this->cl_hsmqk_, pks, Bs_, *R_);
 }
 
-void QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk, const Share& sh) const 
+unique_ptr<const Share> QCLPVSS::decShare(const SecretKey& sk, size_t i) const 
 {
-  QFI fi, Mi;
+  cl_hsmqk_.Cl_G().nupow(*fi_, *R_, sk);
+  cl_hsmqk_.Cl_Delta().nucompinv(*fi_, *Bs_[i], *fi_);
 
-  cl_hsmqk_.Cl_G().nupow(fi, *R_, sk);
-  cl_hsmqk_.Cl_Delta().nucompinv(fi, *Bs_[sh.x()], fi);
-
-  Mpz Ai(cl_hsmqk_.dlog_in_F(fi));
-
-  cl_hsmqk_.Cl_Delta().nucompinv(Mi, *Bs_[sh.x()], fi);
-
-  Nizk_DLEQ(hash_, randgen_, this->cl_hsmqk_, seclevel_, *R_, pk, Mi, sk);
+  //return Ai on the form of a share <i, Ai>
+  return unique_ptr<const Share>(new Share(i, Mpz(cl_hsmqk_.dlog_in_F(*fi_)))); 
 }
 
+unique_ptr<Nizk_DLEQ> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk, size_t i) const 
+{
+  QFI Mi;
 
+  cl_hsmqk_.Cl_Delta().nucompinv(Mi, *Bs_[i], *fi_);
 
+  return unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ
+    (hash_, randgen_, this->cl_hsmqk_, seclevel_, *R_, pk, Mi, sk));
+}
+
+const Mpz& QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const 
+{
+  // |T| < t + k
+  if (Ais.size() < t_ + k_)
+    return Mpz();
+  
+  Mpz s, product;
+  //T' \subset T, |T'| = t + k
+  size_t T_p = t_ + k_;
+  for(size_t i = 0; i < T_p; i++)
+  {
+
+    Mpz::add(s, s, product);
+  }
+}

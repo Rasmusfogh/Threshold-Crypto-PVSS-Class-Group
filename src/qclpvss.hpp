@@ -24,6 +24,7 @@ namespace QCLPVSS_
         CL_HSMqk cl_hsmqk_;
         SecLevel& seclevel_;
 
+        const size_t k_;
         /** number of parties. n + k <= q*/
         const size_t n_;
         /** privacy threshold. k + t <= n*/
@@ -37,6 +38,9 @@ namespace QCLPVSS_
         //Public parameters in dist
         unique_ptr<QFI> R_;
         vector<unique_ptr<QFI>> Bs_;
+
+        //public parameters in decShare
+        unique_ptr<QFI> fi_;
 
 
         public:
@@ -64,8 +68,9 @@ namespace QCLPVSS_
         bool verifySharing(vector<unique_ptr<const PublicKey>>&, unique_ptr<Nizk_SH>) const;
 
         //Reconstruction
-        void decShare(const PublicKey&, const SecretKey&, const Share&) const;
-        void rec();
+        unique_ptr<const Share> decShare(const SecretKey&, size_t i) const;
+        unique_ptr<Nizk_DLEQ> decShare(const PublicKey&, const SecretKey&, size_t i) const;
+        const Mpz& rec(vector<unique_ptr<const Share>>& Ais) const;
 
         //Reconstruction Verification
         void verifyDec();
