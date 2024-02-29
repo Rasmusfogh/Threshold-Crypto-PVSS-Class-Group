@@ -18,21 +18,31 @@ namespace NIZK
     class Nizk_SH {
 
         protected:
+
+        const Mpz& q_;
         HashAlgo& h_;
         RandGen& rand_;
+        const size_t n_, t_;
         unique_ptr<Nizk_DLEQ> pf_;
+        
+        size_t degree_;
 
         public:
 
-        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, vector<unique_ptr<const PublicKey>>&, 
-                const vector<unique_ptr<QFI>>& Bs, const QFI& R, const size_t& n, const size_t& t, const Mpz& q, const Mpz& r);
+        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, 
+                const vector<unique_ptr<QFI>>& Bs, const QFI& R, const size_t& n, const size_t& t, 
+                const Mpz& q, const Mpz& r, const vector<unique_ptr<Mpz>>& Vis);
 
         bool verify(const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, const vector<unique_ptr<QFI>>& Bs, 
-                    const QFI& R) const;
+                const QFI& R, const vector<unique_ptr<Mpz>>& Vis);
 
         private:
+
         void initRNG(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, 
-        const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const;
+                const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const;
+
+        void computeUV(QFI& U_ref, QFI& V_ref, const CL_HSMqk& cl_hsm, const vector<unique_ptr<Mpz>>& Vis, 
+                vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, size_t degree) const;
     };
 }
 

@@ -20,17 +20,17 @@ namespace NIZK
         protected:
         Mpz A_;
         HashAlgo & h_;
-        vector<Mpz> u_, c_;
+        Mpz u_, c_;
 
         public:
 
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&, vector<QFI>& Us, 
-            const QFI& R, vector<QFI>& Vs, const Mpz& r);
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& U, 
+            const QFI& R, const QFI& V, const Mpz& r);
 
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,const QFI& R, 
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& R, 
             const PublicKey& pki, QFI& Mi, const SecretKey& sk);
 
-        bool verify(const CL_HSMqk &cl_hsm, vector<QFI>& Us, QFI& R, vector<QFI>& Vs, unique_ptr<Nizk_SH>& pf) const;
+        bool verify(const CL_HSMqk &cl_hsm, const QFI& U, const QFI& R, const QFI& V) const;
         bool verify(const CL_HSMqk &cl_hsm, QFI& R, const PublicKey& pki, QFI& Mi) const;
     };
 

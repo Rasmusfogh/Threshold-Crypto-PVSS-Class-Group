@@ -33,6 +33,9 @@ namespace QCLPVSS_
 
         const Mpz& q_;
 
+        //fixed points used to evaluate the sharing polynomial for the sharing proof
+        vector<unique_ptr<Mpz>> Vis_;
+
         HashAlgo & hash_;
         RandGen & randgen_;
 
@@ -76,6 +79,9 @@ namespace QCLPVSS_
         //Reconstruction Verification
         bool verifyDec(const Share& Ai, const PublicKey& pki, unique_ptr<Nizk_DLEQ> pf, size_t i) const;
         /**@}*/
+
+        private:
+        void computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q);
     };
 }
 
