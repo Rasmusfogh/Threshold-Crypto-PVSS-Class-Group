@@ -9,7 +9,7 @@ using namespace OpenSSL;
 
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
   const size_t n, const size_t t, bool compact_variant) :
-      cl_hsmqk_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
+      CL_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
       sss_(SSS(randgen, t, n, q)),
       seclevel_(seclevel),
       randgen_(randgen),
@@ -34,22 +34,22 @@ QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, c
 
 unique_ptr<const SecretKey> QCLPVSS::keyGen(RandGen &randgen) const
 {
-  return unique_ptr<const SecretKey>(new SecretKey(cl_hsmqk_, randgen));
+  return unique_ptr<const SecretKey>(new SecretKey(CL_, randgen));
 }
 
 unique_ptr<const PublicKey> QCLPVSS::keyGen(const SecretKey& sk) const
 {
-  return unique_ptr<const PublicKey>(new PublicKey(cl_hsmqk_, sk));
+  return unique_ptr<const PublicKey>(new PublicKey(CL_, sk));
 }
 
 unique_ptr<NizkPoK_DL> QCLPVSS::keyGen(const PublicKey& pk, const SecretKey& sk) const
 {
-  return unique_ptr<NizkPoK_DL>(new NizkPoK_DL(hash_, randgen_, cl_hsmqk_, seclevel_, pk, sk));
+  return unique_ptr<NizkPoK_DL>(new NizkPoK_DL(hash_, randgen_, CL_, pk, sk));
 }
 
 bool QCLPVSS::verifyKey(const PublicKey& pk,  unique_ptr<NizkPoK_DL>pf) const 
 {
-  return pf->verify(cl_hsmqk_, pk);
+  return pf->verify(pk);
 }
 
 unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::dist(const Mpz &s) const 
@@ -62,43 +62,42 @@ unique_ptr<Nizk_SH> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
 {
   QFI f, pkr;
 
-  const Mpz r(randgen_.random_mpz(cl_hsmqk_.secretkey_bound()));
-  cl_hsmqk_.power_of_h(*R_, r);
+  const Mpz r(randgen_.random_mpz(CL_.secretkey_bound()));
+  CL_.power_of_h(*R_, r);
 
   for(size_t i = 0; i < n_; i++)
   {
-    f = cl_hsmqk_.power_of_f(shares[i]->y());
-    pks[i]->exponentiation(cl_hsmqk_, pkr, r);
-    //Could just put it into pkr or f instead of B. Just for the understanding of things
-    cl_hsmqk_.Cl_Delta().nucomp(*Bs_[i], pkr, f);
+    f = CL_.power_of_f(shares[i]->y());
+    pks[i]->exponentiation(CL_, pkr, r);
+    CL_.Cl_Delta().nucomp(*Bs_[i], pkr, f);
   }
 
   return unique_ptr<Nizk_SH>(new Nizk_SH
-    (hash_, randgen_, cl_hsmqk_, pks, Bs_, *R_, n_, t_, q_, r, Vis_));
+    (hash_, randgen_, CL_, pks, Bs_, *R_, n_, t_, q_, r, Vis_));
 }
 
 bool QCLPVSS::verifySharing(vector<unique_ptr<const PublicKey>>& pks, unique_ptr<Nizk_SH> pf) const 
 {
-  return pf->verify(cl_hsmqk_, pks, Bs_, *R_, Vis_);
+  return pf->verify(pks, Bs_, *R_, Vis_);
 }
 
 unique_ptr<const Share> QCLPVSS::decShare(const SecretKey& sk, size_t i) const 
 {
-  cl_hsmqk_.Cl_Delta().nupow(*fi_, *R_, sk);
-  cl_hsmqk_.Cl_Delta().nucompinv(*fi_, *Bs_[i], *fi_);
+  CL_.Cl_Delta().nupow(*fi_, *R_, sk);
+  CL_.Cl_Delta().nucompinv(*fi_, *Bs_[i], *fi_);
 
   //return Ai on the form of a share <i, Ai>
-  return unique_ptr<const Share>(new Share(i, Mpz(cl_hsmqk_.dlog_in_F(*fi_)))); 
+  return unique_ptr<const Share>(new Share(i, Mpz(CL_.dlog_in_F(*fi_)))); 
 }
 
 unique_ptr<Nizk_DLEQ> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk, size_t i) const 
 {
   QFI Mi;
 
-  cl_hsmqk_.Cl_Delta().nucompinv(Mi, *Bs_[i], *fi_);
+  CL_.Cl_Delta().nucompinv(Mi, *Bs_[i], *fi_);
 
   return unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ
-    (hash_, randgen_, cl_hsmqk_, *R_, pk, Mi, sk));
+    (hash_, randgen_, CL_, *R_, pk, Mi, sk));
 }
 
 unique_ptr<const Mpz> QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const 
@@ -112,10 +111,10 @@ unique_ptr<const Mpz> QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const
 
 bool QCLPVSS::verifyDec(const Share& Ai, const PublicKey& pki, unique_ptr<Nizk_DLEQ> pf, size_t i) const 
 {
-  QFI Mi(cl_hsmqk_.power_of_f(Ai.y()));
-  cl_hsmqk_.Cl_Delta().nucompinv(Mi, *Bs_[i] , Mi);
+  QFI Mi(CL_.power_of_f(Ai.y()));
+  CL_.Cl_Delta().nucompinv(Mi, *Bs_[i] , Mi);
 
-  return pf->verify(cl_hsmqk_, *R_, pki, Mi);
+  return pf->verify(*R_, pki, Mi);
 }
 
 void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q)

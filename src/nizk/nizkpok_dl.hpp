@@ -7,6 +7,7 @@
 using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
+using namespace std;
 
 namespace NIZK
 {
@@ -14,16 +15,18 @@ namespace NIZK
 
         protected:
         Mpz A_, AS_;
-        HashAlgo & h_;
+        HashAlgo & hash_;
         static const size_t rounds_ = 40;
-        std::array<Mpz, rounds_> b_, u_;
+        array<Mpz, rounds_> b_, u_;
+
+        const CL_HSMqk& CL_;
 
         public:
 
-        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&,
-            const SecLevel&, const PublicKey&, const SecretKey&);
+        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&, 
+            const PublicKey&, const SecretKey&);
 
-        bool verify(const CL_HSMqk&, const PublicKey&) const;
+        bool verify(const PublicKey&) const;
     };
 
 }

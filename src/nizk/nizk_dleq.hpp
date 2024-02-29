@@ -18,8 +18,9 @@ namespace NIZK
     class Nizk_DLEQ {
 
         protected:
+        const CL_HSMqk& CL_;
         Mpz A_;
-        HashAlgo & h_;
+        HashAlgo & hash_;
         Mpz u_, c_;
 
         public:
@@ -30,8 +31,8 @@ namespace NIZK
         Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& R, 
             const PublicKey& pki, QFI& Mi, const SecretKey& sk);
 
-        bool verify(const CL_HSMqk &cl_hsm, const QFI& U, const QFI& R, const QFI& V) const;
-        bool verify(const CL_HSMqk &cl_hsm, QFI& R, const PublicKey& pki, QFI& Mi) const;
+        bool verify(const QFI& U, const QFI& R, const QFI& V) const;
+        bool verify(QFI& R, const PublicKey& pki, QFI& Mi) const;
     };
 
 }

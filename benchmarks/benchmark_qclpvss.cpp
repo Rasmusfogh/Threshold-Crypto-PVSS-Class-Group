@@ -53,7 +53,7 @@ int main (int argc, char *argv[])
 
     QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
 
-    std::cout << pvss.cl_hsmqk_;
+    std::cout << pvss.CL_;
 
     // SecretKey sk = pvss.keyGen(randgen);
     // PublicKey pk = pvss.keyGen(sk);

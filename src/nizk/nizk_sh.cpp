@@ -2,51 +2,51 @@
 
 using namespace NIZK;
 
-Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl_hsm,
+Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
     vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const QFI& R, 
     const size_t& n, const size_t& t, const Mpz& q, const Mpz& r, const vector<unique_ptr<Mpz>>& Vis) 
-    : h_(hash), rand_(randgen), q_(q), n_(n), t_(t), degree_(n - t - 1 - 1)
+    : h_(hash), rand_(randgen), q_(q), n_(n), t_(t), degree_(n - t - 1 - 1), CL_(cl)
 {
     //Not sure if correct way to pass f
-    initRNG(randgen, pks, Bs, R, cl_hsm.h(), cl_hsm.power_of_f(Mpz(1UL)));
+    initRNG(pks, Bs, R, cl.h(), cl.power_of_f(Mpz(1UL)));
 
     QFI U, V;
-    computeUV(U, V, cl_hsm, Vis, pks, Bs, degree_);
+    computeUV(U, V, Vis, pks, Bs);
 
     /** TEST */
     QFI ref, ref2;
-    cl_hsm.power_of_h(ref, r);
+    cl.power_of_h(ref, r);
     if (ref == R)
         cout << "true 1" << endl;
     
-    cl_hsm.Cl_Delta().nupow(ref2, U, r);
+    cl.Cl_Delta().nupow(ref2, U, r);
     if (ref2 == V)
         cout << "true 2" << endl;
 
 
-    pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash, randgen, cl_hsm, U, R, V, r));
+    pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash, randgen, cl, U, R, V, r));
 }
 
-bool Nizk_SH::verify(const CL_HSMqk& cl_hsm, vector<unique_ptr<const PublicKey>>& pks, 
-    const vector<unique_ptr<QFI>>& Bs, const QFI& R, const vector<unique_ptr<Mpz>>& Vis)
+bool Nizk_SH::verify(vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, 
+    const QFI& R, const vector<unique_ptr<Mpz>>& Vis)
 {
-    initRNG(rand_, pks, Bs, R, cl_hsm.h(), cl_hsm.power_of_f(Mpz(1UL)));
+    initRNG(pks, Bs, R, CL_.h(), CL_.power_of_f(Mpz(1UL)));
 
     QFI U, V;
-    computeUV(U, V, cl_hsm, Vis, pks, Bs, degree_);
+    computeUV(U, V, Vis, pks, Bs);
 
-    return pf_->verify(cl_hsm, U, R, V);
+    return pf_->verify(U, R, V);
 }
 
-void Nizk_SH::initRNG(RandGen& randgen, vector<unique_ptr<const PublicKey>>& pks, 
+void Nizk_SH::initRNG(vector<unique_ptr<const PublicKey>>& pks, 
         const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const
 {
     const Mpz seed(h_(pks, R, Bs, h, f));
-    randgen.set_seed(seed);
+    rand_.set_seed(seed);
 }
 
-void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const CL_HSMqk& cl_hsm, const vector<unique_ptr<Mpz>>& Vis, 
-        vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, size_t degree) const
+void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& Vis, 
+        vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs) const
 {
     QFI exp;
     Mpz temp;
@@ -55,7 +55,7 @@ void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const CL_HSMqk& cl_hsm, const ve
     for (size_t i = 1; i <= n_; i++)
     {
         //Evaluate polynomial
-        for(size_t j = 1; j < degree; j++)
+        for(size_t j = 1; j < degree_; j++)
         {
             Mpz::pow_mod(temp, Mpz(i), Mpz(j), q_); 
             Mpz::mul(temp, temp, rand_.random_mpz(q_)); //remainging coefficients
@@ -75,12 +75,12 @@ void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const CL_HSMqk& cl_hsm, const ve
         Mpz::mod(wii, wii, q_);
 
         //compute U
-        (*pks[i - 1]).exponentiation(cl_hsm, exp, wii);
-        cl_hsm.Cl_Delta().nucomp(U_ref, U_ref, exp);
+        (*pks[i - 1]).exponentiation(CL_, exp, wii);
+        CL_.Cl_Delta().nucomp(U_ref, U_ref, exp);
 
         //compute V
-        cl_hsm.Cl_Delta().nupow(exp, (*Bs[i - 1]), wii);
-        cl_hsm.Cl_Delta().nucomp(V_ref, V_ref, exp);
+        CL_.Cl_Delta().nupow(exp, (*Bs[i - 1]), wii);
+        CL_.Cl_Delta().nucomp(V_ref, V_ref, exp);
     }
 }
 

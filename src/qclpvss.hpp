@@ -22,7 +22,7 @@ namespace QCLPVSS_
         public:
 
         SSS sss_;
-        CL_HSMqk cl_hsmqk_;
+        CL_HSMqk CL_;
         SecLevel& seclevel_;
 
         const size_t k_;
@@ -65,7 +65,7 @@ namespace QCLPVSS_
         bool verifyKey(const PublicKey&, unique_ptr<NizkPoK_DL>) const;
 
         //Distribution
-        unique_ptr<vector<unique_ptr<const Share>>> dist(const Mpz &s) const;
+        unique_ptr<vector<unique_ptr<const Share>>> dist(const Mpz &secret) const;
         unique_ptr<Nizk_SH> dist(vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
 
         //Distribution Verification

@@ -30,7 +30,7 @@ namespace SSS_
         const Mpz& q_; //modulo
 
         SSS(RandGen &randgen, const size_t& k, const size_t& n, const Mpz&q);
-        unique_ptr<vector<unique_ptr<const Share>>> shareSecret(const Mpz& s) const;
+        unique_ptr<vector<unique_ptr<const Share>>> shareSecret(const Mpz& secret) const;
         unique_ptr<const Mpz> reconstructSecret(vector<unique_ptr<const Share>>& shares) const;
 
         private:

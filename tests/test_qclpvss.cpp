@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
 
     QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
 
-    std::cout << pvss.cl_hsmqk_;
+    std::cout << pvss.CL_;
 
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
