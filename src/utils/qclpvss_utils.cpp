@@ -12,7 +12,6 @@ PublicKey::PublicKey(const CL_HSMqk &cl, const SecretKey& sk)
 {
   cl.power_of_h(pk_, sk);
 
-  //not sure what below is yet
   d_ = (cl.encrypt_randomness_bound().nbits() + 1)/2;
   e_ = d_/2 + 1;
 

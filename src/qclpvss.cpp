@@ -10,6 +10,7 @@ using namespace OpenSSL;
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
   const size_t n, const size_t t, bool compact_variant) :
       CL_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
+      R_(unique_ptr<QFI>(new QFI)),
       sss_(SSS(randgen, t, n, q)),
       seclevel_(seclevel),
       randgen_(randgen),
@@ -17,8 +18,7 @@ QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, c
       k_(k),
       n_(n),
       t_(t),
-      q_(q),
-      R_(unique_ptr<QFI>(new QFI))
+      q_(q)
 {
   /* Checks */
   if (Mpz(n + k) > q)
@@ -62,13 +62,19 @@ unique_ptr<Nizk_SH> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
 {
   QFI f, pkr;
 
-  const Mpz r(randgen_.random_mpz(CL_.secretkey_bound()));
+  const Mpz r(randgen_.random_mpz(CL_.encrypt_randomness_bound()));
+
+  //Compute R
   CL_.power_of_h(*R_, r);
 
+  //Compute B_i's
   for(size_t i = 0; i < n_; i++)
   {
+    //f^p(a_i)
     f = CL_.power_of_f(shares[i]->y());
+    //(pk_i)^r
     pks[i]->exponentiation(CL_, pkr, r);
+    // B_i = (pk_i)^r * f^p(a_i)
     CL_.Cl_Delta().nucomp(*Bs_[i], pkr, f);
   }
 
@@ -129,8 +135,10 @@ void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t&
         if(i == j) continue;
 
         //Add one to both i and j as alphas are [1...n_]
-        Mpz sub((i + 1) - (j + 1));
+        Mpz sub((signed long)((i + 1) - (j + 1)));
+        Mpz::mod(sub, sub, q_);
         Mpz::mul(*vis[i], *vis[i], sub);
+        Mpz::mod(*vis[i], *vis[i], q_);
       }
 
       Mpz::mod_inverse(*vis[i], *vis[i], q_);

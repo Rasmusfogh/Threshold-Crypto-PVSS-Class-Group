@@ -15,8 +15,9 @@ unique_ptr<vector<unique_ptr<const Share>>> SSS::shareSecret(const Mpz & s) cons
 
     generatePolynomial(s, coefficients);
 
-    for(size_t i = 0; i < parties(); i++)
-        (*shares)[i] = evaluatePolynomial(i + 1, coefficients);    
+    for(size_t i = 0; i < parties(); i++) {
+        (*shares)[i] = evaluatePolynomial(i + 1, coefficients);
+    } 
 
     return shares;
 }

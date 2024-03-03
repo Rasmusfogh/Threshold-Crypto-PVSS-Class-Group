@@ -39,11 +39,11 @@ namespace NIZK
 
         private:
 
-        void initRNG(vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
+        void initSeed(Mpz& seed, vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
                 const QFI& R, const QFI&h, const QFI& f) const;
 
         void computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& Vis, 
-                vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs) const;
+                vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const Mpz& seed) const;
     };
 }
 
