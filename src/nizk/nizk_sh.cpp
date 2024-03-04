@@ -54,16 +54,19 @@ void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& V
 
     for (size_t i = 0; i < n_; i++)
     {
-        rand_.set_seed(seed); //set seed to generate same coefficients every time
+        rand_.set_seed(seed); //set seed to generate same coefficients every n times
         poly_eval = rand_.random_mpz(q_); // coefficient 0 aka secret
+
         //Evaluate polynomial m*
         for(size_t j = 1; j < degree_; j++)
         {
             Mpz::pow_mod(temp, Mpz(i + 1), Mpz(j), q_); 
             Mpz::mul(temp, temp, rand_.random_mpz(q_)); //remaining coefficients
             Mpz::add(poly_eval, poly_eval, temp);
-            Mpz::mod(poly_eval, poly_eval, q_); //maybe move out of loop
         }
+
+        Mpz::mod(poly_eval, poly_eval, q_);
+
     
         //compute wi = temp
         Mpz::mul(temp, poly_eval, *Vis[i]);

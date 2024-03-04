@@ -26,7 +26,7 @@ namespace NIZK
         public:
 
         Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& U, 
-            const QFI& R, const QFI& V, const Mpz& r);
+            const QFI& R, const QFI& V, const Mpz& witness);
 
         Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& R, 
             const PublicKey& pki, QFI& Mi, const SecretKey& sk);

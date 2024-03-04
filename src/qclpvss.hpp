@@ -77,7 +77,7 @@ namespace QCLPVSS_
         unique_ptr<const Mpz> rec(vector<unique_ptr<const Share>>& Ais) const;
 
         //Reconstruction Verification
-        bool verifyDec(const Share& Ai, const PublicKey& pki, unique_ptr<Nizk_DLEQ> pf, size_t i) const;
+        bool verifyDec(const Share& Ai, const PublicKey& pki, const Nizk_DLEQ& pf, size_t i) const;
         /**@}*/
 
         private:
