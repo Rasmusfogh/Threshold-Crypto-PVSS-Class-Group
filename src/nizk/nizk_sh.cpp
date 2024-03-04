@@ -14,17 +14,6 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
     QFI U, V;
     computeUV(U, V, Vis, pks, Bs, seed);
 
-    /** TEST */
-    QFI ref, ref2;
-    cl.power_of_h(ref, r);
-    if (ref == R)
-        cout << "true 1" << endl;
-    
-    cl.Cl_Delta().nupow(ref2, U, r);
-    if (ref2 == V)
-        cout << "true 2" << endl;
-
-
     pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash, randgen, cl, U, R, V, r));
 }
 

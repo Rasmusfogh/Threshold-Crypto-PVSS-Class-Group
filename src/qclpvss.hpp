@@ -37,6 +37,7 @@ namespace QCLPVSS_
         vector<unique_ptr<Mpz>> Vis_;
 
         HashAlgo & hash_;
+        unique_ptr<HashAlgo> hash128_;
         RandGen & randgen_;
 
         //Public parameters in dist
@@ -62,7 +63,7 @@ namespace QCLPVSS_
         unique_ptr<const SecretKey> keyGen(RandGen&) const;
         unique_ptr<const PublicKey> keyGen(const SecretKey&) const;
         unique_ptr<NizkPoK_DL> keyGen(const PublicKey&, const SecretKey&) const;
-        bool verifyKey(const PublicKey&, unique_ptr<NizkPoK_DL>) const;
+        bool verifyKey(const PublicKey&, const NizkPoK_DL&) const;
 
         //Distribution
         unique_ptr<vector<unique_ptr<const Share>>> dist(const Mpz &secret) const;

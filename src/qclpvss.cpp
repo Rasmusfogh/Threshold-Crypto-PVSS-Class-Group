@@ -7,9 +7,12 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
+const int NIZK_POK_DL_HASH_NID = 1100;
+
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
   const size_t n, const size_t t, bool compact_variant) :
       CL_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
+      fi_(unique_ptr<QFI>(new QFI())),
       R_(unique_ptr<QFI>(new QFI)),
       sss_(SSS(randgen, t, n, q)),
       seclevel_(seclevel),
@@ -30,8 +33,8 @@ QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, c
     generate_n(back_inserter(Bs_), n_, [] {return unique_ptr<QFI>(new QFI); });
 
     computeFixedPolyPoints(Vis_, n_, q_);
-
-    fi_ = unique_ptr<QFI>(new QFI());
+    
+    hash128_ = unique_ptr<HashAlgo>(new HashAlgo(NIZK_POK_DL_HASH_NID));
 }
 
 unique_ptr<const SecretKey> QCLPVSS::keyGen(RandGen &randgen) const
@@ -46,12 +49,12 @@ unique_ptr<const PublicKey> QCLPVSS::keyGen(const SecretKey& sk) const
 
 unique_ptr<NizkPoK_DL> QCLPVSS::keyGen(const PublicKey& pk, const SecretKey& sk) const
 {
-  return unique_ptr<NizkPoK_DL>(new NizkPoK_DL(hash_, randgen_, CL_, pk, sk));
+  return unique_ptr<NizkPoK_DL>(new NizkPoK_DL(*hash128_, randgen_, CL_, pk, sk));
 }
 
-bool QCLPVSS::verifyKey(const PublicKey& pk,  unique_ptr<NizkPoK_DL>pf) const 
+bool QCLPVSS::verifyKey(const PublicKey& pk,  const NizkPoK_DL& pf) const 
 {
-  return pf->verify(pk);
+  return pf.verify(pk);
 }
 
 unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::dist(const Mpz &s) const 
@@ -81,7 +84,7 @@ unique_ptr<Nizk_SH> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
   }
 
   return unique_ptr<Nizk_SH>(new Nizk_SH
-    (hash_, randgen_, CL_, pks, Bs_, *R_, n_, t_, q_, r, Vis_));
+    (*hash128_, randgen_, CL_, pks, Bs_, *R_, n_, t_, q_, r, Vis_));
 }
 
 bool QCLPVSS::verifySharing(vector<unique_ptr<const PublicKey>>& pks, unique_ptr<Nizk_SH> pf) const 
@@ -104,7 +107,7 @@ unique_ptr<Nizk_DLEQ> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk
 
   CL_.Cl_Delta().nucompinv(Mi, *Bs_[i], *fi_);
 
-  return unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ(hash_, randgen_, CL_, *R_, pk, Mi, sk));
+  return unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ(*hash128_, randgen_, CL_, *R_, pk, Mi, sk));
 }
 
 unique_ptr<const Mpz> QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const 

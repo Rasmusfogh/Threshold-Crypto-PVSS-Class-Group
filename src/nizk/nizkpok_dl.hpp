@@ -15,7 +15,7 @@ namespace NIZK
 
         protected:
         Mpz A_, AS_;
-        HashAlgo & hash_;
+        HashAlgo& hash_;
         static const size_t rounds_ = 40;
         array<Mpz, rounds_> b_, u_;
 

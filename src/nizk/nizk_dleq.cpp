@@ -1,5 +1,4 @@
 #include "nizk_dleq.hpp"
-#include <cmath>
 using namespace NIZK;
 
 /** X = (g_q/h, U) ; Y = (R, V) ; w = (r)  */
@@ -54,11 +53,6 @@ bool Nizk_DLEQ::verify(const QFI& U, const QFI& R, const QFI& V) const
     Mpz C(CL_.encrypt_randomness_bound());
     Mpz::mul(SC, CL_.encrypt_randomness_bound(), C);
     Mpz::add(boundary, A_, SC);
-
-    cout << u_.nbits() << endl;
-    cout << A_.nbits() << endl;
-    cout << SC.nbits() << endl;
-    cout << boundary.nbits() << endl;
 
     if(u_ > boundary)
         return false;
