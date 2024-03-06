@@ -13,40 +13,51 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &randgen, const CL_HSMqk &cl,
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
     Mpz::add(AS_, A_, cl.encrypt_randomness_bound());
 
-    Mpz temp, r;
-    QFI t;
+    Mpz temp;
+    vector<Mpz> r(rounds_);
+    vector<QFI> t(rounds_);
 
     // //Could be parallelized I think
-    for(size_t i = 0; i < rounds_; i++) {
-        r = randgen.random_mpz(A_);
-        cl.power_of_h(t, r);
+    for(size_t i = 0; i < rounds_; i++) 
+    {
+        r[i] = randgen.random_mpz(A_);
+        cl.power_of_h(t[i], r[i]);
+    }
 
-        b_[i] = hash_(cl.h(), x.get(), t);
+    Mpz seed(hash_(cl.h(), x.get(), t));
+    randgen.set_seed(seed);
+
+    for(size_t i = 0; i < rounds_; i++)
+    {
+        b_[i] = randgen.random_mpz(cl.q()); // not right boundary
         Mpz::mul(temp, w, b_[i]);
-        Mpz::add(u_[i], temp, r);
+        Mpz::add(u_[i], temp, r[i]);
     }
 }
 
-bool NizkPoK_DL::verify(const PublicKey& x) const 
+bool NizkPoK_DL::verify(RandGen &randgen, const PublicKey& x) const 
 {
-    Mpz h;
-    QFI t1, t2;
+    vector<QFI> t(rounds_);
+    QFI temp;
 
     for(size_t i = 0; i < rounds_; i++) {
 
-        if (u_[i] > AS_)
-            return false;
-                
-        x.exponentiation(CL_, t1, b_[i]);
-        CL_.power_of_h(t2, u_[i]);
-        CL_.Cl_Delta().nucompinv(t1, t2, t1);
+        cout << u_[i].nbits() << endl;
+        cout << AS_.nbits() << endl;
 
-        //h = H(h, x, t_j = t1)
-        h = hash_(CL_.h(), x.get(), t1);
-        
-        if (h != b_[i])
-            return false;
+        if (u_[i] > AS_) return false;
+                
+        x.exponentiation(CL_, t[i], b_[i]);
+        CL_.power_of_h(temp, u_[i]);
+        CL_.Cl_Delta().nucompinv(t[i], temp, t[i]);
     }
 
+    Mpz seed(hash_(CL_.h(), x.get(), t));
+    randgen.set_seed(seed);
+
+    for(size_t i = 0; i < rounds_; i++)
+        if (b_[i] != randgen.random_mpz(CL_.q()))
+            return false;
+    
     return true;
 }

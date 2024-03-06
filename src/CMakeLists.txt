@@ -3,10 +3,10 @@ set(SRC_SOURCE_FILES
     qclpvss.cpp
     utils/qclpvss_utils.cpp
     utils/sss.cpp
+    utils/openssl_hash_ext.cpp
     nizk/nizkpok_dl.cpp
     nizk/nizk_sh.cpp
     nizk/nizk_dleq.cpp
-    # Add all your source files here
 )
 
 # Create a library target for your project

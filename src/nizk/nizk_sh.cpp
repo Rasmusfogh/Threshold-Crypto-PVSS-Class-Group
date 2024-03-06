@@ -75,17 +75,3 @@ void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& V
         CL_.Cl_Delta().nucomp(V_ref, V_ref, exp);
     }
 }
-
-template<>
-void OpenSSL::HashAlgo::hash(const vector<unique_ptr<QFI>> &v)
-{
-    for(size_t i = 0; i < v.size(); i++)
-        hash (*v[i]);
-}
-
-template<>
-void OpenSSL::HashAlgo::hash(const vector<unique_ptr<const PublicKey>>& v)
-{
-    for(size_t i = 0; i < v.size(); i++)
-        hash (v[i]->get());
-}

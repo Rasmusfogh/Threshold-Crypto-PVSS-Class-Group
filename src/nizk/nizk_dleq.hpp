@@ -25,14 +25,10 @@ namespace NIZK
 
         public:
 
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& U, 
-            const QFI& R, const QFI& V, const Mpz& witness);
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& X2, 
+            const QFI& Y1, const QFI& Y2, const Mpz& w); //CL contains computation for X1
 
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& R, 
-            const PublicKey& pki, QFI& Mi, const SecretKey& sk);
-
-        bool verify(const QFI& U, const QFI& R, const QFI& V) const;
-        bool verify(QFI& R, const PublicKey& pki, QFI& Mi) const;
+        bool verify(const QFI& X2, const QFI& Y1, const QFI& Y2) const;
     };
 
 }

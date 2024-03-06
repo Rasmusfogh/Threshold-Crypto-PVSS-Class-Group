@@ -36,9 +36,8 @@ namespace QCLPVSS_
         //fixed points used to evaluate the sharing polynomial for the sharing proof
         vector<unique_ptr<Mpz>> Vis_;
 
-        HashAlgo & hash_;
-        unique_ptr<HashAlgo> hash128_;
-        RandGen & randgen_;
+        HashAlgo& hash_;
+        RandGen& randgen_;
 
         //Public parameters in dist
         unique_ptr<QFI> R_;

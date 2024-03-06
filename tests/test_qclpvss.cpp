@@ -51,8 +51,8 @@ int main (int argc, char *argv[])
 
     OpenSSL::HashAlgo H (seclevel);
 
-    size_t n(100UL);
-    size_t t(50UL);
+    size_t n(10UL);
+    size_t t(5UL);
 
     QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
 

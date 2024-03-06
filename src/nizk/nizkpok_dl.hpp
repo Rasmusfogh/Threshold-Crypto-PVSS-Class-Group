@@ -26,7 +26,7 @@ namespace NIZK
         NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&, 
             const PublicKey&, const SecretKey&);
 
-        bool verify(const PublicKey&) const;
+        bool verify(RandGen&, const PublicKey&) const;
     };
 
 }

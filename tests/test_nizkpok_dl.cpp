@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
 
     NizkPoK_DL pf(H, randgen, cl_hsm, pk, sk);
 
-    if(pf.verify(pk))
+    if(pf.verify(randgen ,pk))
         return EXIT_SUCCESS;
 
     return EXIT_FAILURE;
