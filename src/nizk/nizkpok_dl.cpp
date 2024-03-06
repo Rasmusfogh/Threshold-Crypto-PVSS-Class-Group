@@ -42,9 +42,6 @@ bool NizkPoK_DL::verify(RandGen &randgen, const PublicKey& x) const
 
     for(size_t i = 0; i < rounds_; i++) {
 
-        cout << u_[i].nbits() << endl;
-        cout << AS_.nbits() << endl;
-
         if (u_[i] > AS_) return false;
                 
         x.exponentiation(CL_, t[i], b_[i]);

@@ -43,7 +43,9 @@ namespace NIZK
                 const QFI& R, const QFI&h, const QFI& f) const;
 
         void computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& Vis, 
-                vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const Mpz& seed) const;
+                vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const vector<Mpz>& coeffs) const;
+
+        void generateCoefficients(RandGen&, Mpz& seed, vector<Mpz>& coeff) const;
     };
 }
 

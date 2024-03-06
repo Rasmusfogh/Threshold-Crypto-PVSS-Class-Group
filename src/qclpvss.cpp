@@ -7,8 +7,6 @@ using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 
-const int NIZK_POK_DL_HASH_NID = 1100;
-
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
   const size_t n, const size_t t, bool compact_variant) :
       CL_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
@@ -138,9 +136,7 @@ void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t&
 
         //Add one to both i and j as alphas are [1...n_]
         Mpz sub((signed long)((i + 1) - (j + 1)));
-        Mpz::mod(sub, sub, q_);
         Mpz::mul(*vis[i], *vis[i], sub);
-        Mpz::mod(*vis[i], *vis[i], q_);
       }
 
       Mpz::mod_inverse(*vis[i], *vis[i], q_);

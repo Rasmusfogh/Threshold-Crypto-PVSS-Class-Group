@@ -6,18 +6,19 @@ Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
 {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
 
-    Mpz r(randgen.random_mpz(A_));
+    //u_ = r
+    u_ = randgen.random_mpz(A_);
 
     QFI T1, T2;
 
-    cl.power_of_h(T1, r);
-    cl.Cl_Delta().nupow(T2, X2, r);
+    cl.power_of_h(T1, u_);
+    cl.Cl_Delta().nupow(T2, X2, u_);
     
     //cl.h() = X1 = g_q
     c_ = hash_(cl.h(), X2, Y1, Y2, T1, T2);
 
-    Mpz::mul(u_, c_, w);
-    Mpz::add(u_, u_, r);
+    // u_ = r + c_ * w
+    Mpz::addmul(u_, c_, w);
 }
 
 bool Nizk_DLEQ::verify(const QFI& X2, const QFI& Y1, const QFI& Y2) const
