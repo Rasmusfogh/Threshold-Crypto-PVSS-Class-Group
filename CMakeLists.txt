@@ -9,7 +9,6 @@ set (QCLPVSS_DESCRIPTION "QCLPVSS Implements a PVSS over Class Group Cryptograph
 set (MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake.utils")
 list (APPEND CMAKE_MODULE_PATH "${MODULE_DIR}")
 
-
 ##############################################################################
 # Set C++ standard to c++11
 ##############################################################################
@@ -45,9 +44,10 @@ endif ()
 ################################################################################
 find_package (gmp REQUIRED)
 find_package (OpenSSL REQUIRED)
+find_package (benchmark) #Google Benchmark
 
 # Add the bicycl library
-add_subdirectory(lib/include)
+add_subdirectory(include/bicycl)
 
 # Add your own source code in the "src" folder
 add_subdirectory(src)
