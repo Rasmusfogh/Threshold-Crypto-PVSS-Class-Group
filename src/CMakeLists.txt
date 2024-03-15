@@ -13,11 +13,12 @@ set(SRC_SOURCE_FILES
 add_library(project ${SRC_SOURCE_FILES})
 
 # Link the bicycl library to your project
-target_link_libraries(project PUBLIC bicycl)
+target_link_libraries(project PUBLIC bicycl libsecp256k1::secp256k1)
 
 # Optionally, specify any include directories needed for your project
 target_include_directories(project PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/application
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/nizk)
 

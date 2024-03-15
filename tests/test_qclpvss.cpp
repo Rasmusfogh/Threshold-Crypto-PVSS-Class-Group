@@ -66,7 +66,6 @@ int main (int argc, char *argv[])
     vector<unique_ptr<Nizk_DLEQ>> dec_shares(n);
     const Mpz s(9898UL);
 
-    auto start1 = high_resolution_clock::now();
 
     for(size_t i = 0; i < n; i++) 
     {
@@ -75,39 +74,15 @@ int main (int argc, char *argv[])
         keygen_pf[i] = pvss.keyGen(*pks[i], *sks[i]);
     }
 
-    auto stop1 = high_resolution_clock::now();
-    auto duration1 = duration_cast<milliseconds>(stop1 - start1);
-    cout << "keyGen: " << duration1.count() << endl;
-
-    auto start2 = high_resolution_clock::now();
-
     for(size_t i = 0; i < n; i++)
         if(!pvss.verifyKey(*pks[i], *keygen_pf[i]))
             return EXIT_FAILURE;    
 
-    auto stop2 = high_resolution_clock::now();
-    auto duration2 = duration_cast<milliseconds>(stop2 - start2);
-    cout << "verifyKey: " << duration2.count() << endl;
-
-    auto start3 = high_resolution_clock::now();
-
     sss_shares = pvss.dist(s);
     unique_ptr<Nizk_SH> sh_pf = pvss.dist(pks, *sss_shares);
 
-    auto stop3 = high_resolution_clock::now();
-    auto duration3 = duration_cast<milliseconds>(stop3 - start3);
-    cout << "dist: " << duration3.count() << endl;
-
-    auto start4 = high_resolution_clock::now();
-
     if (!pvss.verifySharing(pks, *sh_pf))
         return EXIT_FAILURE;
-
-    auto stop4 = high_resolution_clock::now();
-    auto duration4 = duration_cast<milliseconds>(stop4 - start4);
-    cout << "verifySharing: " << duration4.count() << endl;
-    
-    auto start5 = high_resolution_clock::now();
 
     for(size_t i = 0; i < n; i++)
     {
@@ -115,27 +90,12 @@ int main (int argc, char *argv[])
         dec_shares[i] = pvss.decShare(*pks[i], *sks[i], i);
     }
 
-    auto stop5 = high_resolution_clock::now();
-    auto duration5 = duration_cast<milliseconds>(stop5 - start5);
-    cout << "decShare: " << duration5.count() << endl;
-
-    auto start6 = high_resolution_clock::now();
-
     unique_ptr<const Mpz> s_rec = pvss.rec(Ais);
 
-    auto stop6 = high_resolution_clock::now();
-    auto duration6 = duration_cast<milliseconds>(stop6 - start6);
-    cout << "rec: " << duration6.count() << endl;
-
-    auto start7 = high_resolution_clock::now();
 
     for(size_t i = 0; i < n; i++)
         if (!pvss.verifyDec(*Ais[i], *pks[i], *dec_shares[i], i))
             return EXIT_FAILURE;
-    
-    auto stop7 = high_resolution_clock::now();
-    auto duration7 = duration_cast<milliseconds>(stop7 - start7);
-    cout << "verifyDec: " << duration7.count() << endl;
 
     return EXIT_SUCCESS;
 }

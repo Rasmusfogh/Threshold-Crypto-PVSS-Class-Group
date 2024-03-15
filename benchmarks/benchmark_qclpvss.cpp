@@ -51,7 +51,7 @@ static void setup(benchmark::State& state) {
 
     state.counters["secLevel"] = secLevel.soundness();
 }
-BENCHMARK(setup)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(setup)->Unit(kMillisecond);
 
 static void keyGen(benchmark::State& state) {
     for (auto _ : state) {
@@ -62,7 +62,7 @@ static void keyGen(benchmark::State& state) {
     }
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(keyGen)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(keyGen)->Unit(kMillisecond);
 
 static void verifyKey(benchmark::State& state) {
     bool success;
@@ -76,7 +76,7 @@ static void verifyKey(benchmark::State& state) {
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(verifyKey)->Unit(kMillisecond)->Iterations(5);
+BENCHMARK(verifyKey)->Unit(kMillisecond);
 
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
@@ -86,7 +86,7 @@ static void dist(benchmark::State& state) {
     }
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(dist)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(dist)->Unit(kMillisecond);
 
 
 static void verifySharing(benchmark::State& state) {
@@ -98,7 +98,7 @@ static void verifySharing(benchmark::State& state) {
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(verifySharing)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(verifySharing)->Unit(kMillisecond);
 
 //Only one Ai
 static void decShare(benchmark::State& state) {
@@ -114,7 +114,7 @@ static void decShare(benchmark::State& state) {
     }
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(decShare)->Unit(kMillisecond)->Iterations(5);
+BENCHMARK(decShare)->Unit(kMillisecond);
 
 static void rec(benchmark::State& state) {
     unique_ptr<const Mpz> s_rec;
@@ -126,7 +126,7 @@ static void rec(benchmark::State& state) {
     assert(*s_rec == secret);
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(rec)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(rec)->Unit(kMillisecond);
 
 static void verifyDec(benchmark::State& state) {
     bool success;
@@ -140,6 +140,6 @@ static void verifyDec(benchmark::State& state) {
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
 } 
-BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(5);
+BENCHMARK(verifyDec)->Unit(kMillisecond);
 
 BENCHMARK_MAIN();
