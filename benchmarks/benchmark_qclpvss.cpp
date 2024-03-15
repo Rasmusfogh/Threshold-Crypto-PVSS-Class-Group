@@ -1,65 +1,145 @@
-#include <string>
-#include <iostream>
-#include <chrono>
+#include "benchmark/benchmark.h"
 #include "../src/qclpvss.hpp"
+#include <chrono>
+#include <cassert>
 
-using namespace BICYCL;
+using namespace benchmark;
 using namespace QCLPVSS_;
+using namespace BICYCL;
+using namespace std;
+using namespace std::chrono;
 
-using std::string;
+static const Mpz secret(9898UL);
+static const int SECLEVEL = 128;
+static const size_t N = 10;
+static const size_t T = 5;
+static const size_t K = 1;
+static Mpz Q;
+static SecLevel secLevel(SECLEVEL);
+static RandGen randgen;
+static HashAlgo H(secLevel);
+static unique_ptr<QCLPVSS> pvss;
 
-int main (int argc, char *argv[])
-{
-    BICYCL::Mpz seed;
-    size_t qsize = 0;
-    size_t k = 1;
-    SecLevel seclevel(128);
-    BICYCL::RandGen randgen;
+//Global state
+static vector<unique_ptr<const SecretKey>> sks(N);
+static vector<unique_ptr<const PublicKey>> pks(N);
+static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
+static unique_ptr<vector<unique_ptr<const Share>>> sss_shares;
+static unique_ptr<Nizk_SH> sh_pf;
+static vector<unique_ptr<const Share>> Ais(N); //on the form <i, Ai>
+static vector<unique_ptr<Nizk_DLEQ>> dec_shares(N);
 
-    bool compact_variant = false; /* by default the compact variant is not used */
+static void setup(benchmark::State& state) {
 
-    auto T = std::chrono::system_clock::now();
-    seed = static_cast<unsigned long>(T.time_since_epoch().count());
-
-    /* */
-    std::cout << "# Using seed = " << seed << std::endl;
+    auto t = std::chrono::system_clock::now();
+    Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
     randgen.set_seed (seed);
 
-    BICYCL::Mpz q(randgen.random_prime(129));
+    Q = (randgen.random_prime(SECLEVEL + 1));
 
-    /* */
-    std::cout << "# security: " << seclevel << " bits" << std::endl;
-
-    /* q and qsize are mutually exclusive */
-    if ((q.sgn() != 0 && qsize != 0) || (q.is_zero() && qsize == 0))
-    {
-        std::cerr << "Error, exactly one of q or qsize must be provided"
-                << std::endl;
-        return EXIT_FAILURE;
+    for (auto _ : state) {
+        pvss = unique_ptr<QCLPVSS>(new QCLPVSS(secLevel, H, randgen, Q, K, N, T, false));
+        DoNotOptimize(pvss);
     }
 
-
-    /* If q is given, it should be prime */
-    if (q.sgn() != 0 && (q.sgn() < 0 || !q.is_prime()))
+    for(size_t i = 0; i < N; i++) 
     {
-        std::cerr << "Error, q must be positive and prime" << std::endl;
-        return EXIT_FAILURE;
+        sks[i] = pvss->keyGen(randgen);
+        pks[i] = pvss->keyGen(*sks[i]);
+        keygen_pf[i] = pvss->keyGen(*pks[i], *sks[i]);
     }
 
-    OpenSSL::HashAlgo H (seclevel);
-
-    size_t n(8);
-    size_t t(5);
-
-    QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
-
-    std::cout << pvss.CL_;
-
-    // SecretKey sk = pvss.keyGen(randgen);
-    // PublicKey pk = pvss.keyGen(sk);
-    // NizkPoK_DL pf = pvss.keyGen(randgen, pk, sk);
-
-    // std::cout << pvss.verifyKey(sk, pk, pf) << std::endl;
-
-    return 0;
+    state.counters["secLevel"] = secLevel.soundness();
 }
+BENCHMARK(setup)->Unit(kMillisecond)->Iterations(10);
+
+static void keyGen(benchmark::State& state) {
+    for (auto _ : state) {
+        unique_ptr<const SecretKey> sk = pvss->keyGen(randgen);
+        unique_ptr<const PublicKey> pk = pvss->keyGen(*sk);
+        unique_ptr<NizkPoK_DL> pf = pvss->keyGen(*pk, *sk);
+        DoNotOptimize(pf);
+    }
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(keyGen)->Unit(kMillisecond)->Iterations(10);
+
+static void verifyKey(benchmark::State& state) {
+    bool success;
+    for (auto _ : state) {
+        for(size_t i = 0; i < N; i++)
+        {
+            success = pvss->verifyKey(*pks[i], *keygen_pf[i]);
+            DoNotOptimize(success);
+        }
+    }
+    assert(success);
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(verifyKey)->Unit(kMillisecond)->Iterations(5);
+
+static void dist(benchmark::State& state) {
+    for (auto _ : state) {
+        sss_shares = pvss->dist(secret);
+        sh_pf = pvss->dist(pks, *sss_shares);
+        DoNotOptimize(sh_pf);
+    }
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(dist)->Unit(kMillisecond)->Iterations(10);
+
+
+static void verifySharing(benchmark::State& state) {
+    bool success;
+    for (auto _ : state) {
+        success = pvss->verifySharing(pks, *sh_pf);
+        DoNotOptimize(success);
+    }
+    assert(success);
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(verifySharing)->Unit(kMillisecond)->Iterations(10);
+
+//Only one Ai
+static void decShare(benchmark::State& state) {
+    for (auto _ : state) {
+        Ais[0] = pvss->decShare(*sks[0], 0);
+        dec_shares[0] = pvss->decShare(*pks[0], *sks[0], 0);
+    }
+
+    for(size_t i = 1; i < N; i++)
+    {
+        Ais[i] = pvss->decShare(*sks[i], i);
+        dec_shares[i] = pvss->decShare(*pks[i], *sks[i], i);
+    }
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(decShare)->Unit(kMillisecond)->Iterations(5);
+
+static void rec(benchmark::State& state) {
+    unique_ptr<const Mpz> s_rec;
+    for (auto _ : state) {
+        s_rec = pvss->rec(Ais);
+        DoNotOptimize(s_rec);
+    }
+
+    assert(*s_rec == secret);
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(rec)->Unit(kMillisecond)->Iterations(10);
+
+static void verifyDec(benchmark::State& state) {
+    bool success;
+    for (auto _ : state) {
+        for(size_t i = 0; i < T; i++)
+        {
+            success = pvss->verifyDec(*Ais[i], *pks[i], *dec_shares[i], i);
+            DoNotOptimize(success);
+        }
+    }
+    assert(success);
+    state.counters["secLevel"] = secLevel.soundness();
+} 
+BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(5);
+
+BENCHMARK_MAIN();

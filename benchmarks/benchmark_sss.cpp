@@ -2,32 +2,60 @@
 #include <chrono>
 #include <bicycl.hpp>
 #include <sss.hpp>
-using namespace SSS_;
-using namespace BICYCL;
+#include "benchmark/benchmark.h"
+#include "../src/qclpvss.hpp"
 
-int main (int argc, char *argv[])
+using namespace benchmark;
+using namespace QCLPVSS_;
+using namespace BICYCL;
+using namespace std;
+using namespace std::chrono;
+
+static const size_t N = 500;
+static const size_t T = 250;
+static Mpz Q;
+static RandGen randgen;
+static unique_ptr<SSS> sss;
+static const Mpz secret(1234UL);
+
+//Global state
+static unique_ptr<vector<unique_ptr<const Share>>> shares;
+static unique_ptr<const Mpz> s_;
+
+
+static void setup(benchmark::State& state)
 {
     Mpz seed;
-    RandGen randgen;
-    size_t t_ = 300;
-    size_t n_ = 500;
-
-    auto T = std::chrono::system_clock::now();
-    seed = static_cast<unsigned long>(T.time_since_epoch().count());
+    auto t = std::chrono::system_clock::now();
+    seed = static_cast<unsigned long>(t.time_since_epoch().count());
     randgen.set_seed (seed);
 
-    Mpz q_(randgen.random_prime(64));
-    Mpz s(1234UL);
+    Q = (randgen.random_prime(128));
 
-    unique_ptr<vector<unique_ptr<const Share>>> shares;
-    unique_ptr<const Mpz> s_;
-
-    SSS shamir(randgen, t_, n_, q_);
-    shares = shamir.shareSecret(s); //figure out how
-    s_ = shamir.reconstructSecret(*shares);
-
-    if (s == *s_)
-        return EXIT_SUCCESS;
-
-    return EXIT_FAILURE;
+    for (auto _ : state) {
+        sss = unique_ptr<SSS>(new SSS(randgen, T, N, Q));
+    }
 }
+BENCHMARK(setup)->Unit(kMillisecond);
+
+static void share(benchmark::State& state)
+{
+    for (auto _ : state) {
+        shares = sss->shareSecret(secret);
+        DoNotOptimize(shares);
+    }
+}
+BENCHMARK(share)->Unit(kMillisecond);
+
+static void reconstruct(benchmark::State& state)
+{
+    unique_ptr<const Mpz> s_;
+    for (auto _ : state) {
+        s_ = sss->reconstructSecret(*shares);
+        DoNotOptimize(s_);
+    }
+    assert(*s_ == secret);
+}
+BENCHMARK(reconstruct)->Unit(kMillisecond);
+
+BENCHMARK_MAIN();

@@ -83,9 +83,9 @@ unique_ptr<Nizk_SH> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
     (hash_, randgen_, CL_, pks, Bs_, *R_, n_, t_, q_, r, Vis_));
 }
 
-bool QCLPVSS::verifySharing(vector<unique_ptr<const PublicKey>>& pks, unique_ptr<Nizk_SH> pf) const 
+bool QCLPVSS::verifySharing(vector<unique_ptr<const PublicKey>>& pks, Nizk_SH& pf) const 
 {
-  return pf->verify(pks, Bs_, *R_, Vis_);
+  return pf.verify(pks, Bs_, *R_, Vis_);
 }
 
 unique_ptr<const Share> QCLPVSS::decShare(const SecretKey& sk, size_t i) const 

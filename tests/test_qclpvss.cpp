@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
 
     auto start4 = high_resolution_clock::now();
 
-    if (!pvss.verifySharing(pks, move(sh_pf)))
+    if (!pvss.verifySharing(pks, *sh_pf))
         return EXIT_FAILURE;
 
     auto stop4 = high_resolution_clock::now();

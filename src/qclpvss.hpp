@@ -69,7 +69,7 @@ namespace QCLPVSS_
         unique_ptr<Nizk_SH> dist(vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
 
         //Distribution Verification
-        bool verifySharing(vector<unique_ptr<const PublicKey>>&, unique_ptr<Nizk_SH>) const;
+        bool verifySharing(vector<unique_ptr<const PublicKey>>&, Nizk_SH&) const;
 
         //Reconstruction
         unique_ptr<const Share> decShare(const SecretKey&, size_t i) const;
