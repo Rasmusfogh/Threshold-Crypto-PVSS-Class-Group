@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <memory>
-#include "utils/qclpvss_utils.hpp"
-#include "utils/sss.hpp"
-#include "nizk/nizkpok_dl.hpp"
-#include "nizk/nizk_sh.hpp"
+#include <qclpvss_utils.hpp>
+#include <sss.hpp>
+#include <nizkpok_dl.hpp>
+#include <nizk_sh.hpp>
+#include <datatype.hpp>
 
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -14,6 +15,7 @@ using namespace UTILS;
 using namespace NIZK;
 using namespace std;
 using namespace SSS_;
+using namespace DATATYPE;
 
 namespace QCLPVSS_
 {   
@@ -39,14 +41,6 @@ namespace QCLPVSS_
         HashAlgo& hash_;
         RandGen& randgen_;
 
-        //Public parameters in dist
-        unique_ptr<QFI> R_;
-        vector<unique_ptr<QFI>> Bs_;
-
-        //public parameters in decShare
-        unique_ptr<QFI> fi_;
-
-
         public:
 
         /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of secret, @p t: privacy threshhold, @p n: number of parties  */
@@ -66,18 +60,17 @@ namespace QCLPVSS_
 
         //Distribution
         unique_ptr<vector<unique_ptr<const Share>>> dist(const Mpz &secret) const;
-        unique_ptr<Nizk_SH> dist(vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
+        unique_ptr<EncShares> dist(vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
 
         //Distribution Verification
-        bool verifySharing(vector<unique_ptr<const PublicKey>>&, Nizk_SH&) const;
+        bool verifySharing(const EncShares&, vector<unique_ptr<const PublicKey>>&) const;
 
         //Reconstruction
-        unique_ptr<const Share> decShare(const SecretKey&, size_t i) const;
-        unique_ptr<Nizk_DLEQ> decShare(const PublicKey&, const SecretKey&, size_t i) const;
+        unique_ptr<DecShare> decShare(const PublicKey&, const SecretKey&, const QFI& R, const QFI& B, size_t i) const;
         unique_ptr<const Mpz> rec(vector<unique_ptr<const Share>>& Ais) const;
 
         //Reconstruction Verification
-        bool verifyDec(const Share& Ai, const PublicKey& pki, const Nizk_DLEQ& pf, size_t i) const;
+        bool verifyDec(const DecShare&, const PublicKey& pki, const QFI& R, const QFI& B) const;
         /**@}*/
 
         private:

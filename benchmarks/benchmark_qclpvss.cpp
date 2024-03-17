@@ -25,10 +25,9 @@ static vector<unique_ptr<const SecretKey>> sks(N);
 static vector<unique_ptr<const PublicKey>> pks(N);
 static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
 static unique_ptr<vector<unique_ptr<const Share>>> sss_shares;
-static unique_ptr<Nizk_SH> sh_pf;
-static vector<unique_ptr<const Share>> Ais(N); //on the form <i, Ai>
-static vector<unique_ptr<Nizk_DLEQ>> dec_shares(N);
-
+static unique_ptr<EncShares> enc_shares;
+static vector<unique_ptr<DecShare>> dec_shares(N);
+static vector<unique_ptr<const Share>> rec_shares;
 static void setup(benchmark::State& state) {
 
     auto t = std::chrono::system_clock::now();
@@ -81,8 +80,8 @@ BENCHMARK(verifyKey)->Unit(kMillisecond);
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
         sss_shares = pvss->dist(secret);
-        sh_pf = pvss->dist(pks, *sss_shares);
-        DoNotOptimize(sh_pf);
+        enc_shares = pvss->dist(pks, *sss_shares);
+        DoNotOptimize(enc_shares);
     }
     state.counters["secLevel"] = secLevel.soundness();
 } 
@@ -92,7 +91,7 @@ BENCHMARK(dist)->Unit(kMillisecond);
 static void verifySharing(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
-        success = pvss->verifySharing(pks, *sh_pf);
+        success = pvss->verifySharing(*enc_shares, pks);
         DoNotOptimize(success);
     }
     assert(success);
@@ -102,24 +101,27 @@ BENCHMARK(verifySharing)->Unit(kMillisecond);
 
 //Only one Ai
 static void decShare(benchmark::State& state) {
-    for (auto _ : state) {
-        Ais[0] = pvss->decShare(*sks[0], 0);
-        dec_shares[0] = pvss->decShare(*pks[0], *sks[0], 0);
-    }
+    for (auto _ : state) 
+        dec_shares[0] = pvss->decShare(*pks[0], *sks[0], enc_shares->R, enc_shares->Bs[0], 0);
 
     for(size_t i = 1; i < N; i++)
-    {
-        Ais[i] = pvss->decShare(*sks[i], i);
-        dec_shares[i] = pvss->decShare(*pks[i], *sks[i], i);
-    }
+        dec_shares[i] = pvss->decShare(*pks[i], *sks[i], enc_shares->R, enc_shares->Bs[i], i);
+
     state.counters["secLevel"] = secLevel.soundness();
 } 
 BENCHMARK(decShare)->Unit(kMillisecond);
 
 static void rec(benchmark::State& state) {
     unique_ptr<const Mpz> s_rec;
+
+    for (const auto& dec_share : dec_shares) {
+        if (dec_share->sh) {
+            rec_shares.push_back(unique_ptr<const Share> (new Share(*dec_share->sh)));
+        }
+    }
+
     for (auto _ : state) {
-        s_rec = pvss->rec(Ais);
+        s_rec = pvss->rec(rec_shares);
         DoNotOptimize(s_rec);
     }
 
@@ -133,7 +135,7 @@ static void verifyDec(benchmark::State& state) {
     for (auto _ : state) {
         for(size_t i = 0; i < T; i++)
         {
-            success = pvss->verifyDec(*Ais[i], *pks[i], *dec_shares[i], i);
+            success = pvss->verifyDec(*dec_shares[i], *pks[i], enc_shares->R, enc_shares->Bs[i]);
             DoNotOptimize(success);
         }
     }

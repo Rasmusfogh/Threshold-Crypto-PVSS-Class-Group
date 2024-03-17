@@ -3,7 +3,7 @@
 using namespace NIZK;
 
 Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
-    vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const QFI& R, 
+    vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, const QFI& R, 
     const size_t& n, const size_t& t, const Mpz& q, const Mpz& r, const vector<unique_ptr<Mpz>>& Vis) 
     : h_(hash), rand_(randgen), q_(q), n_(n), t_(t), degree_(n - t - 1 - 1), CL_(cl)
 {
@@ -20,7 +20,7 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
     pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash, randgen, cl, U, R, V, r));
 }
 
-bool Nizk_SH::verify(vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, 
+bool Nizk_SH::verify(vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
     const QFI& R, const vector<unique_ptr<Mpz>>& Vis)
 {
     Mpz seed;
@@ -36,13 +36,13 @@ bool Nizk_SH::verify(vector<unique_ptr<const PublicKey>>& pks, const vector<uniq
 }
 
 void Nizk_SH::initSeed(Mpz& seed, vector<unique_ptr<const PublicKey>>& pks, 
-        const vector<unique_ptr<QFI>>& Bs, const QFI& R, const QFI&h, const QFI& f) const
+        const vector<QFI>& Bs, const QFI& R, const QFI&h, const QFI& f) const
 {
     seed = Mpz(h_(pks, R, Bs, h, f));
 }
 
 void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& Vis, 
-        vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, const vector<Mpz>& coeffs) const
+        vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, const vector<Mpz>& coeffs) const
 {
     QFI exp;
     Mpz temp, poly_eval;
@@ -74,7 +74,7 @@ void Nizk_SH::computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& V
         CL_.Cl_Delta().nucomp(U_ref, U_ref, exp);
 
         //compute V
-        CL_.Cl_Delta().nupow(exp, (*Bs[i]), temp);
+        CL_.Cl_Delta().nupow(exp, Bs[i], temp);
         CL_.Cl_Delta().nucomp(V_ref, V_ref, exp);
     }
 }

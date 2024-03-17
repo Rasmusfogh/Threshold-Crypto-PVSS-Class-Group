@@ -62,8 +62,9 @@ int main (int argc, char *argv[])
     vector<unique_ptr<const PublicKey>> pks(n);
     vector<unique_ptr<NizkPoK_DL>> keygen_pf(n);
     unique_ptr<vector<unique_ptr<const Share>>> sss_shares;
-    vector<unique_ptr<const Share>> Ais(n); //on the form <i, Ai>
-    vector<unique_ptr<Nizk_DLEQ>> dec_shares(n);
+    vector<unique_ptr<DecShare>> dec_shares(n);
+    vector<unique_ptr<const Share>> rec_shares;
+
     const Mpz s(9898UL);
 
 
@@ -79,22 +80,25 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;    
 
     sss_shares = pvss.dist(s);
-    unique_ptr<Nizk_SH> sh_pf = pvss.dist(pks, *sss_shares);
+    unique_ptr<EncShares> enc_shares = pvss.dist(pks, *sss_shares);
 
-    if (!pvss.verifySharing(pks, *sh_pf))
+    if (!pvss.verifySharing(*enc_shares, pks))
         return EXIT_FAILURE;
 
     for(size_t i = 0; i < n; i++)
-    {
-        Ais[i] = pvss.decShare(*sks[i], i);
-        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], i);
+        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], enc_shares->R, enc_shares->Bs[i], i);
+
+    for (const auto& dec_share : dec_shares) {
+        if (dec_share->sh) {
+            rec_shares.push_back(unique_ptr<const Share> (new Share(*dec_share->sh)));
+        }
     }
 
-    unique_ptr<const Mpz> s_rec = pvss.rec(Ais);
+    unique_ptr<const Mpz> s_rec = pvss.rec(rec_shares);
 
 
     for(size_t i = 0; i < n; i++)
-        if (!pvss.verifyDec(*Ais[i], *pks[i], *dec_shares[i], i))
+        if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R, enc_shares->Bs[i]))
             return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
