@@ -4,6 +4,7 @@ set(SRC_SOURCE_FILES
     utils/qclpvss_utils.cpp
     utils/sss.cpp
     utils/openssl_hash_ext.cpp
+    utils/secp256k1_wrapper.cpp
     utils/datatype.cpp
     nizk/nizkpok_dl.cpp
     nizk/nizk_sh.cpp

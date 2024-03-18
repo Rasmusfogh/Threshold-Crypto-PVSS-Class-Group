@@ -3,8 +3,8 @@
 using namespace NIZK;
 
 Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
-    vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, const QFI& R, 
-    const size_t& n, const size_t& t, const Mpz& q, const Mpz& r, const vector<unique_ptr<Mpz>>& Vis) 
+    vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, const QFI& R, const Mpz& r,
+    const size_t& n, const size_t& t, const Mpz& q, const vector<unique_ptr<Mpz>>& Vis) 
     : h_(hash), rand_(randgen), q_(q), n_(n), t_(t), degree_(n - t - 1 - 1), CL_(cl)
 {
     Mpz seed;

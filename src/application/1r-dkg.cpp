@@ -1,13 +1,14 @@
-#include "../qclpvss.hpp"
+#include <qclpvss.hpp>
 #include <chrono>
 #include <secp256k1.h>
 #include "utils.h"
 #include <assert.h>
+#include <secp256k1_wrapper.hpp>
 using namespace QCLPVSS_;
 using namespace BICYCL;
 using namespace std;
 using namespace std::chrono;
-
+using namespace EC;
 int main (int argc, char *argv[])
 {
     Mpz seed;
@@ -26,21 +27,8 @@ int main (int argc, char *argv[])
     size_t t(5UL);
 
     //setup.1
-    QCLPVSS pvss(seclevel, H, randgen, q, 1, n, t, false);
-
-    unsigned char randomize[32];
-    int return_val;
-    //Create context
-    secp256k1_context* ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
-
-    // Randomizing the context is recommended to protect against side-channel leakage 
-    if (!fill_random(randomize, sizeof(randomize))) {
-        printf("Failed to generate randomness\n");
-        return 1;
-    }
-
-    return_val = secp256k1_context_randomize(ctx, randomize);
-    assert(return_val);
+    QCLPVSS pvss(seclevel, H, randgen, q, 1, n, t);
+    Secp256k1 secp256k1;
 
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
@@ -65,21 +53,14 @@ int main (int argc, char *argv[])
 
     for(size_t i = 0; i < n; i++)
     {
-        //Picking randomness
-        unsigned char r_[32];
-        while (1) {
-            if (!fill_random(r_, sizeof(r_))) {
-                printf("Failed to generate randomness\n");
-                return EXIT_FAILURE;
-            }
-            if (secp256k1_ec_seckey_verify(ctx, r_)) {
-                break;
-            }
-        }
-        
-        Mpz r(vector<unsigned char>(r_, r_ + 32));
+        Mpz r = secp256k1.randomPoint();
+        unique_ptr<vector<unique_ptr<const Share>>> shares = pvss.dist(r);
+        unique_ptr<EncShares> enc_shares = pvss.dist(pks, *shares);
 
-        
+        for(size_t i = 0; i < n; i++)
+        {
+            
+        }
     }
 
     // sss_shares = pvss.dist(s);

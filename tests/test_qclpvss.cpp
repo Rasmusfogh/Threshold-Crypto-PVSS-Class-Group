@@ -19,8 +19,6 @@ int main (int argc, char *argv[])
     SecLevel seclevel(128);
     BICYCL::RandGen randgen;
 
-    bool compact_variant = false; /* by default the compact variant is not used */
-
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
 
@@ -54,7 +52,7 @@ int main (int argc, char *argv[])
     size_t n(10UL);
     size_t t(5UL);
 
-    QCLPVSS pvss(seclevel, H, randgen, q, k, n, t, compact_variant);
+    QCLPVSS pvss(seclevel, H, randgen, q, k, n, t);
 
     //std::cout << pvss.CL_;
 
@@ -81,6 +79,7 @@ int main (int argc, char *argv[])
 
     sss_shares = pvss.dist(s);
     unique_ptr<EncShares> enc_shares = pvss.dist(pks, *sss_shares);
+    pvss.dist(pks, *enc_shares);
 
     if (!pvss.verifySharing(*enc_shares, pks))
         return EXIT_FAILURE;

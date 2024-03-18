@@ -16,6 +16,7 @@ namespace DATATYPE
     class EncShares
     {
         public:
+            Mpz r;
             QFI R;
             vector<QFI> Bs;
             unique_ptr<Nizk_SH> pf;

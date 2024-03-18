@@ -9,8 +9,8 @@ using namespace OpenSSL;
 using namespace DATATYPE;
 
 QCLPVSS::QCLPVSS (SecLevel seclevel, HashAlgo &hash, RandGen& randgen, Mpz &q, const size_t k, 
-  const size_t n, const size_t t, bool compact_variant) :
-      CL_(CL_HSMqk (q, k, seclevel, randgen, compact_variant)),
+  const size_t n, const size_t t) :
+      CL_(CL_HSMqk (q, k, seclevel, randgen, false)),
       sss_(SSS(randgen, t, n, q)),
       seclevel_(seclevel),
       randgen_(randgen),
@@ -59,12 +59,12 @@ unique_ptr<EncShares> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
 {
   QFI f, pkr;
 
-  unique_ptr<EncShares> enc_shares (new EncShares(n_));
+  unique_ptr<EncShares> enc_sh (new EncShares(n_));
 
-  const Mpz r(randgen_.random_mpz(CL_.encrypt_randomness_bound()));
+  enc_sh->r = randgen_.random_mpz(CL_.encrypt_randomness_bound());
 
   //Compute R
-  CL_.power_of_h(enc_shares->R, r);
+  CL_.power_of_h(enc_sh->R, enc_sh->r);
 
   //Compute B_i's
   for(size_t i = 0; i < n_; i++)
@@ -72,15 +72,21 @@ unique_ptr<EncShares> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks,
     //f^p(a_i)
     f = CL_.power_of_f(shares[i]->y());
     //(pk_i)^r
-    pks[i]->exponentiation(CL_, pkr, r);
+    pks[i]->exponentiation(CL_, pkr, enc_sh->r);
     // B_i = (pk_i)^r * f^p(a_i)
-    CL_.Cl_Delta().nucomp(enc_shares->Bs[i], pkr, f);
+    CL_.Cl_Delta().nucomp(enc_sh->Bs[i], pkr, f);
   }
 
-  enc_shares->pf = unique_ptr<Nizk_SH>(new Nizk_SH
-    (hash_, randgen_, CL_, pks, enc_shares->Bs, enc_shares->R, n_, t_, q_, r, Vis_));
+  enc_sh->pf = unique_ptr<Nizk_SH>(new Nizk_SH
+    (hash_, randgen_, CL_, pks, enc_sh->Bs, enc_sh->R, enc_sh->r, n_, t_, q_, Vis_));
 
-  return enc_shares;
+  return enc_sh;
+}
+
+void QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_sh) const 
+{
+    enc_sh.pf = unique_ptr<Nizk_SH>(new Nizk_SH
+      (hash_, randgen_, CL_, pks, enc_sh.Bs, enc_sh.R, enc_sh.r, n_, t_, q_, Vis_));
 }
 
 bool QCLPVSS::verifySharing(const EncShares& sh, vector<unique_ptr<const PublicKey>>& pks) const 

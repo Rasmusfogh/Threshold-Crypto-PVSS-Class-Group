@@ -40,3 +40,5 @@ void OpenSSL::HashAlgo::hash(const vector<QFI> &v)
     for(size_t i = 0; i < v.size(); i++)
         hash (v[i]);
 }
+
+

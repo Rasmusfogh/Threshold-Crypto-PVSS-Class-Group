@@ -24,10 +24,12 @@ static unique_ptr<QCLPVSS> pvss;
 static vector<unique_ptr<const SecretKey>> sks(N);
 static vector<unique_ptr<const PublicKey>> pks(N);
 static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
-static unique_ptr<vector<unique_ptr<const Share>>> sss_shares;
+static unique_ptr<vector<unique_ptr<const Share>>> shares;
 static unique_ptr<EncShares> enc_shares;
 static vector<unique_ptr<DecShare>> dec_shares(N);
 static vector<unique_ptr<const Share>> rec_shares;
+
+
 static void setup(benchmark::State& state) {
 
     auto t = std::chrono::system_clock::now();
@@ -37,7 +39,7 @@ static void setup(benchmark::State& state) {
     Q = (randgen.random_prime(SECLEVEL + 1));
 
     for (auto _ : state) {
-        pvss = unique_ptr<QCLPVSS>(new QCLPVSS(secLevel, H, randgen, Q, K, N, T, false));
+        pvss = unique_ptr<QCLPVSS>(new QCLPVSS(secLevel, H, randgen, Q, K, N, T));
         DoNotOptimize(pvss);
     }
 
@@ -79,8 +81,9 @@ BENCHMARK(verifyKey)->Unit(kMillisecond);
 
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
-        sss_shares = pvss->dist(secret);
-        enc_shares = pvss->dist(pks, *sss_shares);
+        shares = pvss->dist(secret);
+        enc_shares = pvss->dist(pks, *shares);
+        pvss->dist(pks, *enc_shares);
         DoNotOptimize(enc_shares);
     }
     state.counters["secLevel"] = secLevel.soundness();
@@ -114,11 +117,10 @@ BENCHMARK(decShare)->Unit(kMillisecond);
 static void rec(benchmark::State& state) {
     unique_ptr<const Mpz> s_rec;
 
-    for (const auto& dec_share : dec_shares) {
-        if (dec_share->sh) {
+    //Simulate parties reconstructing by providing their share
+    for (const auto& dec_share : dec_shares)
+        if (dec_share->sh)
             rec_shares.push_back(unique_ptr<const Share> (new Share(*dec_share->sh)));
-        }
-    }
 
     for (auto _ : state) {
         s_rec = pvss->rec(rec_shares);
