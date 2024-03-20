@@ -9,6 +9,7 @@ set(SRC_SOURCE_FILES
     nizk/nizkpok_dl.cpp
     nizk/nizk_sh.cpp
     nizk/nizk_dleq.cpp
+    nizk/nizk_sh_ext.cpp
 )
 
 # Create a library target for your project

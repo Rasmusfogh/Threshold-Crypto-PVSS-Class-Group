@@ -16,9 +16,10 @@ namespace NIZK
     //Forward declaration
     class Nizk_DLEQ;
 
-    class Nizk_SH : public virtual Nizk_SH_base<const Mpz, 
-                    const vector<unique_ptr<const PublicKey>>, 
-                    const vector<QFI>, const QFI>
+    class Nizk_SH : public virtual Nizk_SH_base<const Mpz,     // r
+                    const vector<unique_ptr<const PublicKey>>, // pks
+                    const vector<QFI>,                         // Bs
+                    const QFI>                                 // R
     {
 
         protected:
