@@ -33,8 +33,6 @@ namespace NIZK
             const Mpz queryRandomOracle (const Mpz& v) const {
                 return rand_.random_mpz(v);
             }
-
-        
     };
 }
 

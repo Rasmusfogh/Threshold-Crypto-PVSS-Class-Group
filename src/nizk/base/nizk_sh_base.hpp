@@ -13,11 +13,8 @@ using namespace std;
 
 namespace NIZK
 {
-    //Forward declaration
-    const Mpz queryRandomOracle (const Mpz& v);
-
     template <typename Witness, typename... Statement>
-    class Nizk_SH_base : public virtual Nizk_base<Witness, Statement...>  {
+    class Nizk_SH_base : public Nizk_base<Witness, Statement...>  {
 
         protected:
             const Mpz& q_;
@@ -58,7 +55,7 @@ namespace NIZK
                     Mpz::mod(temp, temp, q_);
 
                     //compute wi' = temp
-                    Mpz ci(queryRandomOracle(q_)); //ci using RNG
+                    Mpz ci(this->queryRandomOracle(q_)); //ci using RNG
                     Mpz::addmul(temp, ci, q_); 
                     Mpz::mod(temp, temp, q_);
 
@@ -75,7 +72,7 @@ namespace NIZK
             void generateCoefficients(vector<Mpz>& coeffs) const
             {
                 for (size_t i = 0; i < coeffs.size(); i++)
-                    coeffs[i] = queryRandomOracle(q_); 
+                    coeffs[i] = this->queryRandomOracle(q_); 
             }
     };
 }

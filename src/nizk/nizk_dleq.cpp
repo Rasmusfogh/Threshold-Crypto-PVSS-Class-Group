@@ -3,7 +3,7 @@ using namespace NIZK;
 
 Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
     const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2, const Mpz& w) 
-    : C_(cl_.encrypt_randomness_bound()), Nizk_base(hash, randgen, cl)
+    : C_(cl.encrypt_randomness_bound()), Nizk_base(hash, randgen, cl)
 {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
 
