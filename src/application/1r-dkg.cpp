@@ -70,7 +70,6 @@ int main (int argc, char *argv[])
             Dij_matrix[i][j] = secp256k1.exponent((*shares)[j]->second);
         }
 
-        unique_ptr<Nizk_SH_ext> s(new Nizk_SH_ext(H, randgen, ));
     }
 
     // sss_shares = pvss.dist(s);

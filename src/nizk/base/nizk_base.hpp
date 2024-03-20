@@ -23,7 +23,8 @@ namespace NIZK
 
             virtual void prove(const Witness& w, const Statement& ... s) = 0;
             virtual bool verify(const Statement& ... s) const = 0;
-
+            
+        protected:
             //Random Oracle
             template <typename... Args>
             void initRandomOracle (const Args & ...args) const {

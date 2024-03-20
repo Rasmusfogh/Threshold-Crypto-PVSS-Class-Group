@@ -16,10 +16,14 @@ namespace NIZK
     //Forward declaration
     class Nizk_SH;
     
-    class Nizk_DLEQ : public virtual Nizk_base<const Mpz, const QFI, const QFI, const QFI, const QFI> {
-
+    class Nizk_DLEQ : public virtual Nizk_base<const Mpz,   // r
+                                               const QFI,   // g_q / h
+                                               const QFI,   // U
+                                               const QFI,   // R
+                                               const QFI>   // V
+    {
         protected:
-        Mpz A_, C_;
+        Mpz A_, C_, SC_;
         Mpz u_, c_;
 
         public:
@@ -29,6 +33,5 @@ namespace NIZK
         void prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2) override;
         bool verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2) const override;
     };
-
 }
 #endif

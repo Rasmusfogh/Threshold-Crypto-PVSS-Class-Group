@@ -22,15 +22,15 @@ void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk)
 
     for(size_t i = 0; i < rounds_; i++) 
     {
-        r[i] = this->rand_.random_mpz(A_);
-        this->cl_.power_of_h(t[i], r[i]);
+        r[i] = rand_.random_mpz(A_);
+        cl_.power_of_h(t[i], r[i]);
     }
     
-    this->initRandomOracle(this->cl_.h(), pk.get(), t);
+    initRandomOracle(cl_.h(), pk.get(), t);
 
     for(size_t i = 0; i < rounds_; i++)
     {
-        b_[i] = this->queryRandomOracle(this->cl_.q()); // not right boundary
+        b_[i] = queryRandomOracle(cl_.q()); // not right boundary
         Mpz::mul(temp, sk, b_[i]);
         Mpz::add(u_[i], temp, r[i]);
     }

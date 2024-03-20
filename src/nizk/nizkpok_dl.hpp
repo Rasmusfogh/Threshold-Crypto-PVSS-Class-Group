@@ -12,7 +12,8 @@ using namespace std;
 
 namespace NIZK
 {
-    class NizkPoK_DL : public virtual Nizk_base<const SecretKey, const PublicKey> {
+    class NizkPoK_DL : public virtual Nizk_base<const SecretKey,
+                                                const PublicKey> {
 
         protected:
         Mpz A_, AS_;

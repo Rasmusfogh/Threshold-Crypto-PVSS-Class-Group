@@ -11,23 +11,23 @@ void Nizk_SH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks
     const vector<QFI>& Bs, const QFI& R)
 {
     //Not sure if correct way to pass f
-    initRandomOracle(pks, Bs, R, this->cl_.h(), this->cl_.power_of_f(Mpz(1UL)));
+    initRandomOracle(pks, Bs, R, cl_.h());
 
-    vector<Mpz> coeffs(this->t_);
+    vector<Mpz> coeffs(t_);
     generateCoefficients(coeffs);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
 
     //remember to call prove on cl.h(), U, R, V, r
-    pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(this->hash_, this->rand_, this->cl_));
-    pf_->prove(r, this->cl_.h(), U, R, V);
+    pf_ = unique_ptr<Nizk_DLEQ> (new Nizk_DLEQ(hash_, rand_, cl_));
+    pf_->prove(r, cl_.h(), U, R, V);
 }
 
 bool Nizk_SH::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
     const QFI& R) const
 {
-    initRandomOracle(pks, Bs, R, cl_.h(), cl_.power_of_f(Mpz(1UL)));
+    initRandomOracle(pks, Bs, R, cl_.h());
 
     vector<Mpz> coeffs(t_);
     generateCoefficients(coeffs);

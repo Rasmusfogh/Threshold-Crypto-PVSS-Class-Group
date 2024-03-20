@@ -11,5 +11,8 @@ unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>&
 {
     Mpz s = (this->randgen_.random_mpz(this->q_));
     unique_ptr<vector<unique_ptr<const Share>>> shares = this->dist(s);
-    
+
+    //unique_ptr<Nizk_SH_ext> s(new Nizk_SH_ext(H, randgen,  ));
+
+
 }
