@@ -9,6 +9,7 @@ using namespace std;
 Secp256k1::Secp256k1() 
 {
     ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+    unsigned char randomize[32];
 
     // Randomizing the context is recommended to protect against side-channel leakage 
     if (!fill_random(randomize, sizeof(randomize)))
@@ -37,11 +38,15 @@ const Mpz Secp256k1::exponent(const Mpz& e) const
     size_t bytes = (e.nbits() + 7 ) / 8;
     unsigned char* buffer = new unsigned char[bytes];
 
-    size_t exportedSize;
-    mpz_export(buffer, &exportedSize, 1, 1, 0, 0, e.mpz_);
+    mpz_export(buffer, nullptr, 1, 1, 0, 0, e.mpz_);
 
+    secp256k1_pubkey pubkey;
+    bool success = secp256k1_ec_pubkey_create(ctx, &pubkey, buffer);
+    assert(success);
 
     delete[] buffer;    
+
+    return Mpz(vector<unsigned char>(pubkey.data, pubkey.data + 64));
 }
 
 Secp256k1::~Secp256k1()

@@ -4,6 +4,7 @@
 #include "qclpvss_utils.hpp"
 #include "bicycl.hpp"
 #include "nizk/nizk_dleq.hpp"
+#include <nizk_sh_base.hpp>
 
 using namespace UTILS;
 using namespace BICYCL;
@@ -15,37 +16,22 @@ namespace NIZK
     //Forward declaration
     class Nizk_DLEQ;
 
-    class Nizk_SH {
+    class Nizk_SH : public virtual Nizk_SH_base<const Mpz, 
+                    const vector<unique_ptr<const PublicKey>>, 
+                    const vector<QFI>, const QFI>
+    {
 
         protected:
-
-        const Mpz& q_;
-        HashAlgo& h_;
-        RandGen& rand_;
-        const CL_HSMqk& CL_;
-        const size_t n_, t_;
-        unique_ptr<Nizk_DLEQ> pf_;
-        
-        size_t degree_;
+            unique_ptr<Nizk_DLEQ> pf_;
 
         public:
 
-        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, 
+            Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, 
                 const vector<QFI>& Bs, const QFI& R, const Mpz& r, const size_t& n, const size_t& t, 
                 const Mpz& q, const vector<unique_ptr<Mpz>>& Vis);
 
-        bool verify(vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, 
-                const QFI& R, const vector<unique_ptr<Mpz>>& Vis);
-
-        private:
-
-        void initSeed(Mpz& seed, vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs,
-                const QFI& R, const QFI&h, const QFI& f) const;
-
-        void computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<Mpz>>& Vis, 
-                vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, const vector<Mpz>& coeffs) const;
-
-        void generateCoefficients(RandGen&, Mpz& seed, vector<Mpz>& coeff) const;
+            virtual bool verify(const vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, 
+                const QFI& R) const override;
     };
 }
 

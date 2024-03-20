@@ -6,8 +6,9 @@ using namespace UTILS;
 using namespace NIZK;
 
 
-NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &randgen, const CL_HSMqk &cl,
-    const PublicKey& x, const SecretKey& w) : hash_(hash), CL_(cl)
+NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &rand, const CL_HSMqk &cl,
+    const PublicKey& x, const SecretKey& w) 
+    : Nizk_base(hash, rand, cl)
 {
     //Compute boundary A and AS
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
@@ -20,22 +21,21 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &randgen, const CL_HSMqk &cl,
     // //Could be parallelized I think
     for(size_t i = 0; i < rounds_; i++) 
     {
-        r[i] = randgen.random_mpz(A_);
+        r[i] = rand.random_mpz(A_);
         cl.power_of_h(t[i], r[i]);
     }
-
-    Mpz seed(hash_(cl.h(), x.get(), t));
-    randgen.set_seed(seed);
+    
+    initRandomOracle(cl.h(), x.get(), t);
 
     for(size_t i = 0; i < rounds_; i++)
     {
-        b_[i] = randgen.random_mpz(cl.q()); // not right boundary
+        b_[i] = queryRandomOracle(cl.q()); // not right boundary
         Mpz::mul(temp, w, b_[i]);
         Mpz::add(u_[i], temp, r[i]);
     }
 }
 
-bool NizkPoK_DL::verify(RandGen &randgen, const PublicKey& x) const 
+bool NizkPoK_DL::verify(const PublicKey& x) const
 {
     vector<QFI> t(rounds_);
     QFI temp;
@@ -44,16 +44,15 @@ bool NizkPoK_DL::verify(RandGen &randgen, const PublicKey& x) const
 
         if (u_[i] > AS_) return false;
                 
-        x.exponentiation(CL_, t[i], b_[i]);
-        CL_.power_of_h(temp, u_[i]);
-        CL_.Cl_Delta().nucompinv(t[i], temp, t[i]);
+        x.exponentiation(cl_, t[i], b_[i]);
+        cl_.power_of_h(temp, u_[i]);
+        cl_.Cl_Delta().nucompinv(t[i], temp, t[i]);
     }
 
-    Mpz seed(hash_(CL_.h(), x.get(), t));
-    randgen.set_seed(seed);
+    initRandomOracle(cl_.h(), x.get(), t);
 
     for(size_t i = 0; i < rounds_; i++)
-        if (b_[i] != randgen.random_mpz(CL_.q()))
+        if (b_[i] != queryRandomOracle(cl_.q()))
             return false;
     
     return true;

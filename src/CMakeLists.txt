@@ -22,7 +22,8 @@ target_include_directories(project PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/application
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/nizk)
+    ${CMAKE_CURRENT_SOURCE_DIR}/nizk
+    ${CMAKE_CURRENT_SOURCE_DIR}/nizk/base)
 
 # Optionally, specify any additional compiler options or flags
 # target_compile_options(project PRIVATE ...)

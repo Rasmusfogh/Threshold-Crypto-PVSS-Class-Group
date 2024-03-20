@@ -11,7 +11,6 @@ namespace EC
     class Secp256k1
     {
         private:
-            unsigned char randomize[32];
             secp256k1_context* ctx;
 
         public:

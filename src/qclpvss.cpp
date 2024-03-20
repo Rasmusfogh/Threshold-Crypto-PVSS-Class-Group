@@ -46,7 +46,7 @@ unique_ptr<NizkPoK_DL> QCLPVSS::keyGen(const PublicKey& pk, const SecretKey& sk)
 
 bool QCLPVSS::verifyKey(const PublicKey& pk,  const NizkPoK_DL& pf) const 
 {
-  return pf.verify(randgen_, pk);
+  return pf.verify(pk);
 }
 
 unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::dist(const Mpz &s) const 
@@ -91,7 +91,7 @@ void QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_sh) 
 
 bool QCLPVSS::verifySharing(const EncShares& sh, vector<unique_ptr<const PublicKey>>& pks) const 
 {
-  return sh.pf->verify(pks, sh.Bs, sh.R, Vis_);
+  return sh.pf->verify(pks, sh.Bs, sh.R);
 }
 
 unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk, const QFI& R, const QFI& B, size_t i) const 
@@ -106,7 +106,7 @@ unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk,
 
   //return Ai on the form of a share <i, Ai>
   dec_share->sh = unique_ptr<const Share>(new Share(i + 1, Mpz(CL_.dlog_in_F(fi)))); 
-  dec_share->pf = unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ(hash_, randgen_, CL_, R, pk.get(), Mi, sk));
+  dec_share->pf = unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ(hash_, randgen_, CL_, CL_.h(), R, pk.get(), Mi, sk));
 
   return dec_share;
 }
@@ -125,7 +125,7 @@ bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki, const Q
   QFI Mi(CL_.power_of_f(dec_share.sh->y()));
   CL_.Cl_Delta().nucompinv(Mi, B , Mi);
 
-  return dec_share.pf->verify(R, pki.get(), Mi);
+  return dec_share.pf->verify(CL_.h(), R, pki.get(), Mi);
 }
 
 void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q)
