@@ -33,7 +33,7 @@ namespace QCLPVSS_
             //fixed points used to evaluate the sharing polynomial for the sharing proof
             vector<unique_ptr<Mpz>> Vis_;
 
-        private:
+        protected:
             SSS sss_;
             CL_HSMqk CL_;
             HashAlgo& hash_;
@@ -42,7 +42,7 @@ namespace QCLPVSS_
         public:
 
             /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of secret, @p t: privacy threshhold, @p n: number of parties  */
-            QCLPVSS (SecLevel, HashAlgo &, RandGen&, Mpz &q, const size_t k,
+            QCLPVSS (SecLevel&, HashAlgo &, RandGen&, Mpz &q, const size_t k,
                 const size_t n, const size_t t);
 
 

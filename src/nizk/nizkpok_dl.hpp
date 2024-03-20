@@ -21,9 +21,9 @@ namespace NIZK
 
         public:
 
-        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&, 
-            const PublicKey&, const SecretKey&);
+        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&);
 
+        virtual void prove(const SecretKey&, const PublicKey&) override;
         virtual bool verify(const PublicKey& pk) const override;
     };
 

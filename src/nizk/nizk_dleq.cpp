@@ -1,19 +1,21 @@
 #include "nizk_dleq.hpp"
 using namespace NIZK;
 
-Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
-    const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2, const Mpz& w) 
+Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl) 
     : C_(cl.encrypt_randomness_bound()), Nizk_base(hash, randgen, cl)
 {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
+}
 
+void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2)
+{
     //u_ = r
-    u_ = randgen.random_mpz(A_);
+    u_ = this->rand_.random_mpz(A_);
 
     QFI T1, T2;
 
-    cl.power_of_h(T1, u_);
-    cl.Cl_Delta().nupow(T2, X2, u_);
+    this->cl_.power_of_h(T1, u_);
+    this->cl_.Cl_Delta().nupow(T2, X2, u_);
 
     initRandomOracle(X1, X2, Y1, Y2, T1, T2);
     c_ = queryRandomOracle(C_);

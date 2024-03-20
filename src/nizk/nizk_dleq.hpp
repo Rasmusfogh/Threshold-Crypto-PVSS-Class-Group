@@ -24,9 +24,9 @@ namespace NIZK
 
         public:
 
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const QFI& X1, const QFI& X2, 
-            const QFI& Y1, const QFI& Y2, const Mpz& w); //CL contains computation for X1
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&);
 
+        void prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2) override;
         bool verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2) const override;
     };
 

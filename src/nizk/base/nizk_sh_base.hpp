@@ -27,8 +27,6 @@ namespace NIZK
                 : Nizk_base<Witness, Statement...>(hash, rand, cl), q_(q), n_(n), t_(t), degree_(n - t - 1 - 1), Vis_(Vis)
             {}
 
-            virtual bool verify(const Statement& ... s) const = 0;
-
         protected:
 
             void computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<const PublicKey>>& pks, 

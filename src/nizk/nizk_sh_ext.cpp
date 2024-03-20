@@ -14,10 +14,18 @@ Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, vect
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
+
+
 }
 
-bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, 
-    const vector<QFI>& Ds, const QFI& R) const
+void Nizk_SH_ext::prove(const pair<Mpz, Mpz>& rd, 
+    const vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, const vector<Mpz>& Ds, const QFI& R)
+{
+
+}
+
+bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
+    const vector<Mpz>& Ds, const QFI& R) const
 {
 
 }

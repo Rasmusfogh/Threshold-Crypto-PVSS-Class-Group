@@ -27,9 +27,11 @@ namespace NIZK
 
         public:
 
-            Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, vector<unique_ptr<const PublicKey>>&, 
-                const vector<QFI>& Bs, const QFI& R, const Mpz& r, const size_t& n, const size_t& t, 
+            Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const size_t& n, const size_t& t, 
                 const Mpz& q, const vector<unique_ptr<Mpz>>& Vis);
+
+            virtual void prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>&, 
+                const vector<QFI>& Bs, const QFI& R) override;
 
             virtual bool verify(const vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, 
                 const QFI& R) const override;

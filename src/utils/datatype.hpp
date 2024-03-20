@@ -4,6 +4,7 @@
 #include <bicycl.hpp>
 #include <memory>
 #include <nizk_sh.hpp>
+#include <nizk_sh_ext.hpp>
 #include <sss.hpp>
 
 using namespace BICYCL;
@@ -24,11 +25,23 @@ namespace DATATYPE
             EncShares(size_t n);
     };
 
+    class EncSharesExt
+    {
+         public:
+            Mpz r;
+            QFI R;
+            vector<QFI> Bs;
+            vector<Mpz> Ds;
+            unique_ptr<Nizk_SH_ext> pf;
+
+            EncSharesExt(size_t n);
+    };
+
     class DecShare
     {
         public:
             unique_ptr<const Share> sh;
-            unique_ptr<const Nizk_DLEQ> pf;
+            unique_ptr<Nizk_DLEQ> pf;
 
             DecShare();
     };

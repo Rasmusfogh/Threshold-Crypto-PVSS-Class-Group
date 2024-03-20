@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 100; // try 1000
-static const size_t T =  50 + 1; //try 500 + 1
+static const size_t N = 10; 
+static const size_t T =  5;
 static const size_t K = 1;
 static Mpz Q;
 static SecLevel secLevel(SECLEVEL);

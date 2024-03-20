@@ -21,6 +21,7 @@ namespace NIZK
             Nizk_base(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl)
                 : hash_(hash), rand_(rand), cl_(cl) {}
 
+            virtual void prove(const Witness& w, const Statement& ... s) = 0;
             virtual bool verify(const Statement& ... s) const = 0;
 
             //Random Oracle

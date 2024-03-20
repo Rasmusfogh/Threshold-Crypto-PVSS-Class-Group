@@ -6,31 +6,32 @@ using namespace UTILS;
 using namespace NIZK;
 
 
-NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &rand, const CL_HSMqk &cl,
-    const PublicKey& x, const SecretKey& w) 
+NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &rand, const CL_HSMqk &cl) 
     : Nizk_base(hash, rand, cl)
 {
     //Compute boundary A and AS
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
     Mpz::add(AS_, A_, cl.encrypt_randomness_bound());
+}
 
+void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk)
+{
     Mpz temp;
     vector<Mpz> r(rounds_);
     vector<QFI> t(rounds_);
 
-    // //Could be parallelized I think
     for(size_t i = 0; i < rounds_; i++) 
     {
-        r[i] = rand.random_mpz(A_);
-        cl.power_of_h(t[i], r[i]);
+        r[i] = this->rand_.random_mpz(A_);
+        this->cl_.power_of_h(t[i], r[i]);
     }
     
-    initRandomOracle(cl.h(), x.get(), t);
+    this->initRandomOracle(this->cl_.h(), pk.get(), t);
 
     for(size_t i = 0; i < rounds_; i++)
     {
-        b_[i] = queryRandomOracle(cl.q()); // not right boundary
-        Mpz::mul(temp, w, b_[i]);
+        b_[i] = this->queryRandomOracle(this->cl_.q()); // not right boundary
+        Mpz::mul(temp, sk, b_[i]);
         Mpz::add(u_[i], temp, r[i]);
     }
 }
