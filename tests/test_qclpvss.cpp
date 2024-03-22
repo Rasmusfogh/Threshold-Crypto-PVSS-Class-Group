@@ -10,6 +10,9 @@ using namespace QCLPVSS_;
 using namespace std;
 using std::string;
 using namespace std::chrono;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 int main (int argc, char *argv[])
 {
@@ -96,9 +99,17 @@ int main (int argc, char *argv[])
     unique_ptr<const Mpz> s_rec = pvss.rec(rec_shares);
 
 
-    for(size_t i = 0; i < n; i++)
+    for(size_t i = 0; i < t; i++)
+    {
+        auto start = system_clock::now();
         if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R, enc_shares->Bs[i]))
             return EXIT_FAILURE;
+        auto stop = system_clock::now();
+
+        auto ms_int = duration_cast<milliseconds>(stop - start);
+        cout << ms_int.count() << endl;
+    }
+
 
     return EXIT_SUCCESS;
 }

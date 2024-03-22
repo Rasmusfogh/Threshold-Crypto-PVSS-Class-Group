@@ -1,4 +1,4 @@
-#include <qclpvss.hpp>
+#include <qclpvss_ext.hpp>
 #include <chrono>
 #include <secp256k1.h>
 #include <assert.h>
@@ -32,8 +32,7 @@ int main (int argc, char *argv[])
     size_t t(5UL);
 
     //setup.1
-    QCLPVSS pvss(seclevel, H, randgen, q, 1, n, t);
-    Secp256k1 secp256k1;
+    QCLPVSS_ext pvss(seclevel, H, randgen, q, 1, n, t);
 
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
@@ -43,7 +42,6 @@ int main (int argc, char *argv[])
     vector<unique_ptr<Nizk_DLEQ>> dec_shares(n);
     const Mpz s(9898UL);
 
-    vector<vector<Mpz>> Dij_matrix(n, vector<Mpz>(n));
     vector<unique_ptr<EncSharesExt>> enc_shares_ext_matrix(n);
     //setup.2
     for(size_t i = 0; i < n; i++) 
@@ -60,16 +58,7 @@ int main (int argc, char *argv[])
 
     for(size_t i = 0; i < n; i++)
     {
-        //Mpz r = secp256k1.randomPoint();
-        Mpz s = (randgen.random_mpz(q));
-        unique_ptr<vector<unique_ptr<const Share>>> shares = pvss.dist(s);
-        enc_shares_ext_matrix[i] = pvss.dist(pks, *shares);
-
-        for(size_t j = 0; j < n; j++)
-        {
-            Dij_matrix[i][j] = secp256k1.exponent((*shares)[j]->second);
-        }
-
+         enc_shares_ext_matrix[i] = pvss.share(pks);
     }
 
     // sss_shares = pvss.dist(s);
