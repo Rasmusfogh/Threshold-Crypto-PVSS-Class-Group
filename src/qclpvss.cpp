@@ -51,35 +51,10 @@ bool QCLPVSS::verifyKey(const PublicKey& pk,  const NizkPoK_DL& pf) const
     return pf.verify(pk);
 }
 
-unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::dist(const Mpz &s) const 
+unique_ptr<EncShares> QCLPVSS::dist(const Mpz &s, vector<unique_ptr<const PublicKey>>& pks) const 
 {
-    return sss_.shareSecret(s);
-}
-
-unique_ptr<EncShares> QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks, 
-  vector<unique_ptr<const Share>>& shares) const 
-{
-    QFI f, pkr;
-
-    unique_ptr<EncShares> enc_sh (new EncShares(n_));
-
-    enc_sh->r = randgen_.random_mpz(CL_.encrypt_randomness_bound());
-
-    //Compute R
-    CL_.power_of_h(enc_sh->R, enc_sh->r);
-
-    //Compute B_i's
-    for(size_t i = 0; i < n_; i++)
-    {
-        //f^p(a_i)
-        f = CL_.power_of_f(shares[i]->y());
-        //(pk_i)^r
-        pks[i]->exponentiation(CL_, pkr, enc_sh->r);
-        // B_i = (pk_i)^r * f^p(a_i)
-        CL_.Cl_Delta().nucomp(enc_sh->Bs[i], pkr, f);
-    }
-
-    return enc_sh;
+    unique_ptr<vector<unique_ptr<const Share>>> shares = create_shares(s);
+    return compute_encrypted_shares(*shares, pks);
 }
 
 void QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_sh) const 
@@ -127,6 +102,36 @@ bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki, const Q
   CL_.Cl_Delta().nucompinv(Mi, B , Mi);
 
   return dec_share.pf->verify(CL_.h(), R, pki.get(), Mi);
+}
+
+unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::create_shares(const Mpz &s) const 
+{
+    return sss_.shareSecret(s);
+}
+
+unique_ptr<EncShares> QCLPVSS::compute_encrypted_shares(vector<unique_ptr<const Share>>& shares,
+  vector<unique_ptr<const PublicKey>>& pks) const
+{
+    QFI f, pkr;
+    unique_ptr<EncShares> enc_sh (new EncShares(n_));
+
+    enc_sh->r = randgen_.random_mpz(CL_.encrypt_randomness_bound());
+
+    //Compute R
+    CL_.power_of_h(enc_sh->R, enc_sh->r);
+
+    //Compute B_i's
+    for(size_t i = 0; i < n_; i++)
+    {
+        //f^p(a_i)
+        f = CL_.power_of_f(shares[i]->y());
+        //(pk_i)^r
+        pks[i]->exponentiation(CL_, pkr, enc_sh->r);
+        // B_i = (pk_i)^r * f^p(a_i)
+        CL_.Cl_Delta().nucomp(enc_sh->Bs[i], pkr, f);
+    }
+
+    return enc_sh;
 }
 
 void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q)

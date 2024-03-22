@@ -57,8 +57,7 @@ namespace QCLPVSS_
             bool verifyKey(const PublicKey&, const NizkPoK_DL&) const;
 
             //Distribution
-            unique_ptr<vector<unique_ptr<const Share>>> dist(const Mpz &secret) const;
-            unique_ptr<EncShares> dist(vector<unique_ptr<const PublicKey>>&, vector<unique_ptr<const Share>>&) const;
+            unique_ptr<EncShares> dist(const Mpz &secret, vector<unique_ptr<const PublicKey>>&) const;
             void dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_shares) const;
 
             //Distribution Verification
@@ -72,6 +71,11 @@ namespace QCLPVSS_
             bool verifyDec(const DecShare&, const PublicKey&, const QFI& R, const QFI& B) const;
             /**@}*/
 
+        protected:
+            unique_ptr<vector<unique_ptr<const Share>>> create_shares(const Mpz &secret) const;
+            unique_ptr<EncShares> compute_encrypted_shares(vector<unique_ptr<const Share>>& shares, 
+                vector<unique_ptr<const PublicKey>>& pks) const;
+        
         private:
             void computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q);
     };

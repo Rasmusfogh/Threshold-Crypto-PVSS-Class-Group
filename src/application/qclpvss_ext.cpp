@@ -10,8 +10,8 @@ QCLPVSS_ext::QCLPVSS_ext(SecLevel& seclevel, HashAlgo& hash, RandGen& rand, Secp
 unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>& pks) const
 {
     Mpz s = (randgen_.random_mpz(q_));
-    unique_ptr<vector<unique_ptr<const Share>>> shares = dist(s);
-    unique_ptr<EncShares> enc_shares = dist(pks, *shares);
+    unique_ptr<vector<unique_ptr<const Share>>> shares = create_shares(s);
+    unique_ptr<EncShares> enc_shares = compute_encrypted_shares(*shares, pks);
 
     unique_ptr<EncSharesExt> enc_shares_ext (new EncSharesExt(n_));
     enc_shares_ext->Bs = enc_shares->Bs;

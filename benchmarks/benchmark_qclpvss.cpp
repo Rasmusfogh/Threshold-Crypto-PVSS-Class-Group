@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 100; 
-static const size_t T =  50;
+static const size_t N = 10; 
+static const size_t T =  5;
 static const size_t K = 1;
 static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
@@ -24,7 +24,6 @@ static unique_ptr<QCLPVSS> pvss;
 static vector<unique_ptr<const SecretKey>> sks(N);
 static vector<unique_ptr<const PublicKey>> pks(N);
 static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
-static unique_ptr<vector<unique_ptr<const Share>>> shares;
 static unique_ptr<EncShares> enc_shares;
 static vector<unique_ptr<DecShare>> dec_shares(N);
 static vector<unique_ptr<const Share>> rec_shares;
@@ -88,8 +87,7 @@ BENCHMARK(verifyKey)->Unit(kMillisecond);
 
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
-        shares = pvss->dist(secret);
-        enc_shares = pvss->dist(pks, *shares);
+        enc_shares = pvss->dist(secret, pks);
         pvss->dist(pks, *enc_shares);
         DoNotOptimize(enc_shares);
     }

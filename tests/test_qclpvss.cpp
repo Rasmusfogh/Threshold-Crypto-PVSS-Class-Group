@@ -62,7 +62,6 @@ int main (int argc, char *argv[])
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
     vector<unique_ptr<NizkPoK_DL>> keygen_pf(n);
-    unique_ptr<vector<unique_ptr<const Share>>> sss_shares;
     vector<unique_ptr<DecShare>> dec_shares(n);
     vector<unique_ptr<const Share>> rec_shares;
 
@@ -80,8 +79,7 @@ int main (int argc, char *argv[])
         if(!pvss.verifyKey(*pks[i], *keygen_pf[i]))
             return EXIT_FAILURE;    
 
-    sss_shares = pvss.dist(s);
-    unique_ptr<EncShares> enc_shares = pvss.dist(pks, *sss_shares);
+    unique_ptr<EncShares> enc_shares = pvss.dist(s, pks);
     pvss.dist(pks, *enc_shares);
 
     if (!pvss.verifySharing(*enc_shares, pks))
