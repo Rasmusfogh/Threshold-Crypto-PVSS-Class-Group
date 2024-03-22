@@ -28,9 +28,6 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
 
     Mpz D = secp256k1_.exponent(d);
 
-    if(B == B_)
-        cout << D.nbits() << endl;
-
     //maybe add g_q, f, h?
     initRandomOracle(U_, M_, R_, V_, B_, D_, R, V, B, D);
     c_ = queryRandomOracle(C_);
