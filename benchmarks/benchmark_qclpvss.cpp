@@ -88,7 +88,6 @@ BENCHMARK(verifyKey)->Unit(kMillisecond);
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
         enc_shares = pvss->dist(secret, pks);
-        pvss->dist(pks, *enc_shares);
         DoNotOptimize(enc_shares);
     }
     state.counters["secLevel"] = secLevel.soundness();

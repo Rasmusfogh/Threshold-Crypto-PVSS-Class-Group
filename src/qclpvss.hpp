@@ -58,7 +58,6 @@ namespace QCLPVSS_
 
             //Distribution
             unique_ptr<EncShares> dist(const Mpz &secret, vector<unique_ptr<const PublicKey>>&) const;
-            void dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_shares) const;
 
             //Distribution Verification
             bool verifySharing(const EncShares&, vector<unique_ptr<const PublicKey>>&) const;
@@ -72,9 +71,12 @@ namespace QCLPVSS_
             /**@}*/
 
         protected:
-            unique_ptr<vector<unique_ptr<const Share>>> create_shares(const Mpz &secret) const;
-            unique_ptr<EncShares> compute_encrypted_shares(vector<unique_ptr<const Share>>& shares, 
-                vector<unique_ptr<const PublicKey>>& pks) const;
+            unique_ptr<vector<unique_ptr<const Share>>> createShares(const Mpz &secret) const;
+            
+            unique_ptr<EncShares> computeEncryptedShares(vector<unique_ptr<const Share>>&, 
+                vector<unique_ptr<const PublicKey>>&) const;
+
+            void computeSHNizk(vector<unique_ptr<const PublicKey>>&, EncShares&) const;
         
         private:
             void computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q);

@@ -80,7 +80,6 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;    
 
     unique_ptr<EncShares> enc_shares = pvss.dist(s, pks);
-    pvss.dist(pks, *enc_shares);
 
     if (!pvss.verifySharing(*enc_shares, pks))
         return EXIT_FAILURE;

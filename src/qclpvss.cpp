@@ -53,17 +53,12 @@ bool QCLPVSS::verifyKey(const PublicKey& pk,  const NizkPoK_DL& pf) const
 
 unique_ptr<EncShares> QCLPVSS::dist(const Mpz &s, vector<unique_ptr<const PublicKey>>& pks) const 
 {
-    unique_ptr<vector<unique_ptr<const Share>>> shares = create_shares(s);
-    return compute_encrypted_shares(*shares, pks);
+    unique_ptr<vector<unique_ptr<const Share>>> shares = createShares(s);
+    unique_ptr<EncShares> enc_shares = computeEncryptedShares(*shares, pks);
+    computeSHNizk(pks, *enc_shares);
+    return enc_shares;
 }
 
-void QCLPVSS::dist(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_sh) const 
-{
-    enc_sh.pf = unique_ptr<Nizk_SH>(new Nizk_SH
-        (hash_, randgen_, CL_, n_, t_, q_, Vis_));
-
-    enc_sh.pf->prove(enc_sh.r, pks, enc_sh.Bs, enc_sh.R);
-}
 
 bool QCLPVSS::verifySharing(const EncShares& sh, vector<unique_ptr<const PublicKey>>& pks) const 
 {
@@ -104,12 +99,12 @@ bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki, const Q
   return dec_share.pf->verify(CL_.h(), R, pki.get(), Mi);
 }
 
-unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::create_shares(const Mpz &s) const 
+unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::createShares(const Mpz &s) const 
 {
     return sss_.shareSecret(s);
 }
 
-unique_ptr<EncShares> QCLPVSS::compute_encrypted_shares(vector<unique_ptr<const Share>>& shares,
+unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(vector<unique_ptr<const Share>>& shares,
   vector<unique_ptr<const PublicKey>>& pks) const
 {
     QFI f, pkr;
@@ -132,6 +127,14 @@ unique_ptr<EncShares> QCLPVSS::compute_encrypted_shares(vector<unique_ptr<const 
     }
 
     return enc_sh;
+}
+
+void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks, EncShares& enc_shares) const
+{
+    enc_shares.pf = unique_ptr<Nizk_SH>(new Nizk_SH
+        (hash_, randgen_, CL_, n_, t_, q_, Vis_));
+
+    enc_shares.pf->prove(enc_shares.r, pks, enc_shares.Bs, enc_shares.R); 
 }
 
 void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q)
