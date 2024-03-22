@@ -14,7 +14,7 @@ namespace QCLPVSS_
     {
         protected:
 
-        Secp256k1 secp256k1;
+        const Secp256k1& secp256k1;
 
         public:
             QCLPVSS_ext(SecLevel&, HashAlgo &, RandGen&, Mpz &q, const size_t k,

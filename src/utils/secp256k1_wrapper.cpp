@@ -45,8 +45,13 @@ const Mpz Secp256k1::exponent(const Mpz& e) const
     assert(success);
 
     delete[] buffer;    
+    unsigned char res[33];
 
-    return Mpz(vector<unsigned char>(pubkey.data, pubkey.data + 64));
+    size_t len = sizeof(res);
+    secp256k1_ec_pubkey_serialize(ctx, res, &len, &pubkey, SECP256K1_EC_COMPRESSED);
+
+    //Should remove the first byte defining the sign
+    return Mpz(vector<unsigned char>(res, res + 32));
 }
 
 Secp256k1::~Secp256k1()

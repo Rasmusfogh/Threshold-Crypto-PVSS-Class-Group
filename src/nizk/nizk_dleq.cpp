@@ -2,7 +2,7 @@
 using namespace NIZK;
 
 Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl) 
-    : C_(cl.encrypt_randomness_bound()), Nizk_base(hash, randgen, cl)
+    : Nizk_base(hash, randgen, cl), C_(cl.encrypt_randomness_bound())
 {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
     Mpz::mul(SC_, cl_.encrypt_randomness_bound(), C_);
@@ -30,11 +30,12 @@ bool Nizk_DLEQ::verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y
 {
     if(u_ > SC_)
         return false;
-
+        
     QFI T1, T2, temp;
 
     cl_.power_of_h(T1, u_);
     cl_.Cl_Delta().nupow(temp, Y1, c_);
+
     cl_.Cl_Delta().nucompinv(T1, T1, temp);
 
     cl_.Cl_Delta().nupow(T2, X2, u_);

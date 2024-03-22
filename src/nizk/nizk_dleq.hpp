@@ -3,7 +3,6 @@
 
 #include "qclpvss_utils.hpp"
 #include "bicycl.hpp"
-#include "nizk/nizk_sh.hpp"
 #include "nizk_base.hpp"
 
 using namespace UTILS;
@@ -12,10 +11,7 @@ using namespace OpenSSL;
 using namespace std;
 
 namespace NIZK
-{
-    //Forward declaration
-    class Nizk_SH;
-    
+{ 
     class Nizk_DLEQ : public virtual Nizk_base<const Mpz,   // r
                                                const QFI,   // g_q / h
                                                const QFI,   // U

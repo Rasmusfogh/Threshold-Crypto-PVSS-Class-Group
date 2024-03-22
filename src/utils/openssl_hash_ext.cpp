@@ -41,4 +41,11 @@ void OpenSSL::HashAlgo::hash(const vector<QFI> &v)
         hash (v[i]);
 }
 
+template<>
+void OpenSSL::HashAlgo::hash(const vector<Mpz> &v)
+{
+    for(size_t i = 0; i < v.size(); i++)
+        hash (v[i]);
+}
+
 

@@ -55,8 +55,7 @@ namespace NIZK
                     //compute wi' = temp
                     Mpz ci(this->queryRandomOracle(q_)); //ci using RNG
                     Mpz::addmul(temp, ci, q_); 
-                    Mpz::mod(temp, temp, q_);
-
+                    
                     //compute U
                     (*pks[i]).exponentiation(this->cl_, exp, temp);
                     this->cl_.Cl_Delta().nucomp(U_ref, U_ref, exp);

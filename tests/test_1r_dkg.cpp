@@ -1,11 +1,11 @@
-#include <qclpvss_ext.hpp>
+#include "../src/application/qclpvss_ext.hpp"
 #include <chrono>
 #include <secp256k1.h>
 #include <assert.h>
 #include <memory>
 #include <secp256k1_wrapper.hpp>
 #include <nizk_sh_ext.hpp>
-#include "utils.h"
+#include "../include/secp256k1/secp256k1.h"
 
 using namespace QCLPVSS_;
 using namespace BICYCL;
@@ -24,14 +24,13 @@ int main (int argc, char *argv[])
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
     randgen.set_seed (seed);
 
-    BICYCL::Mpz q(randgen.random_prime(seclevel.soundness() * 2));
+    BICYCL::Mpz q(randgen.random_prime(256));
 
     OpenSSL::HashAlgo H (seclevel);
 
     size_t n(10UL);
     size_t t(5UL);
 
-    //setup.1
     QCLPVSS_ext pvss(seclevel, H, randgen, q, 1, n, t);
 
     vector<unique_ptr<const SecretKey>> sks(n);
@@ -43,7 +42,7 @@ int main (int argc, char *argv[])
     const Mpz s(9898UL);
 
     vector<unique_ptr<EncSharesExt>> enc_shares_ext_matrix(n);
-    //setup.2
+
     for(size_t i = 0; i < n; i++) 
     {
         sks[i] = pvss.keyGen(randgen);
@@ -57,28 +56,17 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;    
 
     for(size_t i = 0; i < n; i++)
-    {
          enc_shares_ext_matrix[i] = pvss.share(pks);
+
+    for(size_t i = 0; i < n; i++)
+    {
+        if(enc_shares_ext_matrix[i]->pf->verify(pks, enc_shares_ext_matrix[i]->Bs, 
+                                                enc_shares_ext_matrix[i]->Ds, 
+                                                enc_shares_ext_matrix[i]->R))
+        {
+            return EXIT_FAILURE;    
+        }
+
     }
-
-    // sss_shares = pvss.dist(s);
-    // unique_ptr<Nizk_SH> sh_pf = pvss.dist(pks, *sss_shares);
-
-    // if (!pvss.verifySharing(pks, *sh_pf))
-    //     return EXIT_FAILURE;
-
-    // for(size_t i = 0; i < n; i++)
-    // {
-    //     Ais[i] = pvss.decShare(*sks[i], i);
-    //     dec_shares[i] = pvss.decShare(*pks[i], *sks[i], i);
-    // }
-
-    // unique_ptr<const Mpz> s_rec = pvss.rec(Ais);
-
-
-    // for(size_t i = 0; i < n; i++)
-    //     if (!pvss.verifyDec(*Ais[i], *pks[i], *dec_shares[i], i))
-    //         return EXIT_FAILURE;
-
     return EXIT_SUCCESS;
 }
