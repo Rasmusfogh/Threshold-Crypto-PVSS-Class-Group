@@ -29,10 +29,10 @@ namespace NIZK
             Mpz c_, ud_, ur_;
 
         private:
-            const Secp256k1& secp256k1_;
+            Secp256k1& secp256k1_;
 
         public:
-            Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, const Secp256k1&);
+            Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, Secp256k1&);
 
             void prove(const pair<Mpz, Mpz>& w, const QFI& X1, const QFI& X2, 
                 const QFI& Y1, const QFI& Y2, const QFI& Y3, const Mpz& Y4) override;

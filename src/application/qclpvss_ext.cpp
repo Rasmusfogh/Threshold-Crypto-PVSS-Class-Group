@@ -2,10 +2,10 @@
 
 using namespace QCLPVSS_;
 
-QCLPVSS_ext::QCLPVSS_ext(SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
+QCLPVSS_ext::QCLPVSS_ext(SecLevel& seclevel, HashAlgo& hash, RandGen& rand, Secp256k1& secp256k1,
     Mpz &q, const size_t k, const size_t n, const size_t t) 
     :   QCLPVSS(seclevel, hash, rand, q, k, n, t), 
-        secp256k1(Secp256k1()) {}
+        secp256k1(secp256k1) {}
 
 unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>& pks) const
 {

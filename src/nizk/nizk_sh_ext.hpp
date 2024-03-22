@@ -31,10 +31,10 @@ namespace NIZK
             unique_ptr<Nizk_DLEQ_mix> pf_;
 
         private:
-            const Secp256k1& secp256k1_;
-        
+            Secp256k1& secp256k1_;
+    
         public:
-            Nizk_SH_ext(HashAlgo&, RandGen&, const CL_HSMqk&, const Secp256k1&, const size_t& n, const size_t& t, 
+            Nizk_SH_ext(HashAlgo&, RandGen&, const CL_HSMqk&, Secp256k1&, const size_t& n, const size_t& t, 
                 const Mpz& q, const vector<unique_ptr<Mpz>>& Vis);
 
             virtual void prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& rd, const vector<unique_ptr<const PublicKey>>&,

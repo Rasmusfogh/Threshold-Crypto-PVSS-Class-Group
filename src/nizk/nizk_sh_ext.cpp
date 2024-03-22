@@ -2,7 +2,7 @@
 
 using namespace NIZK;
 
-Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, const Secp256k1& secp256k1, 
+Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, Secp256k1& secp256k1, 
     const size_t& n, const size_t& t, const Mpz& q, const vector<unique_ptr<Mpz>>& Vis)
     : Nizk_SH_base(hash, rand, cl, q, n, t, Vis), secp256k1_(secp256k1)
 { }
@@ -19,11 +19,11 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
 
-    Mpz d, d_temp;
+    Mpz d(0L), d_temp;
     QFI B, B_temp;
     Mpz D(1UL), D_temp;
     QFI M, M_temp;
-    for(size_t i = 0; i < degree_; i++)
+    for(size_t i = 0; i < t_ + 1; i++)
     {
         Mpz e(queryRandomOracle(q_));
 
@@ -44,7 +44,7 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
         cl_.Cl_Delta().nucomp(M, M, M_temp);
     }
 
-    Mpz::mod(d, d, q_); //Mod ??
+    Mpz::mod(d, d, q_);
     Mpz::mod(D, D, q_); //mod ??
 
     pair<Mpz, Mpz> witness(w.second, d);
@@ -64,11 +64,10 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
 
-    Mpz d, d_temp;
     QFI B, B_temp;
     Mpz D(1UL), D_temp;
     QFI M, M_temp;
-    for(size_t i = 0; i < degree_; i++)
+    for(size_t i = 0; i < t_ + 1; i++)
     {
         Mpz e(queryRandomOracle(q_));
 
@@ -85,7 +84,6 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
         cl_.Cl_Delta().nucomp(M, M, M_temp);
     }
 
-    Mpz::mod(d, d, q_); //Mod ??
     Mpz::mod(D, D, q_); //mod ??
 
     return pf_->verify(U, M, R, V, B, D);

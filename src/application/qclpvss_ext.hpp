@@ -14,10 +14,10 @@ namespace QCLPVSS_
     {
         protected:
 
-        const Secp256k1& secp256k1;
+        Secp256k1& secp256k1;
 
         public:
-            QCLPVSS_ext(SecLevel&, HashAlgo &, RandGen&, Mpz &q, const size_t k,
+            QCLPVSS_ext(SecLevel&, HashAlgo &, RandGen&, Secp256k1&, Mpz &q, const size_t k,
                 const size_t n, const size_t t);
 
             unique_ptr<EncSharesExt> share(vector<unique_ptr<const PublicKey>>&) const;

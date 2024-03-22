@@ -12,11 +12,13 @@ namespace EC
     {
         private:
             secp256k1_context* ctx;
+            unsigned char buffer[32];
 
         public:
             Secp256k1();
             const Mpz randomPoint() const;
-            const Mpz exponent(const Mpz& e) const;
+            const Mpz exponent(const Mpz& e);
+
             ~Secp256k1();
     };
 }

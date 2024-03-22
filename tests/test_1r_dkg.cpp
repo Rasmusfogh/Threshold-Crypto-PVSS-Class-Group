@@ -31,7 +31,8 @@ int main (int argc, char *argv[])
     size_t n(10UL);
     size_t t(5UL);
 
-    QCLPVSS_ext pvss(seclevel, H, randgen, q, 1, n, t);
+    Secp256k1 secp256k1;
+    QCLPVSS_ext pvss(seclevel, H, randgen, secp256k1, q, 1, n, t);
 
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
@@ -60,9 +61,9 @@ int main (int argc, char *argv[])
 
     for(size_t i = 0; i < n; i++)
     {
-        if(enc_shares_ext_matrix[i]->pf->verify(pks, enc_shares_ext_matrix[i]->Bs, 
+        if(!(enc_shares_ext_matrix[i]->pf->verify(pks, enc_shares_ext_matrix[i]->Bs, 
                                                 enc_shares_ext_matrix[i]->Ds, 
-                                                enc_shares_ext_matrix[i]->R))
+                                                enc_shares_ext_matrix[i]->R)))
         {
             return EXIT_FAILURE;    
         }
