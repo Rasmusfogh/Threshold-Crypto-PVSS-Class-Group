@@ -7,7 +7,6 @@
 #include "nizk/nizk_dleq_mix.hpp"
 #include <nizk_sh_base.hpp>
 #include <sss.hpp>
-#include <secp256k1_wrapper.hpp>
 
 using namespace UTILS;
 using namespace BICYCL;
@@ -31,10 +30,10 @@ namespace NIZK
             unique_ptr<Nizk_DLEQ_mix> pf_;
 
         private:
-            Secp256k1& secp256k1_;
+            const ECGroup& ec_group_;
     
         public:
-            Nizk_SH_ext(HashAlgo&, RandGen&, const CL_HSMqk&, Secp256k1&, const size_t& n, const size_t& t, 
+            Nizk_SH_ext(HashAlgo&, RandGen&, const CL_HSMqk&, const ECGroup&, const size_t& n, const size_t& t, 
                 const Mpz& q, const vector<unique_ptr<Mpz>>& Vis);
 
             virtual void prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& rd, const vector<unique_ptr<const PublicKey>>&,

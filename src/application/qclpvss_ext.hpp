@@ -3,10 +3,8 @@
 
 #include <qclpvss.hpp>
 #include <nizk_sh_ext.hpp>
-#include <secp256k1_wrapper.hpp>
 
 using namespace NIZK;
-using namespace EC;
 
 namespace QCLPVSS_
 {
@@ -14,10 +12,10 @@ namespace QCLPVSS_
     {
         protected:
 
-        Secp256k1& secp256k1;
+        const ECGroup& ec_group_;
 
         public:
-            QCLPVSS_ext(SecLevel&, HashAlgo &, RandGen&, Secp256k1&, Mpz &q, const size_t k,
+            QCLPVSS_ext(SecLevel&, HashAlgo &, RandGen&, Mpz &q, const size_t k,
                 const size_t n, const size_t t);
 
             unique_ptr<EncSharesExt> share(vector<unique_ptr<const PublicKey>>&) const;

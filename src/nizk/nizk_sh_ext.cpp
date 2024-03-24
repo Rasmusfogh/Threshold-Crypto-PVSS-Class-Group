@@ -2,9 +2,9 @@
 
 using namespace NIZK;
 
-Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, Secp256k1& secp256k1, 
+Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, const ECGroup& ec_group, 
     const size_t& n, const size_t& t, const Mpz& q, const vector<unique_ptr<Mpz>>& Vis)
-    : Nizk_SH_base(hash, rand, cl, q, n, t, Vis), secp256k1_(secp256k1)
+    : Nizk_SH_base(hash, rand, cl, q, n, t, Vis), ec_group_(ec_group)
 { }
 
 void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w, 
@@ -49,7 +49,7 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
 
     pair<Mpz, Mpz> witness(w.second, d);
 
-    pf_ = unique_ptr<Nizk_DLEQ_mix> (new Nizk_DLEQ_mix(hash_, rand_, cl_, secp256k1_));
+    pf_ = unique_ptr<Nizk_DLEQ_mix> (new Nizk_DLEQ_mix(hash_, rand_, cl_, ec_group_));
     pf_->prove(witness, U, M, R, V, B, D);
 }
 

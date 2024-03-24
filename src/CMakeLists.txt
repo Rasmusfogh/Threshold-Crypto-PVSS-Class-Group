@@ -4,7 +4,6 @@ set(SRC_SOURCE_FILES
     utils/qclpvss_utils.cpp
     utils/sss.cpp
     utils/openssl_hash_ext.cpp
-    utils/secp256k1_wrapper.cpp
     utils/datatype.cpp
     nizk/nizkpok_dl.cpp
     nizk/nizk_sh.cpp
@@ -18,7 +17,7 @@ set(SRC_SOURCE_FILES
 add_library(project ${SRC_SOURCE_FILES})
 
 # Link the bicycl library to your project
-target_link_libraries(project PUBLIC bicycl libsecp256k1::secp256k1)
+target_link_libraries(project PUBLIC bicycl)
 
 # Optionally, specify any include directories needed for your project
 target_include_directories(project PUBLIC 

@@ -2,10 +2,10 @@
 
 using namespace QCLPVSS_;
 
-QCLPVSS_ext::QCLPVSS_ext(SecLevel& seclevel, HashAlgo& hash, RandGen& rand, Secp256k1& secp256k1,
+QCLPVSS_ext::QCLPVSS_ext(SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
     Mpz &q, const size_t k, const size_t n, const size_t t) 
     :   QCLPVSS(seclevel, hash, rand, q, k, n, t), 
-        secp256k1(secp256k1) {}
+        ec_group_(ECGroup(seclevel)) {}
 
 unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>& pks) const
 {
@@ -20,10 +20,10 @@ unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>&
 
     for(size_t j = 0; j < n_; j++)
     {
-        enc_shares_ext->Ds[j] = secp256k1.exponent((*shares)[j]->second);
+        //enc_shares_ext->Ds[j] = secp256k1.exponent((*shares)[j]->second);
     }
 
-    enc_shares_ext->pf =  unique_ptr<Nizk_SH_ext>(new Nizk_SH_ext(hash_, randgen_, CL_, secp256k1, n_, t_, q_, Vis_));
+    enc_shares_ext->pf =  unique_ptr<Nizk_SH_ext>(new Nizk_SH_ext(hash_, randgen_, CL_, ec_group_, n_, t_, q_, Vis_));
 
     pair<vector<unique_ptr<const Share>>&, Mpz> witness(*shares, enc_shares_ext->r);
 

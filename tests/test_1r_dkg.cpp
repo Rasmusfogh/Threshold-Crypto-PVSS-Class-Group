@@ -3,15 +3,12 @@
 #include <secp256k1.h>
 #include <assert.h>
 #include <memory>
-#include <secp256k1_wrapper.hpp>
 #include <nizk_sh_ext.hpp>
-#include "../include/secp256k1/secp256k1.h"
 
 using namespace QCLPVSS_;
 using namespace BICYCL;
 using namespace std;
 using namespace std::chrono;
-using namespace EC;
 using namespace NIZK;
 
 int main (int argc, char *argv[])
@@ -31,8 +28,7 @@ int main (int argc, char *argv[])
     size_t n(10UL);
     size_t t(5UL);
 
-    Secp256k1 secp256k1;
-    QCLPVSS_ext pvss(seclevel, H, randgen, secp256k1, q, 1, n, t);
+    QCLPVSS_ext pvss(seclevel, H, randgen, q, 1, n, t);
 
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);

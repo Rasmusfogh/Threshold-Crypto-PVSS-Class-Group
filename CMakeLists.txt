@@ -45,7 +45,6 @@ endif ()
 find_package (gmp REQUIRED)
 find_package (OpenSSL REQUIRED)
 find_package (benchmark) #Google Benchmark
-find_package (libsecp256k1) # Elliptic curve
 
 # Add the bicycl library
 add_subdirectory(include/bicycl)
