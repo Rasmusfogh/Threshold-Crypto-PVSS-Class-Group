@@ -48,4 +48,15 @@ void OpenSSL::HashAlgo::hash(const vector<Mpz> &v)
         hash (v[i]);
 }
 
+template<>
+void OpenSSL::HashAlgo::hash(const pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&>& v)
+{
+    const ECGroup& E = v.second;
+
+    for(size_t i = 0; i < v.first.size(); i++)
+    {
+        const ECPoint& P = *(v.first[i]);
+        hash(ECPointGroupCRefPair(P, E));
+    }
+}
 

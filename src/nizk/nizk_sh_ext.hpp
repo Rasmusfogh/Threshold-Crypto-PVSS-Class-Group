@@ -22,7 +22,7 @@ namespace NIZK
     class Nizk_SH_ext : public virtual Nizk_SH_base<pair<vector<unique_ptr<const Share>>&, Mpz>,     // p(X), r
                         const vector<unique_ptr<const PublicKey>>,                                  // pks
                         const vector<QFI>,                                                          // Bs
-                        const vector<Mpz>,                                                          // Ds
+                        const vector<unique_ptr<ECPoint>>,                                                  // Ds
                         const QFI>                                                                  // R
     {
 
@@ -37,10 +37,10 @@ namespace NIZK
                 const Mpz& q, const vector<unique_ptr<Mpz>>& Vis);
 
             virtual void prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& rd, const vector<unique_ptr<const PublicKey>>&,
-                const vector<QFI>& Bs, const vector<Mpz>& Ds, const QFI& R) override; 
+                const vector<QFI>& Bs, const vector<unique_ptr<ECPoint>>& Ds, const QFI& R) override; 
 
             virtual bool verify(const vector<unique_ptr<const PublicKey>>&, const vector<QFI>& Bs, 
-                const vector<Mpz>& Ds, const QFI& R) const override;
+                const vector<unique_ptr<ECPoint>>& Ds, const QFI& R) const override;
             
 
     };

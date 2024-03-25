@@ -9,9 +9,10 @@ Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, cons
 
 void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w, 
     const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs,
-    const vector<Mpz>& Ds, const QFI& R)
+    const vector<unique_ptr<ECPoint>>& Ds, const QFI& R)
 {
-    initRandomOracle(pks, Bs, Ds, R, cl_.h());
+    pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
+    initRandomOracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs(t_);
     generateCoefficients(coeffs);
@@ -21,7 +22,7 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
 
     Mpz d(0L), d_temp;
     QFI B, B_temp;
-    Mpz D(1UL), D_temp;
+    ECPoint D(ec_group_), D_temp(ec_group_);
     QFI M, M_temp;
     for(size_t i = 0; i < t_ + 1; i++)
     {
@@ -36,8 +37,10 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
         cl_.Cl_Delta().nucomp(B, B, B_temp);
 
         //compute D
-        Mpz::pow_mod(D_temp, Ds[i], e, q_);
-        Mpz::mul(D, D, D_temp);
+        bool test = ec_group_.is_at_infinity(D_temp);
+
+        ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
+        ec_group_.ec_add(D, D, D_temp);
 
         //compute M
         pks[i]->exponentiation(cl_, M_temp, e);
@@ -45,7 +48,6 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     }
 
     Mpz::mod(d, d, q_);
-    Mpz::mod(D, D, q_); //mod ??
 
     pair<Mpz, Mpz> witness(w.second, d);
 
@@ -54,9 +56,10 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
 }
 
 bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
-    const vector<Mpz>& Ds, const QFI& R) const
+    const vector<unique_ptr<ECPoint>>& Ds, const QFI& R) const
 {
-    initRandomOracle(pks, Bs, Ds, R, cl_.h());
+    pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
+    initRandomOracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs(t_);
     generateCoefficients(coeffs);
@@ -65,7 +68,7 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
     computeUV(U, V, pks, Bs, coeffs);
 
     QFI B, B_temp;
-    Mpz D(1UL), D_temp;
+    ECPoint D(ec_group_), D_temp(ec_group_);
     QFI M, M_temp;
     for(size_t i = 0; i < t_ + 1; i++)
     {
@@ -76,15 +79,13 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
         cl_.Cl_Delta().nucomp(B, B, B_temp);
 
         //compute D
-        Mpz::pow_mod(D_temp, Ds[i], e, q_);
-        Mpz::mul(D, D, D_temp);
+        ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
+        ec_group_.ec_add(D, D, D_temp);
 
         //compute M
         pks[i]->exponentiation(cl_, M_temp, e);
         cl_.Cl_Delta().nucomp(M, M, M_temp);
     }
-
-    Mpz::mod(D, D, q_); //mod ??
 
     return pf_->verify(U, M, R, V, B, D);
 }

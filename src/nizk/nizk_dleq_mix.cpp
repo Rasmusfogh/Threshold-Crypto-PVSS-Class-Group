@@ -10,7 +10,7 @@ Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, 
 }
 
 void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
-    const QFI& R_, const QFI& V_, const QFI& B_, const Mpz& D_)
+    const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_)
 {
     Mpz r = rand_.random_mpz(A_);
     Mpz d = rand_.random_mpz(cl_.q());
@@ -26,11 +26,13 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     QFI fd = cl_.power_of_f(d);
     cl_.Cl_Delta().nucomp(B, B, fd);
 
-    //Mpz D = secp256k1_.exponent(d);
+    ECPoint D(ec_group_, BN(d));
 
     //maybe add g_q, f, h?
-    initRandomOracle(U_, M_, R_, V_, B_, D_, R, V, B);
-    //initRandomOracle(U_, M_, R_, V_, B_, D_, R, V, B, D);
+    ECPointGroupCRefPair ecp1(D_, ec_group_);
+    ECPointGroupCRefPair ecp2(D, ec_group_);
+    initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
+
     c_ = queryRandomOracle(C_);
 
     Mpz::mul(ud_, c_, w.second);
@@ -42,7 +44,7 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
 }
 
 bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_, 
-    const QFI& V_, const QFI& B_, const Mpz& D_) const
+    const QFI& V_, const QFI& B_, const ECPoint& D_) const
 {
     QFI R, R_temp;
     cl_.power_of_h(R_temp, ur_);
@@ -61,14 +63,20 @@ bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     cl_.Cl_Delta().nupow(B, B_, c_);
     cl_.Cl_Delta().nucompinv(B, B_temp, B);
 
-    Mpz D, D_temp;
-    //D_temp = secp256k1_.exponent(ud_);
-    Mpz::mod_inverse(D, D_, cl_.q());
-    Mpz::pow_mod(D, D, c_, cl_.q());
-    Mpz::mul(D, D, D_temp);
-    Mpz::mod(D, D, cl_.q());
-    initRandomOracle(U_, M_, R_, V_, B_, D_, R, V, B);
-    //initRandomOracle(U_, M_, R_, V_, B_, D_, R, V, B, D);
+    ECPoint D(ec_group_);
+    ECPoint D_temp(ec_group_, BN(ud_));
+
+    Mpz c_neg = c_;
+    c_neg.neg();
+    Mpz::mod(c_neg, c_neg, cl_.q());
+
+    ec_group_.scal_mul(D, BN(c_neg), D_);
+    ec_group_.ec_add(D, D, D_temp);
+
+    ECPointGroupCRefPair ecp1(D_, ec_group_);
+    ECPointGroupCRefPair ecp2(D, ec_group_);
+    initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
+    
     Mpz c = queryRandomOracle(C_);
     return c_ == c;
 }

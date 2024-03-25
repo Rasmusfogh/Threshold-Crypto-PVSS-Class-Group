@@ -19,7 +19,7 @@ namespace NIZK
                                                     const QFI,                // R
                                                     const QFI,                // V
                                                     const QFI,                // B
-                                                    const Mpz>                // D
+                                                    const ECPoint>                // D
 
     {
         protected:
@@ -33,10 +33,10 @@ namespace NIZK
             Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, const ECGroup&);
 
             void prove(const pair<Mpz, Mpz>& w, const QFI& X1, const QFI& X2, 
-                const QFI& Y1, const QFI& Y2, const QFI& Y3, const Mpz& Y4) override;
+                const QFI& Y1, const QFI& Y2, const QFI& Y3, const ECPoint& Y4) override;
 
             bool verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2,
-                const QFI& Y3, const Mpz& Y4) const override;
+                const QFI& Y3, const ECPoint& Y4) const override;
     };
 }
 #endif

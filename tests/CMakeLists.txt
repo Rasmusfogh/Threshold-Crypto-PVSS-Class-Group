@@ -12,7 +12,8 @@ set (TESTS_LIST test_qclpvss
                 test_nizkpok_dl
                 test_randgen
                 test_randgen_coeffs
-                test_1r_dkg)
+                test_1r_dkg
+                )
 
 ### Automatically create target and test from TESTS_LIST
 foreach (test ${TESTS_LIST})

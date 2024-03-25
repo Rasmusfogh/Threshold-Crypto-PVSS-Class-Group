@@ -28,11 +28,11 @@ namespace DATATYPE
     class EncSharesExt
     {
          public:
-            Mpz r;
-            QFI R;
-            vector<QFI> Bs;
-            vector<Mpz> Ds;
-            unique_ptr<Nizk_SH_ext> pf;
+            Mpz r_;
+            QFI R_;
+            vector<QFI> Bs_;
+            vector<unique_ptr<ECPoint>> Ds_;
+            unique_ptr<Nizk_SH_ext> pf_;
 
             EncSharesExt(size_t n);
     };
