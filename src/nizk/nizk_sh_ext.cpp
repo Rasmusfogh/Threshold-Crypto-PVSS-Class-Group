@@ -36,9 +36,6 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
         cl_.Cl_Delta().nupow(B_temp, Bs[i], e);
         cl_.Cl_Delta().nucomp(B, B, B_temp);
 
-        //compute D
-        bool test = ec_group_.is_at_infinity(D_temp);
-
         ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
         ec_group_.ec_add(D, D, D_temp);
 

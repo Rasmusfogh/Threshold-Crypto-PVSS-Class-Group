@@ -26,7 +26,8 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     QFI fd = cl_.power_of_f(d);
     cl_.Cl_Delta().nucomp(B, B, fd);
 
-    ECPoint D(ec_group_, BN(d));
+    ECPoint D(ec_group_);
+    ec_group_.scal_mul_gen(D, BN(d));
 
     //maybe add g_q, f, h?
     ECPointGroupCRefPair ecp1(D_, ec_group_);
@@ -63,8 +64,8 @@ bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     cl_.Cl_Delta().nupow(B, B_, c_);
     cl_.Cl_Delta().nucompinv(B, B_temp, B);
 
-    ECPoint D(ec_group_);
-    ECPoint D_temp(ec_group_, BN(ud_));
+    ECPoint D(ec_group_), D_temp(ec_group_);
+    ec_group_.scal_mul_gen(D_temp, BN(ud_));
 
     Mpz c_neg = c_;
     c_neg.neg();
