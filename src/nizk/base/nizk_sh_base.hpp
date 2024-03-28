@@ -30,7 +30,7 @@ namespace NIZK
         protected:
 
             void computeUV(QFI& U_ref, QFI& V_ref, const vector<unique_ptr<const PublicKey>>& pks, 
-                const vector<QFI>& Bs, const vector<Mpz>& coeffs) const
+                const vector<unique_ptr<QFI>>& Bs, const vector<Mpz>& coeffs) const
             {
                 QFI exp;
                 Mpz temp, poly_eval;
@@ -61,15 +61,15 @@ namespace NIZK
                     this->cl_.Cl_Delta().nucomp(U_ref, U_ref, exp);
 
                     //compute V
-                    this->cl_.Cl_Delta().nupow(exp, Bs[i], temp);
+                    this->cl_.Cl_Delta().nupow(exp, *Bs[i], temp);
                     this->cl_.Cl_Delta().nucomp(V_ref, V_ref, exp);
                 }
             }
 
-            void generateCoefficients(vector<Mpz>& coeffs) const
+            void generateCoefficients(vector<Mpz>& coeffs, size_t t) const
             {
-                for (size_t i = 0; i < coeffs.size(); i++)
-                    coeffs[i] = this->queryRandomOracle(q_); 
+                for (size_t i = 0; i < t; i++)
+                    coeffs.emplace_back(this->queryRandomOracle(q_)); 
             }
     };
 }

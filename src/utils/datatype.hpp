@@ -19,7 +19,7 @@ namespace DATATYPE
         public:
             Mpz r;
             QFI R;
-            vector<QFI> Bs;
+            unique_ptr<vector<unique_ptr<QFI>>> Bs;
             unique_ptr<Nizk_SH> pf;
 
             EncShares(size_t n);
@@ -30,8 +30,8 @@ namespace DATATYPE
          public:
             Mpz r_;
             QFI R_;
-            vector<QFI> Bs_;
-            vector<unique_ptr<ECPoint>> Ds_;
+            unique_ptr<vector<unique_ptr<QFI>>> Bs_;
+            unique_ptr<vector<unique_ptr<ECPoint>>> Ds_;
             unique_ptr<Nizk_SH_ext> pf_;
 
             EncSharesExt(size_t n, const ECGroup& ec_group_);

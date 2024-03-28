@@ -8,14 +8,15 @@ Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, cons
 { }
 
 void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w, 
-    const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs,
+    const vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs,
     const vector<unique_ptr<ECPoint>>& Ds, const QFI& R)
 {
     pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
     initRandomOracle(pks, Bs, Ds_, R, cl_.h());
 
-    vector<Mpz> coeffs(t_);
-    generateCoefficients(coeffs);
+    vector<Mpz> coeffs;
+    coeffs.reserve(t_);
+    generateCoefficients(coeffs, t_);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
@@ -27,13 +28,14 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     for(size_t i = 0; i < t_ + 1; i++)
     {
         Mpz e(queryRandomOracle(q_));
+        cout << e << endl;
 
         //compute d
         Mpz::mul(d_temp, e, w.first[i]->y());
         Mpz::add(d, d, d_temp);
 
         //compute B
-        cl_.Cl_Delta().nupow(B_temp, Bs[i], e);
+        cl_.Cl_Delta().nupow(B_temp, *Bs[i], e);
         cl_.Cl_Delta().nucomp(B, B, B_temp);
 
         ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
@@ -52,14 +54,15 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     pf_->prove(witness, U, M, R, V, B, D);
 }
 
-bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
+bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, 
     const vector<unique_ptr<ECPoint>>& Ds, const QFI& R) const
 {
     pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
     initRandomOracle(pks, Bs, Ds_, R, cl_.h());
 
-    vector<Mpz> coeffs(t_);
-    generateCoefficients(coeffs);
+    vector<Mpz> coeffs;
+    coeffs.reserve(t_);
+    generateCoefficients(coeffs, t_);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
@@ -70,9 +73,10 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
     for(size_t i = 0; i < t_ + 1; i++)
     {
         Mpz e(queryRandomOracle(q_));
+        cout << e << endl;
 
         //compute B
-        cl_.Cl_Delta().nupow(B_temp, Bs[i], e);
+        cl_.Cl_Delta().nupow(B_temp, *Bs[i], e);
         cl_.Cl_Delta().nucomp(B, B, B_temp);
 
         //compute D

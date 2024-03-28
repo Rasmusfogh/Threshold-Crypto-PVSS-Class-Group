@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 10; 
-static const size_t T =  5;
+static const size_t N = 100; 
+static const size_t T =  50;
 static const size_t K = 1;
 static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
@@ -113,10 +113,10 @@ BENCHMARK(verifySharing)->Unit(kMillisecond);
 //Only one Ai
 static void decShare(benchmark::State& state) {
     for (auto _ : state) 
-        dec_shares[0] = pvss->decShare(*pks[0], *sks[0], enc_shares->R, enc_shares->Bs[0], 0);
+        dec_shares[0] = pvss->decShare(*pks[0], *sks[0], enc_shares->R, *enc_shares->Bs->at(0), 0);
 
     for(size_t i = 1; i < N; i++)
-        dec_shares[i] = pvss->decShare(*pks[i], *sks[i], enc_shares->R, enc_shares->Bs[i], i);
+        dec_shares[i] = pvss->decShare(*pks[i], *sks[i], enc_shares->R, *enc_shares->Bs->at(i), i);
 
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
@@ -149,7 +149,7 @@ static void verifyDec(benchmark::State& state) {
     for (auto _ : state) {
         for(size_t i = 0; i < T; i++)
         {
-            success = pvss->verifyDec(*dec_shares[i], *pks[i], enc_shares->R, enc_shares->Bs[i]);
+            success = pvss->verifyDec(*dec_shares[i], *pks[i], enc_shares->R, *enc_shares->Bs->at(i));
             DoNotOptimize(success);
         }
     }

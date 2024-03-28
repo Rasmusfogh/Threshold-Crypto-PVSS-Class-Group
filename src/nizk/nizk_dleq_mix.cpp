@@ -67,11 +67,11 @@ bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     ECPoint D(ec_group_), D_temp(ec_group_);
     ec_group_.scal_mul_gen(D_temp, BN(ud_));
 
-    Mpz c_neg = c_;
-    c_neg.neg();
-    Mpz::mod(c_neg, c_neg, cl_.q());
+    Mpz c_copy(c_);
+    c_copy.neg();
+    Mpz::mod(c_copy, c_copy, cl_.q());
 
-    ec_group_.scal_mul(D, BN(c_neg), D_);
+    ec_group_.scal_mul(D, BN(c_copy), D_);
     ec_group_.ec_add(D, D, D_temp);
 
     ECPointGroupCRefPair ecp1(D_, ec_group_);

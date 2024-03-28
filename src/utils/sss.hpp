@@ -36,8 +36,6 @@ namespace SSS_
         private:
         void generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const;
         unique_ptr<const Share> evaluatePolynomial(size_t x, const vector<Mpz>& coefficients) const;
-        const size_t & degree() const;
-        const size_t & parties() const;
     };
 }
 

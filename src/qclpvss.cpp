@@ -62,7 +62,7 @@ unique_ptr<EncShares> QCLPVSS::dist(const Mpz &s, vector<unique_ptr<const Public
 
 bool QCLPVSS::verifySharing(const EncShares& sh, vector<unique_ptr<const PublicKey>>& pks) const 
 {
-  return sh.pf->verify(pks, sh.Bs, sh.R);
+  return sh.pf->verify(pks, *sh.Bs, sh.R);
 }
 
 unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk, const QFI& R, const QFI& B, size_t i) const 
@@ -123,7 +123,8 @@ unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(vector<unique_ptr<const Sh
         //(pk_i)^r
         pks[i]->exponentiation(CL_, pkr, enc_sh->r);
         // B_i = (pk_i)^r * f^p(a_i)
-        CL_.Cl_Delta().nucomp(enc_sh->Bs[i], pkr, f);
+
+        CL_.Cl_Delta().nucomp(*enc_sh->Bs->at(i), pkr, f);
     }
 
     return enc_sh;
@@ -134,7 +135,7 @@ void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks, EncShares&
     enc_shares.pf = unique_ptr<Nizk_SH>(new Nizk_SH
         (hash_, randgen_, CL_, n_, t_, q_, Vis_));
 
-    enc_shares.pf->prove(enc_shares.r, pks, enc_shares.Bs, enc_shares.R); 
+    enc_shares.pf->prove(enc_shares.r, pks, *enc_shares.Bs, enc_shares.R); 
 }
 
 void QCLPVSS::computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q)

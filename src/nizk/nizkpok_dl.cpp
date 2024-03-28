@@ -17,12 +17,13 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen &rand, const CL_HSMqk &cl)
 void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk)
 {
     Mpz temp;
-    vector<Mpz> r(rounds_);
+    vector<Mpz> r;
+    r.reserve(rounds_);
     vector<QFI> t(rounds_);
 
     for(size_t i = 0; i < rounds_; i++) 
     {
-        r[i] = rand_.random_mpz(A_);
+        r.emplace_back(rand_.random_mpz(A_));
         cl_.power_of_h(t[i], r[i]);
     }
     
@@ -39,12 +40,13 @@ void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk)
 bool NizkPoK_DL::verify(const PublicKey& x) const
 {
     vector<QFI> t(rounds_);
+
     QFI temp;
 
     for(size_t i = 0; i < rounds_; i++) {
 
         if (u_[i] > AS_) return false;
-                
+
         x.exponentiation(cl_, t[i], b_[i]);
         cl_.power_of_h(temp, u_[i]);
         cl_.Cl_Delta().nucompinv(t[i], temp, t[i]);

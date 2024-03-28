@@ -8,13 +8,14 @@ Nizk_SH::Nizk_SH(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl,
 { }
 
 void Nizk_SH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks, 
-    const vector<QFI>& Bs, const QFI& R)
+    const vector<unique_ptr<QFI>>& Bs, const QFI& R)
 {
     //Not sure if correct way to pass f
     initRandomOracle(pks, Bs, R, cl_.h());
 
-    vector<Mpz> coeffs(t_);
-    generateCoefficients(coeffs);
+    vector<Mpz> coeffs;
+    coeffs.reserve(t_);
+    generateCoefficients(coeffs, t_);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
@@ -24,13 +25,14 @@ void Nizk_SH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks
     pf_->prove(r, cl_.h(), U, R, V);
 }
 
-bool Nizk_SH::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<QFI>& Bs, 
+bool Nizk_SH::verify(const vector<unique_ptr<const PublicKey>>& pks, const vector<unique_ptr<QFI>>& Bs, 
     const QFI& R) const
 {
     initRandomOracle(pks, Bs, R, cl_.h());
 
-    vector<Mpz> coeffs(t_);
-    generateCoefficients(coeffs);
+    vector<Mpz> coeffs;
+    coeffs.reserve(t_);
+    generateCoefficients(coeffs, t_);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);

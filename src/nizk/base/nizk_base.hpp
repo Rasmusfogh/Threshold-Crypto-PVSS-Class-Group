@@ -29,6 +29,7 @@ namespace NIZK
             template <typename... Args>
             void initRandomOracle (const Args & ...args) const {
                 Mpz seed(hash_(args ...));
+                cout << seed << endl;
                 rand_.set_seed(seed);
             }
     

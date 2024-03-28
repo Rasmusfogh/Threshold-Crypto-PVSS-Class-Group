@@ -3,6 +3,7 @@
 #include <chrono>
 #include <memory>
 #include "../src/qclpvss.hpp"
+#include <cassert>
 
 using namespace BICYCL;
 using namespace QCLPVSS_;
@@ -85,7 +86,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
 
     for(size_t i = 0; i < n; i++)
-        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], enc_shares->R, enc_shares->Bs[i], i);
+        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], enc_shares->R, *enc_shares->Bs->at(i), i);
 
     for (const auto& dec_share : dec_shares) {
         if (dec_share->sh) {
@@ -94,12 +95,12 @@ int main (int argc, char *argv[])
     }
 
     unique_ptr<const Mpz> s_rec = pvss.rec(rec_shares);
-
+    assert(*s_rec == s);
 
     for(size_t i = 0; i < t; i++)
     {
         auto start = system_clock::now();
-        if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R, enc_shares->Bs[i]))
+        if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R, *enc_shares->Bs->at(i)))
             return EXIT_FAILURE;
         auto stop = system_clock::now();
 

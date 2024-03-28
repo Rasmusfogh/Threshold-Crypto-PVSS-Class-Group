@@ -20,6 +20,11 @@ namespace QCLPVSS_
 
             unique_ptr<EncSharesExt> share(vector<unique_ptr<const PublicKey>>&) const;
 
+            unique_ptr<ECPoint> generate_sk_share(const vector<unique_ptr<ECPoint>>& Ds) const;
+
+            unique_ptr<Mpz> compute_sk(const vector<unique_ptr<QFI>>& Bs, const vector<QFI>& Rs, 
+                const SecretKey& ski) const;
+
     };
 }
 

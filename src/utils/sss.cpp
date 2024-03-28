@@ -9,34 +9,35 @@ SSS::SSS(RandGen &randgen, const size_t& k, const size_t& n, const Mpz &q)
 
 unique_ptr<vector<unique_ptr<const Share>>> SSS::shareSecret(const Mpz & s) const
 {
-    vector<Mpz> coefficients(degree());
+    vector<Mpz> coefficients;
+    coefficients.reserve(k_);
 
-    unique_ptr<vector<unique_ptr<const Share>>> shares(new vector<unique_ptr<const Share>>(parties()));
+    unique_ptr<vector<unique_ptr<const Share>>> shares(new vector<unique_ptr<const Share>>());
+    shares->reserve(n_);
 
     generatePolynomial(s, coefficients);
 
-    for(size_t i = 0; i < parties(); i++) {
-        (*shares)[i] = evaluatePolynomial(i + 1, coefficients);
-    } 
+    for(size_t i = 0; i < n_; i++)
+        shares->emplace_back(evaluatePolynomial(i + 1, coefficients));
 
     return shares;
 }
 
 unique_ptr<const Mpz> SSS::reconstructSecret(vector<unique_ptr<const Share>>&shares) const 
 {
-    if (shares.size() < degree())
+    if (shares.size() < k_)
         throw std::invalid_argument ("Too few shares to reconstruct secret.");
 
     unique_ptr<Mpz> s (new Mpz);
 
-    for (size_t j = 0; j < degree(); j++)
+    for (size_t j = 0; j < k_; j++)
     {
         Mpz numerator(1UL);
         Mpz denominator(1UL);
 
         Mpz xj(shares[j]->x());
 
-        for(size_t m = 0; m < degree(); m++)
+        for(size_t m = 0; m < k_; m++)
         {
             if (m == j) continue;
 
@@ -60,14 +61,14 @@ unique_ptr<const Mpz> SSS::reconstructSecret(vector<unique_ptr<const Share>>&sha
 
 void SSS::generatePolynomial(const Mpz & s, vector<Mpz>& coefficients) const
 {
-    if(coefficients.size() < degree())
+    if(k_ > n_)
         throw std::invalid_argument ("Too few shares to reconstruct secret.");
 
     //set a_0 to the secret
-    coefficients[0] = s;
+    coefficients.push_back(s);
 
-    for (size_t i = 1; i < degree(); i++)
-        coefficients[i] = randgen_.random_mpz(q_); 
+    for (size_t i = 1; i < k_; i++)
+        coefficients.emplace_back(randgen_.random_mpz(q_)); 
 }
 
 unique_ptr<const Share> SSS::evaluatePolynomial(size_t x, const vector<Mpz>& coefficients) const 
@@ -78,7 +79,7 @@ unique_ptr<const Share> SSS::evaluatePolynomial(size_t x, const vector<Mpz>& coe
     share->second = coefficients[0];
 
     //evaluate polynomial for degree [1... k - 1]
-    for (size_t i = 1; i < degree(); i++)
+    for (size_t i = 1; i < k_; i++)
     {
         Mpz::pow_mod(temp, Mpz(x), Mpz(i), q_);
         Mpz::mul(temp, temp, coefficients[i]);
@@ -87,14 +88,6 @@ unique_ptr<const Share> SSS::evaluatePolynomial(size_t x, const vector<Mpz>& coe
 
     Mpz::mod(share->second, share->second, q_);
     return share;
-}
-
-const size_t & SSS::degree() const {
-    return k_;
-}
-
-const size_t & SSS::parties() const {
-    return n_;
 }
 
 Share::Share(unsigned long x, const Mpz& y) :pair(x, y) {}
