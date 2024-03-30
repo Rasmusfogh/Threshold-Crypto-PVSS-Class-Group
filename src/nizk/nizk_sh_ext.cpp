@@ -22,28 +22,28 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     computeUV(U, V, pks, Bs, coeffs);
 
     Mpz d(0L), d_temp;
-    QFI B, B_temp;
+    QFI B, M, temp;
     ECPoint D(ec_group_), D_temp(ec_group_);
-    QFI M, M_temp;
-    for(size_t i = 0; i < t_ + 1; i++)
+
+    for(size_t i = 0; i < t_; i++)
     {
         Mpz e(queryRandomOracle(q_));
-        cout << e << endl;
 
         //compute d
         Mpz::mul(d_temp, e, w.first[i]->y());
         Mpz::add(d, d, d_temp);
 
         //compute B
-        cl_.Cl_Delta().nupow(B_temp, *Bs[i], e);
-        cl_.Cl_Delta().nucomp(B, B, B_temp);
+        cl_.Cl_Delta().nupow(temp, *Bs[i], e);
+        cl_.Cl_Delta().nucomp(B, B, temp);
 
+        //compute D
         ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
         ec_group_.ec_add(D, D, D_temp);
 
         //compute M
-        pks[i]->exponentiation(cl_, M_temp, e);
-        cl_.Cl_Delta().nucomp(M, M, M_temp);
+        pks[i]->exponentiation(cl_, temp, e);
+        cl_.Cl_Delta().nucomp(M, M, temp);
     }
 
     Mpz::mod(d, d, q_);
@@ -67,25 +67,23 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks, const v
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
 
-    QFI B, B_temp;
+    QFI B, M, temp;
     ECPoint D(ec_group_), D_temp(ec_group_);
-    QFI M, M_temp;
-    for(size_t i = 0; i < t_ + 1; i++)
+    for(size_t i = 0; i < t_; i++)
     {
         Mpz e(queryRandomOracle(q_));
-        cout << e << endl;
 
         //compute B
-        cl_.Cl_Delta().nupow(B_temp, *Bs[i], e);
-        cl_.Cl_Delta().nucomp(B, B, B_temp);
+        cl_.Cl_Delta().nupow(temp, *Bs[i], e);
+        cl_.Cl_Delta().nucomp(B, B, temp);
 
         //compute D
         ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
         ec_group_.ec_add(D, D, D_temp);
 
         //compute M
-        pks[i]->exponentiation(cl_, M_temp, e);
-        cl_.Cl_Delta().nucomp(M, M, M_temp);
+        pks[i]->exponentiation(cl_, temp, e);
+        cl_.Cl_Delta().nucomp(M, M, temp);
     }
 
     return pf_->verify(U, M, R, V, B, D);

@@ -17,18 +17,19 @@ int main (int argc, char *argv[])
     SecLevel seclevel(128);
     RandGen randgen;
 
+    ECGroup ec_group_(seclevel);
+
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
     randgen.set_seed (seed);
 
-    BICYCL::Mpz q(randgen.random_prime(256));
+    Mpz q(ec_group_.order());
 
     OpenSSL::HashAlgo H (seclevel);
 
     size_t n(10UL);
     size_t t(5UL);
 
-    ECGroup ec_group_(seclevel);
     QCLPVSS_ext pvss(seclevel, H, randgen, ec_group_, q, 1, n, t);
 
     vector<unique_ptr<const SecretKey>> sks(n);
@@ -39,6 +40,8 @@ int main (int argc, char *argv[])
     vector<unique_ptr<Nizk_DLEQ>> dec_shares(n);
     vector<unique_ptr<ECPoint>> tpki;
     vector<unique_ptr<Mpz>> tski;
+    tski.reserve(n);
+    generate_n(back_inserter(tski), n, [] {return unique_ptr<Mpz>(new Mpz()); });
 
     tpki.reserve(n);
     generate_n(back_inserter(tpki), n, [&] {return unique_ptr<ECPoint>(new ECPoint(ec_group_)); });
@@ -73,7 +76,7 @@ int main (int argc, char *argv[])
     for(size_t i = 0; i < n; i++)
     {
         for(size_t j = 0; j < n; j++)
-            ec_group_.ec_add(*tpki[i], *tpki[i], *enc_shares_ext_matrix[j]->Ds_->at(i));
+            ec_group_.ec_add(*tpki[i], *tpki[i], *enc_shares_ext_matrix[j]->Ds_->at(j));
     }
 
     //global public key
@@ -119,7 +122,7 @@ int main (int argc, char *argv[])
 
 
     for(size_t i = 0; i < n; i++)
-        tski[i] = pvss.compute_sk(shared_Bs[i], shared_Rs, *sks[i]);
+        tski.emplace_back(pvss.compute_sk(shared_Bs[i], shared_Rs, *sks[i]));
     
 
     for(size_t i = 0; i < n; i++)

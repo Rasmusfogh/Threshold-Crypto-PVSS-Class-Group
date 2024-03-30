@@ -47,31 +47,32 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
 bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_, 
     const QFI& V_, const QFI& B_, const ECPoint& D_) const
 {
-    QFI R, R_temp;
-    cl_.power_of_h(R_temp, ur_);
+    QFI temp;
+
+    QFI R;
+    cl_.power_of_h(temp, ur_);
     cl_.Cl_Delta().nupow(R, R_, c_);
-    cl_.Cl_Delta().nucompinv(R, R_temp, R);
+    cl_.Cl_Delta().nucompinv(R, temp, R);
 
-    QFI V, V_temp;
-    cl_.Cl_Delta().nupow(V_temp, U_, ur_);
+    QFI V;
+    cl_.Cl_Delta().nupow(temp, U_, ur_);
     cl_.Cl_Delta().nupow(V, V_, c_);
-    cl_.Cl_Delta().nucompinv(V, V_temp, V);
+    cl_.Cl_Delta().nucompinv(V, temp, V);
 
-    QFI B, B_temp;
-    B_temp = cl_.power_of_f(ud_);
+    QFI B;
+    temp = cl_.power_of_f(ud_);
     cl_.Cl_Delta().nupow(B, M_, ur_);
-    cl_.Cl_Delta().nucomp(B_temp, B_temp, B);
+    cl_.Cl_Delta().nucomp(temp, temp, B);
     cl_.Cl_Delta().nupow(B, B_, c_);
-    cl_.Cl_Delta().nucompinv(B, B_temp, B);
+    cl_.Cl_Delta().nucompinv(B, temp, B);
 
     ECPoint D(ec_group_), D_temp(ec_group_);
     ec_group_.scal_mul_gen(D_temp, BN(ud_));
 
-    Mpz c_copy(c_);
-    c_copy.neg();
-    Mpz::mod(c_copy, c_copy, cl_.q());
+    BN c_bn(c_);
+    c_bn.neg();
 
-    ec_group_.scal_mul(D, BN(c_copy), D_);
+    ec_group_.scal_mul(D, c_bn, D_);
     ec_group_.ec_add(D, D, D_temp);
 
     ECPointGroupCRefPair ecp1(D_, ec_group_);

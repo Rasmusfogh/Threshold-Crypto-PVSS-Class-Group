@@ -13,11 +13,11 @@ unique_ptr<EncSharesExt> QCLPVSS_ext::share(vector<unique_ptr<const PublicKey>>&
     unique_ptr<vector<unique_ptr<const Share>>> shares = createShares(s);
     unique_ptr<EncShares> enc_shares = computeEncryptedShares(*shares, pks);
 
-    unique_ptr<EncSharesExt> enc_shares_ext (new EncSharesExt(n_, ec_group_));
+    unique_ptr<EncSharesExt> enc_shares_ext (new EncSharesExt(n_));
 
     for(size_t i = 0; i < n_; i++)
-        ec_group_.scal_mul_gen(*enc_shares_ext->Ds_->at(i), BN((*shares)[i]->second));
-    
+        enc_shares_ext->Ds_->emplace_back(unique_ptr<ECPoint>
+            (new ECPoint(ec_group_, BN((*shares)[i]->second))));
 
     enc_shares_ext->r_ = enc_shares->r;
     enc_shares_ext->R_ = enc_shares->R;
