@@ -41,7 +41,7 @@ unique_ptr<const PublicKey> QCLPVSS::keyGen(const SecretKey& sk) const
 
 unique_ptr<NizkPoK_DL> QCLPVSS::keyGen(const PublicKey& pk, const SecretKey& sk) const
 {
-    unique_ptr<NizkPoK_DL> pf(new NizkPoK_DL(hash_, randgen_, CL_));
+    unique_ptr<NizkPoK_DL> pf(new NizkPoK_DL(hash_, randgen_, CL_, seclevel_));
     pf->prove(sk, pk);
     return pf;
 }

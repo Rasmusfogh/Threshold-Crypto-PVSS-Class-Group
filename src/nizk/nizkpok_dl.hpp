@@ -16,13 +16,13 @@ namespace NIZK
                                                 const PublicKey> {
 
         protected:
-        Mpz A_, AS_;
-        static const size_t rounds_ = 40;
-        array<Mpz, rounds_> b_, u_;
+        unsigned int l_;
+        Mpz A_, AS_, l_boundary;
+        vector<Mpz> b_, u_;
 
         public:
 
-        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&);
+        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
 
         virtual void prove(const SecretKey&, const PublicKey&) override;
         virtual bool verify(const PublicKey& pk) const override;

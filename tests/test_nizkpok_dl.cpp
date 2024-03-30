@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
     SecretKey sk(cl_hsm, randgen);
     PublicKey pk(cl_hsm, sk);
 
-    NizkPoK_DL pf(H, randgen, cl_hsm);
+    NizkPoK_DL pf(H, randgen, cl_hsm, seclevel);
 
     if(pf.verify(pk))
         return EXIT_SUCCESS;
