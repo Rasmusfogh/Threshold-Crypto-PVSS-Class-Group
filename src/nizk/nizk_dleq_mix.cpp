@@ -2,16 +2,16 @@
 
 using namespace NIZK;
 
-Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl, const ECGroup& ec_group)
-    : Nizk_base(hash, rand, cl), ec_group_(ec_group), C_(cl.encrypt_randomness_bound())
-{
+Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+    const ECGroup& ec_group)
+    : C_(cl.encrypt_randomness_bound()), Nizk_base(hash, rand, cl),
+      ec_group_(ec_group) {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
-    //Define A_ and C_
+    // Define A_ and C_
 }
 
 void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
-    const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_)
-{
+    const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_) {
     Mpz r = rand_.random_mpz(A_);
     Mpz d = rand_.random_mpz(cl_.q());
 
@@ -19,7 +19,7 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     cl_.power_of_h(R, r);
 
     QFI V;
-    cl_.Cl_Delta().nupow(V, U_, r); //witness or random r?
+    cl_.Cl_Delta().nupow(V, U_, r);    // witness or random r?
 
     QFI B;
     cl_.Cl_Delta().nupow(B, M_, r);
@@ -29,7 +29,7 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     ECPoint D(ec_group_);
     ec_group_.scal_mul_gen(D, BN(d));
 
-    //maybe add g_q, f, h?
+    // maybe add g_q, f, h?
     ECPointGroupCRefPair ecp1(D_, ec_group_);
     ECPointGroupCRefPair ecp2(D, ec_group_);
     initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
@@ -44,9 +44,8 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     Mpz::add(ur_, ur_, r);
 }
 
-bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_, 
-    const QFI& V_, const QFI& B_, const ECPoint& D_) const
-{
+bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
+    const QFI& V_, const QFI& B_, const ECPoint& D_) const {
     QFI temp;
 
     QFI R;
@@ -78,7 +77,7 @@ bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     ECPointGroupCRefPair ecp1(D_, ec_group_);
     ECPointGroupCRefPair ecp2(D, ec_group_);
     initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
-    
+
     Mpz c = queryRandomOracle(C_);
     return c_ == c;
 }

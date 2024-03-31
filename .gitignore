@@ -62,3 +62,6 @@ test/test_runner
 
 # Local History for Visual Studio Code
 .history/
+
+#
+.clang-format

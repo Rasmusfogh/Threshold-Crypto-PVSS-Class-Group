@@ -1,17 +1,16 @@
 #include "nizk_dleq.hpp"
 using namespace NIZK;
 
-Nizk_DLEQ::Nizk_DLEQ(HashAlgo &hash, RandGen &randgen, const CL_HSMqk &cl) 
-    : Nizk_base(hash, randgen, cl), C_(cl.encrypt_randomness_bound())
-{
+Nizk_DLEQ::Nizk_DLEQ(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl)
+    : Nizk_base(hash, randgen, cl), C_(cl.encrypt_randomness_bound()) {
     Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
     Mpz::mul(SC_, cl_.encrypt_randomness_bound(), C_);
     Mpz::add(SC_, A_, SC_);
 }
 
-void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2)
-{
-    //u_ = r
+void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
+    const QFI& Y2) {
+    // u_ = r
     u_ = rand_.random_mpz(A_);
 
     QFI T1, T2;
@@ -26,11 +25,11 @@ void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
     Mpz::addmul(u_, c_, w);
 }
 
-bool Nizk_DLEQ::verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2) const
-{
-    if(u_ > SC_)
+bool Nizk_DLEQ::verify(const QFI& X1, const QFI& X2, const QFI& Y1,
+    const QFI& Y2) const {
+    if (u_ > SC_)
         return false;
-        
+
     QFI T1, T2, temp;
 
     cl_.power_of_h(T1, u_);
@@ -44,6 +43,6 @@ bool Nizk_DLEQ::verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y
 
     initRandomOracle(X1, X2, Y1, Y2, T1, T2);
 
-    //CL_.h() = X1 = g_q
+    // CL_.h() = X1 = g_q
     return c_ == queryRandomOracle(C_);
 }

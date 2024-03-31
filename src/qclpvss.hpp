@@ -1,13 +1,13 @@
 #ifndef QCLPVSS__
 #define QCLPVSS__
 
+#include <datatype.hpp>
 #include <iostream>
 #include <memory>
+#include <nizk_sh.hpp>
+#include <nizkpok_dl.hpp>
 #include <qclpvss_utils.hpp>
 #include <sss.hpp>
-#include <nizkpok_dl.hpp>
-#include <nizk_sh.hpp>
-#include <datatype.hpp>
 
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -17,70 +17,76 @@ using namespace std;
 using namespace SSS_;
 using namespace DATATYPE;
 
-namespace QCLPVSS_
-{   
-    class QCLPVSS 
-    {
-        public:
-            SecLevel& seclevel_;
-            const size_t k_;
-            /** number of parties. n + k <= q*/
-            const size_t n_;
-            /** privacy threshold. k + t <= n*/
-            const size_t t_;
-            const Mpz& q_;
+namespace QCLPVSS_ {
+    class QCLPVSS {
+      public:
+        SecLevel& seclevel_;
+        const size_t k_;
+        /** number of parties. n + k <= q*/
+        const size_t n_;
+        /** privacy threshold. k + t <= n*/
+        const size_t t_;
+        const Mpz& q_;
 
-            //fixed points used to evaluate the sharing polynomial for the sharing proof
-            vector<unique_ptr<Mpz>> Vis_;
+        // fixed points used to evaluate the sharing polynomial for the sharing
+        // proof
+        vector<Mpz> Vis_;
 
-        protected:
-            SSS sss_;
-            CL_HSMqk CL_;
-            HashAlgo& hash_;
-            RandGen& randgen_;
+      protected:
+        SSS sss_;
+        CL_HSMqk CL_;
+        HashAlgo& hash_;
+        RandGen& randgen_;
 
-        public:
+      public:
+        /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of
+         * secret, @p t: privacy threshhold, @p n: number of parties  */
+        QCLPVSS(SecLevel&, HashAlgo&, RandGen&, Mpz& q, const size_t k,
+            const size_t n, const size_t t);
 
-            /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of secret, @p t: privacy threshhold, @p n: number of parties  */
-            QCLPVSS (SecLevel&, HashAlgo &, RandGen&, Mpz &q, const size_t k,
-                const size_t n, const size_t t);
+        /** @name Cryptographic functionalities
+         * @{
+         * */
 
+        // Setup
+        unique_ptr<const SecretKey> keyGen(RandGen&) const;
+        unique_ptr<const PublicKey> keyGen(const SecretKey&) const;
+        unique_ptr<NizkPoK_DL> keyGen(const PublicKey&, const SecretKey&) const;
+        bool verifyKey(const PublicKey&, const NizkPoK_DL&) const;
 
-            /** @name Cryptographic functionalities 
-             * @{
-             * */ 
+        // Distribution
+        unique_ptr<EncShares> dist(const Mpz& secret,
+            vector<unique_ptr<const PublicKey>>&) const;
 
-            //Setup
-            unique_ptr<const SecretKey> keyGen(RandGen&) const;
-            unique_ptr<const PublicKey> keyGen(const SecretKey&) const;
-            unique_ptr<NizkPoK_DL> keyGen(const PublicKey&, const SecretKey&) const;
-            bool verifyKey(const PublicKey&, const NizkPoK_DL&) const;
+        // Distribution Verification
+        bool verifySharing(const EncShares&,
+            vector<unique_ptr<const PublicKey>>&) const;
 
-            //Distribution
-            unique_ptr<EncShares> dist(const Mpz &secret, vector<unique_ptr<const PublicKey>>&) const;
+        // Reconstruction
+        unique_ptr<DecShare> decShare(const PublicKey&, const SecretKey&,
+            const QFI& R, const QFI& B, size_t i) const;
+        unique_ptr<const Mpz> rec(vector<unique_ptr<const Share>>& Ais) const;
 
-            //Distribution Verification
-            bool verifySharing(const EncShares&, vector<unique_ptr<const PublicKey>>&) const;
+        // Reconstruction Verification
+        bool verifyDec(const DecShare&, const PublicKey&, const QFI& R,
+            const QFI& B) const;
+        /**@}*/
 
-            //Reconstruction
-            unique_ptr<DecShare> decShare(const PublicKey&, const SecretKey&, const QFI& R, const QFI& B, size_t i) const;
-            unique_ptr<const Mpz> rec(vector<unique_ptr<const Share>>& Ais) const;
+      protected:
+        unique_ptr<vector<unique_ptr<const Share>>> createShares(
+            const Mpz& secret) const;
 
-            //Reconstruction Verification
-            bool verifyDec(const DecShare&, const PublicKey&, const QFI& R, const QFI& B) const;
-            /**@}*/
+        unique_ptr<EncShares> computeEncryptedShares(
+            vector<unique_ptr<const Share>>&,
+            vector<unique_ptr<const PublicKey>>&) const;
 
-        protected:
-            unique_ptr<vector<unique_ptr<const Share>>> createShares(const Mpz &secret) const;
-            
-            unique_ptr<EncShares> computeEncryptedShares(vector<unique_ptr<const Share>>&, 
-                vector<unique_ptr<const PublicKey>>&) const;
+        void computeSHNizk(vector<unique_ptr<const PublicKey>>&,
+            EncShares&) const;
 
-            void computeSHNizk(vector<unique_ptr<const PublicKey>>&, EncShares&) const;
-        
-        private:
-            void computeFixedPolyPoints(vector<unique_ptr<Mpz>>& vis, const size_t& n, const Mpz& q);
+      private:
+        void computeFixedPolyPoints(vector<Mpz>& vis, const size_t n,
+            const Mpz& q);
     };
-}
+}    // namespace QCLPVSS_
 
 #endif /* QCLPVSS__ */
