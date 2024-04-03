@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     // Setup
     vector<unique_ptr<const SecretKey>> sks(n);
     vector<unique_ptr<const PublicKey>> pks(n);
-    vector<unique_ptr<NizkPoK_DL>> keygen_pf(n);
+    vector<unique_ptr<NizkDL>> keygen_pf(n);
     vector<unique_ptr<EncSharesExt>> enc_sh(n);
 
     vector<Mpz> tsks;
@@ -64,6 +64,8 @@ int main(int argc, char* argv[]) {
         enc_sh[j] = bdkg.dist(s_j, pks);
     }
 
+    auto start = std::chrono::system_clock::now();
+
     // parties verify shares
     for (size_t j = 0; j < n; j++) {
         if (!(enc_sh[j]->pf_->verify(pks, *enc_sh[j]->Bs_, *enc_sh[j]->Ds_,
@@ -71,6 +73,10 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
     }
+
+    auto stop = std::chrono::system_clock::now();
+    auto ms_int = duration_cast<milliseconds>(stop - start);
+    cout << "verifying shares: " << ms_int.count() << endl;
 
     /********************* Output sharing *************************/
 
@@ -96,19 +102,40 @@ int main(int argc, char* argv[]) {
     // |Q| = n as all proofs verifies above
     size_t Q = n;
 
+    start = std::chrono::system_clock::now();
+
     // Compute tpks[i]
     for (size_t i = 0; i < n; i++) {
         for (size_t j = 0; j < Q; j++)
             ec_group_.ec_add(tpks[i], tpks[i], *enc_sh[j]->Ds_->at(i));
     }
 
+    stop = std::chrono::system_clock::now();
+    ms_int = duration_cast<milliseconds>(stop - start);
+    cout << "computing n tpk_i's: " << ms_int.count() << endl;
+
+    start = std::chrono::system_clock::now();
+
     // Compute global public key
     unique_ptr<ECPoint> tpk = move(bdkg.compute_tpk(tpks));
 
+    stop = std::chrono::system_clock::now();
+    ms_int = duration_cast<milliseconds>(stop - start);
+    cout << "computing global tpk: " << ms_int.count() << endl;
+
     /********************* PRIVATE OUTPUT *************************/
 
+    start = std::chrono::system_clock::now();
+
+    // Compute private key share 0
+    tsks.emplace_back(bdkg.compute_tsk_i(shared_Bs[0], shared_Rs, *sks[0]));
+
+    stop = std::chrono::system_clock::now();
+    ms_int = duration_cast<milliseconds>(stop - start);
+    cout << "computing 1 tsk: " << ms_int.count() << endl;
+
     // Compute private key share
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 1; i < n; i++)
         tsks.emplace_back(bdkg.compute_tsk_i(shared_Bs[i], shared_Rs, *sks[i]));
 
     /********************* VERIFY OUTPUT *************************/

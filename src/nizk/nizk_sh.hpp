@@ -13,19 +13,19 @@ using namespace std;
 
 namespace NIZK {
     // Forward declaration
-    class Nizk_DLEQ;
+    class NizkDLEQ;
 
-    class Nizk_SH : public virtual Nizk_SH_base<const Mpz,            // r
-                        const vector<unique_ptr<const PublicKey>>,    // pks
-                        const vector<shared_ptr<QFI>>,                // Bs
-                        const QFI>                                    // R
+    class NizkSH : public virtual BaseNizkSH<const Mpz,              // r
+                       const vector<unique_ptr<const PublicKey>>,    // pks
+                       const vector<shared_ptr<QFI>>,                // Bs
+                       const QFI>                                    // R
     {
 
       protected:
-        unique_ptr<Nizk_DLEQ> pf_;
+        unique_ptr<NizkDLEQ> pf_;
 
       public:
-        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
+        NizkSH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
             const size_t n, const size_t t, const Mpz& q,
             const vector<Mpz>& Vis);
 

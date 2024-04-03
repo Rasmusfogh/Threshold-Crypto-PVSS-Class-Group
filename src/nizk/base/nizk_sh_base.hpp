@@ -13,7 +13,7 @@ using namespace std;
 
 namespace NIZK {
     template <typename Witness, typename... Statement>
-    class Nizk_SH_base : public Nizk_base<Witness, Statement...> {
+    class BaseNizkSH : public BaseNizk<Witness, Statement...> {
 
       protected:
         Mpz C_;    // Is set from inheriting class
@@ -23,39 +23,69 @@ namespace NIZK {
         const vector<Mpz>& Vis_;
 
       public:
-        Nizk_SH_base(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+        BaseNizkSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
             const SecLevel& seclevel, const Mpz& q, const size_t n,
             const size_t t, const vector<Mpz>& Vis)
-            : Nizk_base<Witness, Statement...>(hash, rand, cl), q_(q), n_(n),
+            : BaseNizk<Witness, Statement...>(hash, rand, cl), q_(q), n_(n),
               t_(t), degree_(n - t - 1 - 1), Vis_(Vis), seclevel_(seclevel) {}
 
       protected:
+        Mpz evaluatePolynomial(size_t x, const vector<Mpz>& coeffs) const {
+            Mpz res(coeffs[0]), temp;
+
+            // Evaluate polynomial m*
+            for (size_t j = 1; j < degree_; j++) {
+                Mpz::pow_mod(temp, Mpz(x), Mpz(j), q_);
+                Mpz::addmul(res, temp, coeffs[j]);
+            }
+            Mpz::mod(res, res, q_);
+            return res;
+        }
+
+        Mpz computeWi(size_t i, const vector<Mpz>& coeffs) const {
+
+            Mpz res = evaluatePolynomial(i + 1, coeffs);
+
+            Mpz::mul(res, res, Vis_[i]);
+            Mpz::mod(res, res, q_);
+            return res;
+        }
+
         void computeUV(QFI& U_ref, QFI& V_ref,
             const vector<unique_ptr<const PublicKey>>& pks,
             const vector<shared_ptr<QFI>>& Bs,
             const vector<Mpz>& coeffs) const {
             QFI exp;
-            Mpz temp, poly_eval;
+            Mpz temp;
 
             for (size_t i = 0; i < n_; i++) {
-                poly_eval = coeffs[0];    // coefficient 0 aka secret
+                temp = computeWi(i, coeffs);
 
-                // Evaluate polynomial m*
-                for (size_t j = 1; j < degree_; j++) {
-                    Mpz::pow_mod(temp, Mpz(i + 1), Mpz(j), q_);
-                    Mpz::addmul(poly_eval, temp,
-                        coeffs[j]);    // remaining coefficients
-                }
-
-                Mpz::mod(poly_eval, poly_eval, q_);
-
-                // compute wi = temp
-                Mpz::mul(temp, poly_eval, Vis_[i]);
-                Mpz::mod(temp, temp, q_);
-
-                // compute wi' = temp
-                Mpz ci(this->queryRandomOracle(C_));    // ci using RNG
+                // compute wi' = wi
+                Mpz ci(this->query_random_oracle(C_));
                 Mpz::addmul(temp, ci, q_);
+
+                // compute U
+                (*pks[i]).exponentiation(this->cl_, exp, temp);
+                this->cl_.Cl_Delta().nucomp(U_ref, U_ref, exp);
+
+                // compute V
+                this->cl_.Cl_Delta().nupow(exp, *Bs[i], temp);
+                this->cl_.Cl_Delta().nucomp(V_ref, V_ref, exp);
+            }
+        }
+
+        void computeUVusingWis(QFI& U_ref, QFI& V_ref,
+            const vector<unique_ptr<const PublicKey>>& pks,
+            const vector<shared_ptr<QFI>>& Bs, const vector<Mpz>& wis) const {
+            QFI exp;
+            Mpz temp;
+
+            for (size_t i = 0; i < n_; i++) {
+                // compute wi' = wi
+                Mpz ci(this->query_random_oracle(C_));
+                Mpz::mul(temp, ci, q_);
+                Mpz::add(temp, wis[i], temp);
 
                 // compute U
                 (*pks[i]).exponentiation(this->cl_, exp, temp);
@@ -69,7 +99,7 @@ namespace NIZK {
 
         void generateCoefficients(vector<Mpz>& coeffs, size_t t) const {
             for (size_t _ = 0; _ < t; _++)
-                coeffs.emplace_back(this->queryRandomOracle(q_));
+                coeffs.emplace_back(this->query_random_oracle(q_));
         }
     };
 }    // namespace NIZK

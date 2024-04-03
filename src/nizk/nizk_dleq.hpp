@@ -11,18 +11,18 @@ using namespace OpenSSL;
 using namespace std;
 
 namespace NIZK {
-    class Nizk_DLEQ : public virtual Nizk_base<const Mpz,    // r
-                          const QFI,                         // g_q / h
-                          const QFI,                         // U
-                          const QFI,                         // R
-                          const QFI>                         // V
+    class NizkDLEQ : public virtual BaseNizk<const Mpz,    // r
+                         const QFI,                        // g_q / h
+                         const QFI,                        // U
+                         const QFI,                        // R
+                         const QFI>                        // V
     {
       protected:
         Mpz A_, C_, S_;
         Mpz u_, c_;
 
       public:
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
+        NizkDLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
 
         void prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
             const QFI& Y2) override;

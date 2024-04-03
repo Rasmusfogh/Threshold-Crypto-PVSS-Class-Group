@@ -11,8 +11,7 @@ using namespace OpenSSL;
 using namespace std;
 
 namespace NIZK {
-    class NizkPoK_DL
-        : public virtual Nizk_base<const SecretKey, const PublicKey> {
+    class NizkDL : public virtual BaseNizk<const SecretKey, const PublicKey> {
 
       protected:
         unsigned int l_;
@@ -20,7 +19,7 @@ namespace NIZK {
         vector<Mpz> b_, u_;
 
       public:
-        NizkPoK_DL(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
+        NizkDL(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
 
         virtual void prove(const SecretKey&, const PublicKey&) override;
         virtual bool verify(const PublicKey& pk) const override;

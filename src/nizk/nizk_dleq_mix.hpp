@@ -12,14 +12,13 @@ using namespace std;
 using namespace SSS_;
 
 namespace NIZK {
-    class Nizk_DLEQ_mix
-        : public virtual Nizk_base<const pair<Mpz, Mpz>,    // r, d
-              const QFI,                                    // U
-              const QFI,                                    // M
-              const QFI,                                    // R
-              const QFI,                                    // V
-              const QFI,                                    // B
-              const ECPoint>                                // D
+    class NizkMixDLEQ : public virtual BaseNizk<const pair<Mpz, Mpz>,    // r, d
+                            const QFI,                                   // U
+                            const QFI,                                   // M
+                            const QFI,                                   // R
+                            const QFI,                                   // V
+                            const QFI,                                   // B
+                            const ECPoint>                               // D
 
     {
       protected:
@@ -30,7 +29,7 @@ namespace NIZK {
         const ECGroup& ec_group_;
 
       public:
-        Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
+        NizkMixDLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
             const ECGroup&);
 
         void prove(const pair<Mpz, Mpz>& w, const QFI& X1, const QFI& X2,

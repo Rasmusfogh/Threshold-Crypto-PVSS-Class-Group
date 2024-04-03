@@ -1,14 +1,14 @@
-#include "nizkpok_dl.hpp"
+#include "nizk_dl.hpp"
 
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace UTILS;
 using namespace NIZK;
 
-NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+NizkDL::NizkDL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel)
     : ell_(static_cast<unsigned long>(cl_.lambda_distance() - 2)),
-      Nizk_base(hash, rand, cl), l_(cl_.lambda_distance() - 2), u_(l_) {
+      BaseNizk(hash, rand, cl), l_(cl_.lambda_distance() - 2), u_(l_) {
 
     b_.reserve(l_);
 
@@ -21,7 +21,7 @@ NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     Mpz::mul(A_, S_, bits);
 }
 
-void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk) {
+void NizkDL::prove(const SecretKey& sk, const PublicKey& pk) {
     Mpz temp;
     vector<Mpz> r;
     r.reserve(l_);
@@ -32,16 +32,16 @@ void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk) {
         cl_.power_of_h(t[i], r[i]);
     }
 
-    initRandomOracle(cl_.h(), pk.get(), t);
+    init_random_oracle(cl_.h(), pk.get(), t);
 
     for (size_t i = 0; i < l_; i++) {
-        b_.emplace_back(queryRandomOracle(ell_));
+        b_.emplace_back(query_random_oracle(ell_));
         Mpz::mul(temp, sk, b_[i]);
         Mpz::add(u_[i], temp, r[i]);
     }
 }
 
-bool NizkPoK_DL::verify(const PublicKey& x) const {
+bool NizkDL::verify(const PublicKey& x) const {
     vector<QFI> t(l_);
 
     QFI temp;
@@ -59,10 +59,10 @@ bool NizkPoK_DL::verify(const PublicKey& x) const {
         cl_.Cl_Delta().nucompinv(t[i], temp, t[i]);
     }
 
-    initRandomOracle(cl_.h(), x.get(), t);
+    init_random_oracle(cl_.h(), x.get(), t);
 
     for (const auto& _ : b_)
-        if (_ != queryRandomOracle(ell_))
+        if (_ != query_random_oracle(ell_))
             return false;
 
     return true;

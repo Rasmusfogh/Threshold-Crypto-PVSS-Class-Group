@@ -5,7 +5,7 @@ set(SRC_SOURCE_FILES
     utils/sss.cpp
     utils/openssl_hash_ext.cpp
     utils/datatype.cpp
-    nizk/nizkpok_dl.cpp
+    nizk/nizk_dl.cpp
     nizk/nizk_sh.cpp
     nizk/nizk_dleq.cpp
     nizk/nizk_sh_ext.cpp

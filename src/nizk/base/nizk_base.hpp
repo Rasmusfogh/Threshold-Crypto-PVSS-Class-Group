@@ -9,7 +9,7 @@ using namespace std;
 
 namespace NIZK {
     template <typename Witness, typename... Statement>
-    class Nizk_base {
+    class BaseNizk {
 
       protected:
         HashAlgo& hash_;
@@ -17,7 +17,7 @@ namespace NIZK {
         const CL_HSMqk& cl_;
 
       public:
-        Nizk_base(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl)
+        BaseNizk(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl)
             : hash_(hash), rand_(rand), cl_(cl) {}
 
         virtual void prove(const Witness& w, const Statement&... s) = 0;
@@ -26,12 +26,12 @@ namespace NIZK {
       protected:
         // Random Oracle
         template <typename... Args>
-        void initRandomOracle(const Args&... args) const {
+        void init_random_oracle(const Args&... args) const {
             Mpz seed(hash_(args...));
             rand_.set_seed(seed);
         }
 
-        const Mpz queryRandomOracle(const Mpz& v) const {
+        const Mpz query_random_oracle(const Mpz& v) const {
             return rand_.random_mpz(v);
         }
     };

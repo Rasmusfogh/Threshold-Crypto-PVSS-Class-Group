@@ -35,14 +35,14 @@ unique_ptr<const PublicKey> QCLPVSS::keyGen(const SecretKey& sk) const {
     return unique_ptr<const PublicKey>(new PublicKey(CL_, sk));
 }
 
-unique_ptr<NizkPoK_DL> QCLPVSS::keyGen(const PublicKey& pk,
+unique_ptr<NizkDL> QCLPVSS::keyGen(const PublicKey& pk,
     const SecretKey& sk) const {
-    unique_ptr<NizkPoK_DL> pf(new NizkPoK_DL(hash_, randgen_, CL_, seclevel_));
+    unique_ptr<NizkDL> pf(new NizkDL(hash_, randgen_, CL_, seclevel_));
     pf->prove(sk, pk);
     return pf;
 }
 
-bool QCLPVSS::verifyKey(const PublicKey& pk, const NizkPoK_DL& pf) const {
+bool QCLPVSS::verifyKey(const PublicKey& pk, const NizkDL& pf) const {
     return pf.verify(pk);
 }
 
@@ -73,7 +73,7 @@ unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk,
     dec_share->sh =
         unique_ptr<const Share>(new Share(i + 1, Mpz(CL_.dlog_in_F(fi))));
     dec_share->pf =
-        unique_ptr<Nizk_DLEQ>(new Nizk_DLEQ(hash_, randgen_, CL_, seclevel_));
+        unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, randgen_, CL_, seclevel_));
     dec_share->pf->prove(sk, CL_.h(), R, pk.get(), Mi);
     return dec_share;
 }
@@ -129,8 +129,8 @@ unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(
 
 void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks,
     EncShares& enc_shares) const {
-    enc_shares.pf = unique_ptr<Nizk_SH>(
-        new Nizk_SH(hash_, randgen_, CL_, seclevel_, n_, t_, q_, Vis_));
+    enc_shares.pf = unique_ptr<NizkSH>(
+        new NizkSH(hash_, randgen_, CL_, seclevel_, n_, t_, q_, Vis_));
 
     enc_shares.pf->prove(enc_shares.r, pks, *enc_shares.Bs, enc_shares.R);
 }

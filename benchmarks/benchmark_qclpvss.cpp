@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 1000;
-static const size_t T = 500;
+static const size_t N = 100;
+static const size_t T = 50;
 static const size_t K = 1;
 static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
@@ -23,7 +23,7 @@ static unique_ptr<QCLPVSS> pvss;
 // Global state
 static vector<unique_ptr<const SecretKey>> sks(N);
 static vector<unique_ptr<const PublicKey>> pks(N);
-static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
+static vector<unique_ptr<NizkDL>> keygen_pf(N);
 static unique_ptr<EncShares> enc_shares;
 static vector<unique_ptr<DecShare>> dec_shares(N);
 static vector<unique_ptr<const Share>> rec_shares;
@@ -59,7 +59,7 @@ static void keyGen(benchmark::State& state) {
     for (auto _ : state) {
         unique_ptr<const SecretKey> sk = pvss->keyGen(randgen);
         unique_ptr<const PublicKey> pk = pvss->keyGen(*sk);
-        unique_ptr<NizkPoK_DL> pf = pvss->keyGen(*pk, *sk);
+        unique_ptr<NizkDL> pf = pvss->keyGen(*pk, *sk);
         DoNotOptimize(pf);
     }
     state.counters["secLevel"] = secLevel.soundness();

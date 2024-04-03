@@ -16,10 +16,10 @@ using namespace SSS_;
 
 namespace NIZK {
     // Forward declaration
-    class Nizk_DLEQ;
+    class NizkDLEQ;
 
-    class Nizk_SH_ext
-        : public virtual Nizk_SH_base<
+    class NizkExtSH
+        : public virtual BaseNizkSH<
               pair<vector<unique_ptr<const Share>>&, Mpz>,    // p(X), r
               const vector<unique_ptr<const PublicKey>>,      // pks
               const vector<shared_ptr<QFI>>,                  // Bs
@@ -28,13 +28,13 @@ namespace NIZK {
     {
 
       protected:
-        unique_ptr<Nizk_DLEQ_mix> pf_;
+        unique_ptr<NizkMixDLEQ> pf_;
 
       private:
         const ECGroup& ec_group_;
 
       public:
-        Nizk_SH_ext(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
+        NizkExtSH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
             const ECGroup&, const size_t n, const size_t t, const Mpz& q,
             const vector<Mpz>& Vis);
 

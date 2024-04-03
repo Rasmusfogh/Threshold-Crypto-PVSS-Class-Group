@@ -3,9 +3,9 @@
 
 #include <bicycl.hpp>
 #include <memory>
+#include <nizk_dl.hpp>
 #include <nizk_sh.hpp>
 #include <nizk_sh_ext.hpp>
-#include <nizkpok_dl.hpp>
 #include <sss.hpp>
 
 using namespace BICYCL;
@@ -20,7 +20,7 @@ namespace DATATYPE {
         Mpz r;
         QFI R;
         unique_ptr<vector<shared_ptr<QFI>>> Bs;
-        unique_ptr<Nizk_SH> pf;
+        unique_ptr<NizkSH> pf;
 
         EncShares(size_t n);
     };
@@ -31,7 +31,7 @@ namespace DATATYPE {
         QFI R_;
         unique_ptr<vector<shared_ptr<QFI>>> Bs_;
         unique_ptr<vector<shared_ptr<ECPoint>>> Ds_;
-        unique_ptr<Nizk_SH_ext> pf_;
+        unique_ptr<NizkExtSH> pf_;
 
         EncSharesExt(size_t n);
         EncSharesExt(size_t, EncShares& enc_sh);
@@ -40,7 +40,7 @@ namespace DATATYPE {
     class DecShare {
       public:
         unique_ptr<const Share> sh;
-        unique_ptr<Nizk_DLEQ> pf;
+        unique_ptr<NizkDLEQ> pf;
 
         DecShare();
     };
@@ -49,7 +49,7 @@ namespace DATATYPE {
       public:
         unique_ptr<const PublicKey> pk_;
         unique_ptr<const SecretKey> sk_;
-        unique_ptr<NizkPoK_DL> pf_;
+        unique_ptr<NizkDL> pf_;
 
         KeyPair();
     };

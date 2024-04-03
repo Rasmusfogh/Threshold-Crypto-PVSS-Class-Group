@@ -2,9 +2,9 @@
 
 using namespace NIZK;
 
-Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+NizkMixDLEQ::NizkMixDLEQ(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const ECGroup& ec_group)
-    : Nizk_base(hash, rand, cl), ec_group_(ec_group) {
+    : BaseNizk(hash, rand, cl), ec_group_(ec_group) {
 
     // Define A_ and C_
     Mpz S;
@@ -13,7 +13,7 @@ Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     Mpz::mul(A_, S, C_);
 }
 
-void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
+void NizkMixDLEQ::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_) {
     Mpz r = rand_.random_mpz(A_);
     Mpz d = rand_.random_mpz(cl_.q());
@@ -35,9 +35,9 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     // maybe add g_q, f, h?
     ECPointGroupCRefPair ecp1(D_, ec_group_);
     ECPointGroupCRefPair ecp2(D, ec_group_);
-    initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
+    init_random_oracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
 
-    c_ = queryRandomOracle(C_);
+    c_ = query_random_oracle(C_);
 
     Mpz::mul(ud_, c_, w.second);
     Mpz::add(ud_, ud_, d);
@@ -47,7 +47,7 @@ void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
     Mpz::add(ur_, ur_, r);
 }
 
-bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
+bool NizkMixDLEQ::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     const QFI& V_, const QFI& B_, const ECPoint& D_) const {
     QFI temp;
 
@@ -79,8 +79,8 @@ bool Nizk_DLEQ_mix::verify(const QFI& U_, const QFI& M_, const QFI& R_,
 
     ECPointGroupCRefPair ecp1(D_, ec_group_);
     ECPointGroupCRefPair ecp2(D, ec_group_);
-    initRandomOracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
+    init_random_oracle(U_, M_, R_, V_, B_, ecp1, R, V, B, ecp2);
 
-    Mpz c = queryRandomOracle(C_);
+    Mpz c = query_random_oracle(C_);
     return c_ == c;
 }

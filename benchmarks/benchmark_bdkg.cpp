@@ -12,8 +12,8 @@ using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 100;
+static const size_t T = 50;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);
@@ -25,7 +25,7 @@ static unique_ptr<BDKG> bdkg;
 // Global state
 static vector<unique_ptr<const SecretKey>> sks(N);
 static vector<unique_ptr<const PublicKey>> pks(N);
-static vector<unique_ptr<NizkPoK_DL>> keygen_pf(N);
+static vector<unique_ptr<NizkDL>> keygen_pf(N);
 static vector<unique_ptr<EncSharesExt>> enc_sh(N);
 
 static vector<vector<shared_ptr<QFI>>> shared_Bs;
@@ -106,7 +106,7 @@ static void compute_threshold_keypair(benchmark::State& state) {
                 *enc_sh[j]->Ds_, enc_sh[j]->R_);
         }
 
-        for (size_t i = 0; i < T; i++) {
+        for (size_t i = 0; i < N; i++) {
             for (size_t j = 0; j < Q; j++)
                 ec_group_.ec_add(tpks[i], tpks[i], *enc_sh[j]->Ds_->at(i));
         }

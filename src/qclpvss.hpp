@@ -4,8 +4,8 @@
 #include <datatype.hpp>
 #include <iostream>
 #include <memory>
+#include <nizk_dl.hpp>
 #include <nizk_sh.hpp>
-#include <nizkpok_dl.hpp>
 #include <qclpvss_utils.hpp>
 #include <sss.hpp>
 
@@ -51,8 +51,8 @@ namespace QCLPVSS_ {
         // Setup
         unique_ptr<const SecretKey> keyGen(RandGen&) const;
         unique_ptr<const PublicKey> keyGen(const SecretKey&) const;
-        unique_ptr<NizkPoK_DL> keyGen(const PublicKey&, const SecretKey&) const;
-        bool verifyKey(const PublicKey&, const NizkPoK_DL&) const;
+        unique_ptr<NizkDL> keyGen(const PublicKey&, const SecretKey&) const;
+        bool verifyKey(const PublicKey&, const NizkDL&) const;
 
         // Distribution
         unique_ptr<EncShares> dist(const Mpz& secret,

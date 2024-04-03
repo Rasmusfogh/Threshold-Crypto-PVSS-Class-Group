@@ -2,37 +2,50 @@
 
 using namespace NIZK;
 
-Nizk_SH_ext::Nizk_SH_ext(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+NizkExtSH::NizkExtSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const ECGroup& ec_group, const size_t n,
     const size_t t, const Mpz& q, const vector<Mpz>& Vis)
-    : Nizk_SH_base(hash, rand, cl, seclevel, q, n, t, Vis),
-      ec_group_(ec_group) {
+    : BaseNizkSH(hash, rand, cl, seclevel, q, n, t, Vis), ec_group_(ec_group) {
 
     // Set base class C boundary
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
 }
 
-void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
+void NizkExtSH::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
     const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const vector<shared_ptr<ECPoint>>& Ds,
     const QFI& R) {
 
     pair<const vector<shared_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
-    initRandomOracle(pks, Bs, Ds_, R, cl_.h());
+    init_random_oracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs;
     coeffs.reserve(t_);
     generateCoefficients(coeffs, t_);
 
+    vector<Mpz> wis;
+    wis.reserve(n_);
+
+    for (size_t i = 0; i < n_; i++)
+        wis.emplace_back(computeWi(i, coeffs));
+
+    // Verification. If fails, reject
+    ECPoint verif(ec_group_);
+    for (size_t i = 0; i < n_; i++)
+        ec_group_.scal_mul(verif, BN(wis[i]), *Ds[i]);
+
+    // if (!ec_group_.ec_point_eq(verif, ECPoint(ec_group_, BN(1))))
+    //     throw std::invalid_argument("D_i^(w_i) != 1_H");
+
     QFI U, V;
-    computeUV(U, V, pks, Bs, coeffs);
+    computeUVusingWis(U, V, pks, Bs, wis);
 
     Mpz d(0L), d_temp;
     QFI B, M, temp;
     ECPoint D(ec_group_), D_temp(ec_group_);
 
     for (size_t i = 0; i < t_; i++) {
-        Mpz e(queryRandomOracle(q_));
+        Mpz e(query_random_oracle(q_));
 
         // compute d
         Mpz::mul(d_temp, e, w.first[i]->y());
@@ -55,17 +68,17 @@ void Nizk_SH_ext::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
 
     pair<Mpz, Mpz> witness(w.second, d);
 
-    pf_ = unique_ptr<Nizk_DLEQ_mix>(
-        new Nizk_DLEQ_mix(hash_, rand_, cl_, seclevel_, ec_group_));
+    pf_ = unique_ptr<NizkMixDLEQ>(
+        new NizkMixDLEQ(hash_, rand_, cl_, seclevel_, ec_group_));
     pf_->prove(witness, U, M, R, V, B, D);
 }
 
-bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks,
+bool NizkExtSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const vector<shared_ptr<ECPoint>>& Ds,
     const QFI& R) const {
 
     pair<const vector<shared_ptr<ECPoint>>&, const ECGroup&> Ds_(Ds, ec_group_);
-    initRandomOracle(pks, Bs, Ds_, R, cl_.h());
+    init_random_oracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs;
     coeffs.reserve(t_);
@@ -78,7 +91,7 @@ bool Nizk_SH_ext::verify(const vector<unique_ptr<const PublicKey>>& pks,
     ECPoint D(ec_group_), D_temp(ec_group_);
     for (size_t i = 0; i < t_; i++) {
 
-        Mpz e(queryRandomOracle(q_));
+        Mpz e(query_random_oracle(q_));
 
         // compute B
         cl_.Cl_Delta().nupow(temp, *Bs[i], e);

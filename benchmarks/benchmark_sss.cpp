@@ -1,9 +1,9 @@
-#include <iostream>
-#include <chrono>
-#include <bicycl.hpp>
-#include <sss.hpp>
-#include "benchmark/benchmark.h"
 #include "../src/qclpvss.hpp"
+#include "benchmark/benchmark.h"
+#include <bicycl.hpp>
+#include <chrono>
+#include <iostream>
+#include <sss.hpp>
 
 using namespace benchmark;
 using namespace QCLPVSS_;
@@ -18,17 +18,15 @@ static RandGen randgen;
 static unique_ptr<SSS> sss;
 static const Mpz secret(1234UL);
 
-//Global state
+// Global state
 static unique_ptr<vector<unique_ptr<const Share>>> shares;
 static unique_ptr<const Mpz> s_;
 
-
-static void setup(benchmark::State& state)
-{
+static void setup(benchmark::State& state) {
     Mpz seed;
     auto t = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(t.time_since_epoch().count());
-    randgen.set_seed (seed);
+    randgen.set_seed(seed);
 
     Q = (randgen.random_prime(128));
 
@@ -38,8 +36,7 @@ static void setup(benchmark::State& state)
 }
 BENCHMARK(setup)->Unit(kMillisecond);
 
-static void share(benchmark::State& state)
-{
+static void share(benchmark::State& state) {
     for (auto _ : state) {
         shares = sss->shareSecret(secret);
         DoNotOptimize(shares);
@@ -47,8 +44,7 @@ static void share(benchmark::State& state)
 }
 BENCHMARK(share)->Unit(kMillisecond);
 
-static void reconstruct(benchmark::State& state)
-{
+static void reconstruct(benchmark::State& state) {
     unique_ptr<const Mpz> s_;
     for (auto _ : state) {
         s_ = sss->reconstructSecret(*shares);
