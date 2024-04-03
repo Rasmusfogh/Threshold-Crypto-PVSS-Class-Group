@@ -8,7 +8,7 @@ using namespace UTILS;
 using namespace std;
 
 template <>
-void OpenSSL::HashAlgo::hash(const vector<unique_ptr<QFI>>& v) {
+void OpenSSL::HashAlgo::hash(const vector<shared_ptr<QFI>>& v) {
     for (const auto& _ : v)
         hash(*_);
 }
@@ -33,7 +33,7 @@ void OpenSSL::HashAlgo::hash(const vector<Mpz>& v) {
 
 template <>
 void OpenSSL::HashAlgo::hash(
-    const pair<const vector<unique_ptr<ECPoint>>&, const ECGroup&>& v) {
+    const pair<const vector<shared_ptr<ECPoint>>&, const ECGroup&>& v) {
     for (const auto& ec : v.first)
         hash(ECPointGroupCRefPair(*ec, v.second));
 }

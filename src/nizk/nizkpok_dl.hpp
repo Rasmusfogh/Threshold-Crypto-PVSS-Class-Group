@@ -16,7 +16,7 @@ namespace NIZK {
 
       protected:
         unsigned int l_;
-        Mpz A_, AS_, l_boundary;
+        Mpz A_, S_, ell_;
         vector<Mpz> b_, u_;
 
       public:

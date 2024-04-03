@@ -7,16 +7,18 @@ using namespace NIZK;
 
 NizkPoK_DL::NizkPoK_DL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel)
-    : l_boundary(static_cast<unsigned long>(cl_.lambda_distance())),
-      Nizk_base(hash, rand, cl), l_(cl_.lambda_distance()), u_(l_) {
+    : ell_(static_cast<unsigned long>(cl_.lambda_distance() - 2)),
+      Nizk_base(hash, rand, cl), l_(cl_.lambda_distance() - 2), u_(l_) {
+
     b_.reserve(l_);
 
-    // Compute boundary A and AS
-    Mpz S_;
-    Mpz::mul(A_, cl.encrypt_randomness_bound(),
-        rand.random_mpz_2exp(seclevel.soundness()));
-    Mpz::mul(S_, A_, rand.random_mpz_2exp(seclevel.soundness()));
-    Mpz::add(AS_, cl.encrypt_randomness_bound(), S_);
+    // 2^seclevel
+    Mpz bits;
+    Mpz::mulby2k(bits, 1, seclevel.soundness() - 1);
+
+    // Compute boundary A and S
+    Mpz::mul(S_, cl.Cl_DeltaK().class_number_bound(), bits);
+    Mpz::mul(A_, S_, bits);
 }
 
 void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk) {
@@ -33,7 +35,7 @@ void NizkPoK_DL::prove(const SecretKey& sk, const PublicKey& pk) {
     initRandomOracle(cl_.h(), pk.get(), t);
 
     for (size_t i = 0; i < l_; i++) {
-        b_.emplace_back(queryRandomOracle(l_boundary));
+        b_.emplace_back(queryRandomOracle(ell_));
         Mpz::mul(temp, sk, b_[i]);
         Mpz::add(u_[i], temp, r[i]);
     }
@@ -43,6 +45,9 @@ bool NizkPoK_DL::verify(const PublicKey& x) const {
     vector<QFI> t(l_);
 
     QFI temp;
+
+    Mpz AS_;
+    Mpz::add(AS_, A_, S_);
 
     for (size_t i = 0; i < l_; i++) {
 
@@ -56,8 +61,8 @@ bool NizkPoK_DL::verify(const PublicKey& x) const {
 
     initRandomOracle(cl_.h(), x.get(), t);
 
-    for (size_t i = 0; i < l_; i++)
-        if (b_[i] != queryRandomOracle(l_boundary))
+    for (const auto& _ : b_)
+        if (_ != queryRandomOracle(ell_))
             return false;
 
     return true;

@@ -3,11 +3,14 @@
 using namespace NIZK;
 
 Nizk_DLEQ_mix::Nizk_DLEQ_mix(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
-    const ECGroup& ec_group)
-    : C_(cl.encrypt_randomness_bound()), Nizk_base(hash, rand, cl),
-      ec_group_(ec_group) {
-    Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
+    const SecLevel& seclevel, const ECGroup& ec_group)
+    : Nizk_base(hash, rand, cl), ec_group_(ec_group) {
+
     // Define A_ and C_
+    Mpz S;
+    Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);
+    Mpz::mul(S, cl.Cl_DeltaK().class_number_bound(), C_);
+    Mpz::mul(A_, S, C_);
 }
 
 void Nizk_DLEQ_mix::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,

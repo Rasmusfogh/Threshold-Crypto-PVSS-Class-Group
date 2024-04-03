@@ -16,21 +16,23 @@ namespace NIZK {
     class Nizk_SH_base : public Nizk_base<Witness, Statement...> {
 
       protected:
+        Mpz C_;    // Is set from inheriting class
+        const SecLevel& seclevel_;
         const Mpz& q_;
         const size_t n_, t_, degree_;
         const vector<Mpz>& Vis_;
 
       public:
         Nizk_SH_base(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
-            const Mpz& q, const size_t n, const size_t t,
-            const vector<Mpz>& Vis)
+            const SecLevel& seclevel, const Mpz& q, const size_t n,
+            const size_t t, const vector<Mpz>& Vis)
             : Nizk_base<Witness, Statement...>(hash, rand, cl), q_(q), n_(n),
-              t_(t), degree_(n - t - 1 - 1), Vis_(Vis) {}
+              t_(t), degree_(n - t - 1 - 1), Vis_(Vis), seclevel_(seclevel) {}
 
       protected:
         void computeUV(QFI& U_ref, QFI& V_ref,
             const vector<unique_ptr<const PublicKey>>& pks,
-            const vector<unique_ptr<QFI>>& Bs,
+            const vector<shared_ptr<QFI>>& Bs,
             const vector<Mpz>& coeffs) const {
             QFI exp;
             Mpz temp, poly_eval;
@@ -52,7 +54,7 @@ namespace NIZK {
                 Mpz::mod(temp, temp, q_);
 
                 // compute wi' = temp
-                Mpz ci(this->queryRandomOracle(q_));    // ci using RNG
+                Mpz ci(this->queryRandomOracle(C_));    // ci using RNG
                 Mpz::addmul(temp, ci, q_);
 
                 // compute U

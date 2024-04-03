@@ -18,11 +18,11 @@ namespace NIZK {
                           const QFI>                         // V
     {
       protected:
-        Mpz A_, C_, SC_;
+        Mpz A_, C_, S_;
         Mpz u_, c_;
 
       public:
-        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&);
+        Nizk_DLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
 
         void prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
             const QFI& Y2) override;

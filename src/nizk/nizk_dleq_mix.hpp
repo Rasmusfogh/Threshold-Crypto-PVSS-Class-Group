@@ -30,7 +30,8 @@ namespace NIZK {
         const ECGroup& ec_group_;
 
       public:
-        Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, const ECGroup&);
+        Nizk_DLEQ_mix(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
+            const ECGroup&);
 
         void prove(const pair<Mpz, Mpz>& w, const QFI& X1, const QFI& X2,
             const QFI& Y1, const QFI& Y2, const QFI& Y3,

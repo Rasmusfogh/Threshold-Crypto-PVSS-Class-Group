@@ -1,11 +1,16 @@
 #include "nizk_dleq.hpp"
 using namespace NIZK;
 
-Nizk_DLEQ::Nizk_DLEQ(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl)
+Nizk_DLEQ::Nizk_DLEQ(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl,
+    const SecLevel& seclevel)
     : Nizk_base(hash, randgen, cl), C_(cl.encrypt_randomness_bound()) {
-    Mpz::mul(A_, cl.encrypt_randomness_bound(), cl.encrypt_randomness_bound());
-    Mpz::mul(SC_, cl_.encrypt_randomness_bound(), C_);
-    Mpz::add(SC_, A_, SC_);
+
+    // 2^seclevel
+    Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);
+
+    // Compute boundary A and S
+    Mpz::mul(S_, cl.Cl_DeltaK().class_number_bound(), C_);
+    Mpz::mul(A_, S_, C_);
 }
 
 void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
@@ -27,7 +32,12 @@ void Nizk_DLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
 
 bool Nizk_DLEQ::verify(const QFI& X1, const QFI& X2, const QFI& Y1,
     const QFI& Y2) const {
-    if (u_ > SC_)
+
+    Mpz SCA_;
+    Mpz::mul(SCA_, S_, C_);
+    Mpz::add(SCA_, SCA_, A_);
+
+    if (u_ > SCA_)
         return false;
 
     QFI T1, T2, temp;

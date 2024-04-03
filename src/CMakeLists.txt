@@ -10,7 +10,7 @@ set(SRC_SOURCE_FILES
     nizk/nizk_dleq.cpp
     nizk/nizk_sh_ext.cpp
     nizk/nizk_dleq_mix.cpp
-    application/qclpvss_ext.cpp
+    application/bdkg.cpp
 )
 
 # Create a library target for your project

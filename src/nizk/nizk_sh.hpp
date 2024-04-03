@@ -17,7 +17,7 @@ namespace NIZK {
 
     class Nizk_SH : public virtual Nizk_SH_base<const Mpz,            // r
                         const vector<unique_ptr<const PublicKey>>,    // pks
-                        const vector<unique_ptr<QFI>>,                // Bs
+                        const vector<shared_ptr<QFI>>,                // Bs
                         const QFI>                                    // R
     {
 
@@ -25,15 +25,16 @@ namespace NIZK {
         unique_ptr<Nizk_DLEQ> pf_;
 
       public:
-        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const size_t n,
-            const size_t t, const Mpz& q, const vector<Mpz>& Vis);
+        Nizk_SH(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
+            const size_t n, const size_t t, const Mpz& q,
+            const vector<Mpz>& Vis);
 
         virtual void prove(const Mpz& r,
             const vector<unique_ptr<const PublicKey>>&,
-            const vector<unique_ptr<QFI>>& Bs, const QFI& R) override;
+            const vector<shared_ptr<QFI>>& Bs, const QFI& R) override;
 
         virtual bool verify(const vector<unique_ptr<const PublicKey>>&,
-            const vector<unique_ptr<QFI>>& Bs, const QFI& R) const override;
+            const vector<shared_ptr<QFI>>& Bs, const QFI& R) const override;
     };
 }    // namespace NIZK
 
