@@ -1,6 +1,7 @@
-#ifndef NIZK_SH_HPP__
-#define NIZK_SH_HPP__
+#ifndef NIZK_RESH_HPP__
+#define NIZK_RESH_HPP__
 
+#include "nizk_dleq.hpp"
 #include "nizk_sh_base.hpp"
 #include "sss.hpp"
 
@@ -8,18 +9,24 @@ using namespace std;
 using namespace SSS_;
 
 namespace NIZK {
-    class NizkResh
-        : public virtual BaseNizkSH<
-              tuple<Mpz, Mpz, vector<unique_ptr<const Share>>&>,    // w = (sk',
-                                                                    // r, p(X))
-              const vector<unique_ptr<const PublicKey>>,            // pks
-              const PublicKey,                                      // pk'
-              const QFI,                                            // R'
-              const QFI,                                            // B'
-              const QFI,                                            // R
-              const vector<shared_ptr<QFI>>>                        // Bs
+    class NizkDLEQ;
+
+    class NizkResh : public virtual BaseNizkSH<
+                         tuple<Mpz, Mpz,
+                             vector<unique_ptr<const Share>>&>,    // w = (sk',
+                                                                   // r, p(X))
+                         const vector<unique_ptr<const PublicKey>>,    // pks
+                         const PublicKey,                              // pk'
+                         const QFI,                                    // R'
+                         const QFI,                                    // B'
+                         const QFI,                                    // R
+                         const vector<shared_ptr<QFI>>>                // Bs
 
     {
+      protected:
+        unique_ptr<NizkDLEQ> pf_;
+
+      public:
         NizkResh(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
             const size_t n, const size_t t, const Mpz& q,
             const vector<Mpz>& Vis);

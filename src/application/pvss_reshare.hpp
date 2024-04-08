@@ -26,7 +26,8 @@ namespace Application {
         using QCLPVSS::keyGen;
         using QCLPVSS::verifyKey;
 
-        unique_ptr<EncShares> reshare(EncShares&, size_t n1, size_t t1);
+        unique_ptr<EncShares> reshare(const EncShares&, const size_t n1,
+            const size_t t1);
 
       protected:
         void generateCoefficients(vector<Mpz>& coeffs, size_t t) const;

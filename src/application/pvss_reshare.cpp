@@ -1,6 +1,8 @@
 #include "pvss_reshare.hpp"
+#include "nizk_resh.hpp"
 
 using namespace Application;
+using namespace NIZK;
 
 PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
     RandGen& rand, const Mpz& q, const size_t n0, const size_t t0)
@@ -21,8 +23,8 @@ PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
     enc_shares = this->dist(secret, pks);
 }
 
-unique_ptr<EncShares> PVSS_Reshare::reshare(EncShares& enc_shares, size_t n1,
-    size_t t1) {
+unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
+    const size_t n1, const size_t t1) {
 
     vector<unique_ptr<DecShare>> dec_shares(n0_);
 
@@ -30,17 +32,22 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(EncShares& enc_shares, size_t n1,
         dec_shares[j] = this->decShare(*pks[j], *sks[j], enc_shares.R,
             *enc_shares.Bs->at(j), j);
 
-        vector<Mpz> coeffs;
-        coeffs.reserve(t1);
-
-        // p_j(\beta) = sigma_j = the share
-        coeffs.emplace_back(dec_shares[j]->sh->y());
-        generateCoefficients(coeffs, t1);
-
         auto shares =
             this->sss_.shareSecret(dec_shares[j]->sh->y(), t1, n1, q_);
 
-        auto enc_shares = this->EncryptShares(*shares, pks);
+        auto enc_shares_j = this->EncryptShares(*shares, pks);
+
+        unique_ptr<NizkResh> pf = unique_ptr<NizkResh>(
+            new NizkResh(hash_, randgen_, *this, seclevel_, n1, t1, q_, Vis_));
+
+        tuple<Mpz, Mpz, vector<unique_ptr<const Share>>&> witness(*sks[j],
+            enc_shares_j->r, *shares);
+
+        pf->prove(witness, pks, *pks[j], enc_shares.R, *enc_shares.Bs->at(j),
+            enc_shares_j->R, *enc_shares_j->Bs);
+
+        // Set proof on EncShares. Make that shiet template based. Then return
+        // it.
     }
 }
 
