@@ -1,22 +1,34 @@
-#include <bdkg.hpp>
+#include "bdkg.hpp"
 
 using namespace Application;
 
 BDKG::BDKG(SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
     const ECGroup& ec_group, Mpz& q, const size_t k, const size_t n,
     const size_t t)
-    : QCLPVSS(seclevel, hash, rand, q, k, n, t), ec_group_(ec_group) {
+    : QCLPVSS(seclevel, hash, rand, q, k, n, t), ec_group_(ec_group), sks_(n),
+      pks_(n), keygen_pf_(n) {
 
     lambdas_.reserve(t);
     generate_n(back_inserter(lambdas_), t, [] { return Mpz(1UL); });
     compute_lambdas(lambdas_, t, q);
+
+    for (size_t i = 0; i < n; i++) {
+        sks_[i] = this->keyGen(rand);
+        pks_[i] = this->keyGen(*sks_[i]);
+        keygen_pf_[i] = this->keyGen(*pks_[i], *sks_[i]);
+    }
+
+    // parties verifies key
+    for (size_t i = 0; i < n; i++)
+        if (!this->verifyKey(*pks_[i], *keygen_pf_[i]))
+            throw std::invalid_argument("Verifying keygen proof failed.");
 }
 
 unique_ptr<EncSharesExt> BDKG::dist(const Mpz& s,
     vector<unique_ptr<const PublicKey>>& pks) const {
 
-    auto shares = this->createShares(s);
-    auto enc_shares = this->computeEncryptedShares(*shares, pks);
+    auto shares = this->sss_.shareSecret(s, t_, n_, q_);
+    auto enc_shares = this->EncryptShares(*shares, pks);
 
     unique_ptr<EncSharesExt> enc_shares_ext(new EncSharesExt(n_, *enc_shares));
 
@@ -25,7 +37,7 @@ unique_ptr<EncSharesExt> BDKG::dist(const Mpz& s,
             new ECPoint(ec_group_, BN((*shares)[i]->second))));
 
     enc_shares_ext->pf_ = unique_ptr<NizkExtSH>(new NizkExtSH(hash_, randgen_,
-        CL_, seclevel_, ec_group_, n_, t_, q_, Vis_));
+        *this, seclevel_, ec_group_, n_, t_, q_, Vis_));
 
     pair<vector<unique_ptr<const Share>>&, Mpz> witness(*shares,
         enc_shares_ext->r_);
@@ -71,14 +83,14 @@ const Mpz BDKG::compute_tsk_i(const vector<shared_ptr<QFI>>& Bs,
 
     size_t sizeof_Q = Bs.size();
     for (size_t i = 0; i < sizeof_Q; i++) {
-        this->CL_.Cl_Delta().nucomp(B, B, *Bs[i]);
-        this->CL_.Cl_Delta().nucomp(R, R, Rs[i]);    // always the same
+        this->Cl_Delta().nucomp(B, B, *Bs[i]);
+        this->Cl_Delta().nucomp(R, R, Rs[i]);    // always the same
     }
 
-    this->CL_.Cl_Delta().nupow(fi, R, sk);
-    this->CL_.Cl_Delta().nucompinv(fi, B, fi);
+    this->Cl_Delta().nupow(fi, R, sk);
+    this->Cl_Delta().nucompinv(fi, B, fi);
 
-    return this->CL_.dlog_in_F(fi);
+    return this->dlog_in_F(fi);
 }
 
 bool BDKG::verify_partial_keypairs(const vector<Mpz>& tsks,

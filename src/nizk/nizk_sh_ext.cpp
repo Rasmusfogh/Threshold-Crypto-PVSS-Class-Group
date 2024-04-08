@@ -1,4 +1,4 @@
-#include <nizk_sh_ext.hpp>
+#include "nizk_sh_ext.hpp"
 
 using namespace NIZK;
 
@@ -30,12 +30,15 @@ void NizkExtSH::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
         wis.emplace_back(computeWi(i, coeffs));
 
     // Verification. If fails, reject
-    ECPoint verif(ec_group_);
-    for (size_t i = 0; i < n_; i++)
-        ec_group_.scal_mul(verif, BN(wis[i]), *Ds[i]);
+    ECPoint inf(ec_group_), inf_temp(ec_group_);
 
-    // if (!ec_group_.ec_point_eq(verif, ECPoint(ec_group_, BN(1))))
-    //     throw std::invalid_argument("D_i^(w_i) != 1_H");
+    for (size_t i = 0; i < n_; i++) {
+        ec_group_.scal_mul(inf_temp, BN(wis[i]), *Ds[i]);
+        ec_group_.ec_add(inf, inf, inf_temp);
+    }
+
+    if (!ec_group_.is_at_infinity(inf))
+        throw std::invalid_argument("Failed validating shares");
 
     QFI U, V;
     computeUVusingWis(U, V, pks, Bs, wis);

@@ -3,16 +3,15 @@
 using namespace QCLPVSS_;
 using namespace NIZK;
 using namespace SSS_;
-using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace DATATYPE;
 
-QCLPVSS::QCLPVSS(SecLevel& seclevel, HashAlgo& hash, RandGen& randgen, Mpz& q,
-    const size_t k, const size_t n, const size_t t)
-    : CL_(CL_HSMqk(q, k, seclevel, randgen, false)),
-      sss_(SSS(randgen, t, n, q)), seclevel_(seclevel), randgen_(randgen),
-      hash_(hash), k_(k), n_(n), t_(t), q_(q) {
+QCLPVSS::QCLPVSS(const SecLevel& seclevel, HashAlgo& hash, RandGen& randgen,
+    const Mpz& q, const size_t k, const size_t n, const size_t t)
+    : CL_HSMqk(q, k, seclevel, randgen, false), sss_(SSS(randgen)),
+      seclevel_(seclevel), randgen_(randgen), hash_(hash), k_(k), n_(n), t_(t),
+      q_(q) {
     /* Checks */
     if (Mpz(n + k) > q)
         throw std::invalid_argument("n + k must be less than or equal to q");
@@ -28,16 +27,16 @@ QCLPVSS::QCLPVSS(SecLevel& seclevel, HashAlgo& hash, RandGen& randgen, Mpz& q,
 }
 
 unique_ptr<const SecretKey> QCLPVSS::keyGen(RandGen& randgen) const {
-    return unique_ptr<const SecretKey>(new SecretKey(CL_, randgen));
+    return unique_ptr<const SecretKey>(new SecretKey(*this, randgen));
 }
 
 unique_ptr<const PublicKey> QCLPVSS::keyGen(const SecretKey& sk) const {
-    return unique_ptr<const PublicKey>(new PublicKey(CL_, sk));
+    return unique_ptr<const PublicKey>(new PublicKey(*this, sk));
 }
 
 unique_ptr<NizkDL> QCLPVSS::keyGen(const PublicKey& pk,
     const SecretKey& sk) const {
-    unique_ptr<NizkDL> pf(new NizkDL(hash_, randgen_, CL_, seclevel_));
+    unique_ptr<NizkDL> pf(new NizkDL(hash_, randgen_, *this, seclevel_));
     pf->prove(sk, pk);
     return pf;
 }
@@ -49,7 +48,7 @@ bool QCLPVSS::verifyKey(const PublicKey& pk, const NizkDL& pf) const {
 unique_ptr<EncShares> QCLPVSS::dist(const Mpz& s,
     vector<unique_ptr<const PublicKey>>& pks) const {
     auto shares = createShares(s);
-    auto enc_shares = computeEncryptedShares(*shares, pks);
+    auto enc_shares = EncryptShares(*shares, pks);
     computeSHNizk(pks, *enc_shares);
     return enc_shares;
 }
@@ -64,17 +63,16 @@ unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk,
     QFI fi, Mi;
 
     unique_ptr<DecShare> dec_share(new DecShare());
-
-    CL_.Cl_Delta().nupow(fi, R, sk);
-    CL_.Cl_Delta().nucompinv(fi, B, fi);
-    CL_.Cl_Delta().nucompinv(Mi, B, fi);
+    this->Cl_Delta().nupow(fi, R, sk);
+    this->Cl_Delta().nucompinv(fi, B, fi);
+    this->Cl_Delta().nucompinv(Mi, B, fi);
 
     // return Ai on the form of a share <i, Ai>
     dec_share->sh =
-        unique_ptr<const Share>(new Share(i + 1, Mpz(CL_.dlog_in_F(fi))));
+        unique_ptr<const Share>(new Share(i + 1, Mpz(this->dlog_in_F(fi))));
     dec_share->pf =
-        unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, randgen_, CL_, seclevel_));
-    dec_share->pf->prove(sk, CL_.h(), R, pk.get(), Mi);
+        unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, randgen_, *this, seclevel_));
+    dec_share->pf->prove(sk, this->h(), R, pk.get(), Mi);
     return dec_share;
 }
 
@@ -83,23 +81,23 @@ unique_ptr<const Mpz> QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const {
     if (Ais.size() < t_ + k_)
         return nullptr;
 
-    return sss_.reconstructSecret(Ais);
+    return sss_.reconstructSecret(Ais, t_, q_);
 }
 
 bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki,
     const QFI& R, const QFI& B) const {
-    QFI Mi(CL_.power_of_f(dec_share.sh->y()));
-    CL_.Cl_Delta().nucompinv(Mi, B, Mi);
+    QFI Mi(this->power_of_f(dec_share.sh->y()));
+    this->Cl_Delta().nucompinv(Mi, B, Mi);
 
-    return dec_share.pf->verify(CL_.h(), R, pki.get(), Mi);
+    return dec_share.pf->verify(this->h(), R, pki.get(), Mi);
 }
 
 unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::createShares(
     const Mpz& s) const {
-    return sss_.shareSecret(s);
+    return sss_.shareSecret(s, t_, n_, q_);
 }
 
-unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(
+unique_ptr<EncShares> QCLPVSS::EncryptShares(
     vector<unique_ptr<const Share>>& shares,
     vector<unique_ptr<const PublicKey>>& pks) const {
     QFI f, pkr;
@@ -108,20 +106,20 @@ unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(
     // encrypt_randomness_bound() = exponent_bound = 2^(distance_-2) times
     // Cl_Delta_.class_number_bound_, where distance is a statistical security
     // parameter
-    enc_sh->r = randgen_.random_mpz(CL_.encrypt_randomness_bound());
+    enc_sh->r = randgen_.random_mpz(this->encrypt_randomness_bound());
 
     // Compute R
-    CL_.power_of_h(enc_sh->R, enc_sh->r);
+    this->power_of_h(enc_sh->R, enc_sh->r);
 
     // Compute B_i's
     for (size_t i = 0; i < n_; i++) {
         // f^p(a_i)
-        f = CL_.power_of_f(shares[i]->y());
+        f = this->power_of_f(shares[i]->y());
         //(pk_i)^r
-        pks[i]->exponentiation(CL_, pkr, enc_sh->r);
+        pks[i]->exponentiation(*this, pkr, enc_sh->r);
         // B_i = (pk_i)^r * f^p(a_i)
 
-        CL_.Cl_Delta().nucomp(*enc_sh->Bs->at(i), pkr, f);
+        this->Cl_Delta().nucomp(*enc_sh->Bs->at(i), pkr, f);
     }
 
     return enc_sh;
@@ -130,7 +128,7 @@ unique_ptr<EncShares> QCLPVSS::computeEncryptedShares(
 void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks,
     EncShares& enc_shares) const {
     enc_shares.pf = unique_ptr<NizkSH>(
-        new NizkSH(hash_, randgen_, CL_, seclevel_, n_, t_, q_, Vis_));
+        new NizkSH(hash_, randgen_, *this, seclevel_, n_, t_, q_, Vis_));
 
     enc_shares.pf->prove(enc_shares.r, pks, *enc_shares.Bs, enc_shares.R);
 }

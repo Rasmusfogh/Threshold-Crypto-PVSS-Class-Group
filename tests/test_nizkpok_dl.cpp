@@ -1,4 +1,4 @@
-#include "../src/qclpvss.hpp"
+#include "qclpvss.hpp"
 #include <chrono>
 #include <iostream>
 #include <string>

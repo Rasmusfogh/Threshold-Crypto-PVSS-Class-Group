@@ -1,15 +1,14 @@
 #ifndef NIZK_SH_BASE_HPP__
 #define NIZK_SH_BASE_HPP__
 
-#include "bicycl.hpp"
-#include "utils/qclpvss_utils.hpp"
+#include "nizk_base.hpp"
+#include <bicycl.hpp>
 #include <memory>
-#include <nizk_base.hpp>
 
-using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace std;
+using namespace UTILS;
 
 namespace NIZK {
     template <typename Witness, typename... Statement>

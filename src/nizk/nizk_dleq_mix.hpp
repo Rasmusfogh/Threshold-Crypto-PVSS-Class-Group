@@ -1,11 +1,10 @@
 #ifndef NIZK_DLEQ_MIX_HPP__
 #define NIZK_DLEQ_MIX_HPP__
 
-#include "bicycl.hpp"
 #include "nizk_base.hpp"
-#include "qclpvss_utils.hpp"
 #include "sss.hpp"
-using namespace UTILS;
+#include <bicycl.hpp>
+
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace std;

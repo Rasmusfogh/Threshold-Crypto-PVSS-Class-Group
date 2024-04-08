@@ -1,7 +1,7 @@
 #ifndef QCLPVSS_UTILS_HPP__
 #define QCLPVSS_UTILS_HPP__
 
-#include "bicycl.hpp"
+#include <bicycl.hpp>
 #include <memory>
 
 using namespace BICYCL;

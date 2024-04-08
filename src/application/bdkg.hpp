@@ -1,8 +1,8 @@
 #ifndef BDKG_HPP__
 #define BDKG_HPP__
 
-#include <nizk_sh_ext.hpp>
-#include <qclpvss.hpp>
+#include "nizk_sh_ext.hpp"
+#include "qclpvss.hpp"
 
 using namespace QCLPVSS_;
 using namespace NIZK;
@@ -15,11 +15,13 @@ namespace Application {
         vector<Mpz> lambdas_;
 
       public:
+        vector<unique_ptr<const SecretKey>> sks_;
+        vector<unique_ptr<const PublicKey>> pks_;
+        vector<unique_ptr<NizkDL>> keygen_pf_;
+
+      public:
         BDKG(SecLevel&, HashAlgo&, RandGen&, const ECGroup&, Mpz& q,
             const size_t k, const size_t n, const size_t t);
-
-        using QCLPVSS::keyGen;
-        using QCLPVSS::verifyKey;
 
         unique_ptr<EncSharesExt> dist(const Mpz& s,
             vector<unique_ptr<const PublicKey>>&) const;

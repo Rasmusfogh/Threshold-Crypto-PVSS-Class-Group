@@ -1,9 +1,7 @@
-#include "../src/application/bdkg.hpp"
-#include <assert.h>
+#include "bdkg.hpp"
+#include "nizk_sh_ext.hpp"
 #include <chrono>
 #include <memory>
-#include <nizk_sh_ext.hpp>
-#include <secp256k1.h>
 
 using namespace Application;
 using namespace QCLPVSS_;
@@ -32,10 +30,6 @@ int main(int argc, char* argv[]) {
 
     BDKG bdkg(seclevel, H, randgen, ec_group_, q, 1, n, t);
 
-    // Setup
-    vector<unique_ptr<const SecretKey>> sks(n);
-    vector<unique_ptr<const PublicKey>> pks(n);
-    vector<unique_ptr<NizkDL>> keygen_pf(n);
     vector<unique_ptr<EncSharesExt>> enc_sh(n);
 
     vector<Mpz> tsks;
@@ -47,29 +41,18 @@ int main(int argc, char* argv[]) {
 
     /********************* 1 Round DKG *************************/
 
-    for (size_t i = 0; i < n; i++) {
-        sks[i] = bdkg.keyGen(randgen);
-        pks[i] = bdkg.keyGen(*sks[i]);
-        keygen_pf[i] = bdkg.keyGen(*pks[i], *sks[i]);
-    }
-
-    // parties verifies key
-    for (size_t i = 0; i < n; i++)
-        if (!bdkg.verifyKey(*pks[i], *keygen_pf[i]))
-            return EXIT_FAILURE;
-
     // parties share random secret
     for (size_t j = 0; j < n; j++) {
         Mpz s_j = (randgen.random_mpz(q));
-        enc_sh[j] = bdkg.dist(s_j, pks);
+        enc_sh[j] = bdkg.dist(s_j, bdkg.pks_);
     }
 
     auto start = std::chrono::system_clock::now();
 
     // parties verify shares
     for (size_t j = 0; j < n; j++) {
-        if (!(enc_sh[j]->pf_->verify(pks, *enc_sh[j]->Bs_, *enc_sh[j]->Ds_,
-                enc_sh[j]->R_))) {
+        if (!(enc_sh[j]->pf_->verify(bdkg.pks_, *enc_sh[j]->Bs_,
+                *enc_sh[j]->Ds_, enc_sh[j]->R_))) {
             return EXIT_FAILURE;
         }
     }
@@ -128,7 +111,8 @@ int main(int argc, char* argv[]) {
     start = std::chrono::system_clock::now();
 
     // Compute private key share 0
-    tsks.emplace_back(bdkg.compute_tsk_i(shared_Bs[0], shared_Rs, *sks[0]));
+    tsks.emplace_back(
+        bdkg.compute_tsk_i(shared_Bs[0], shared_Rs, *bdkg.sks_[0]));
 
     stop = std::chrono::system_clock::now();
     ms_int = duration_cast<milliseconds>(stop - start);
@@ -136,7 +120,8 @@ int main(int argc, char* argv[]) {
 
     // Compute private key share
     for (size_t i = 1; i < n; i++)
-        tsks.emplace_back(bdkg.compute_tsk_i(shared_Bs[i], shared_Rs, *sks[i]));
+        tsks.emplace_back(
+            bdkg.compute_tsk_i(shared_Bs[i], shared_Rs, *bdkg.sks_[i]));
 
     /********************* VERIFY OUTPUT *************************/
 

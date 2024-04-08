@@ -1,6 +1,7 @@
 #include "nizk_sh.hpp"
 
 using namespace NIZK;
+using namespace UTILS;
 
 NizkSH::NizkSH(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl,
     const SecLevel& seclevel, const size_t n, const size_t t, const Mpz& q,

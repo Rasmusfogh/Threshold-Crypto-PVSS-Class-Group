@@ -2,8 +2,8 @@
 
 using namespace BICYCL;
 using namespace OpenSSL;
-using namespace UTILS;
 using namespace NIZK;
+using namespace UTILS;
 
 NizkDL::NizkDL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel)

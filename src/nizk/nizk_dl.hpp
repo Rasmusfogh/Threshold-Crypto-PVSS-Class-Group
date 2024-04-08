@@ -1,11 +1,9 @@
 #ifndef NIZKPOK_DL_HPP__
 #define NIZKPOK_DL_HPP__
 
-#include "bicycl.hpp"
 #include "nizk_base.hpp"
-#include "qclpvss_utils.hpp"
+#include <bicycl.hpp>
 
-using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace std;

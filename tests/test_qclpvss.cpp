@@ -1,4 +1,4 @@
-#include "../src/qclpvss.hpp"
+#include "qclpvss.hpp"
 #include <cassert>
 #include <chrono>
 #include <iostream>
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     std::cout << "# Using seed = " << seed << std::endl;
     randgen.set_seed(seed);
 
-    BICYCL::Mpz q(randgen.random_prime(129));
+    BICYCL::Mpz q(randgen.random_prime(256));
 
     /* */
     std::cout << "# security: " << seclevel << " bits" << std::endl;
@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
 
     OpenSSL::HashAlgo H(seclevel);
 
-    size_t n(50UL);
-    size_t t(25UL);
+    size_t n(10UL);
+    size_t t(5UL);
 
     QCLPVSS pvss(seclevel, H, randgen, q, k, n, t);
 

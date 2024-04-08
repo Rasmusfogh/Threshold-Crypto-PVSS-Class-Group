@@ -1,11 +1,11 @@
-#include "bicycl.hpp"
 #include "qclpvss_utils.hpp"
+#include <bicycl.hpp>
 #include <memory>
 
 using namespace BICYCL;
 using namespace OpenSSL;
-using namespace UTILS;
 using namespace std;
+using namespace UTILS;
 
 template <>
 void OpenSSL::HashAlgo::hash(const vector<shared_ptr<QFI>>& v) {

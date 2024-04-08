@@ -1,15 +1,14 @@
 #ifndef NIZK_SH_HPP__
 #define NIZK_SH_HPP__
 
-#include "bicycl.hpp"
-#include "nizk/nizk_dleq.hpp"
-#include "qclpvss_utils.hpp"
-#include <nizk_sh_base.hpp>
+#include "nizk_dleq.hpp"
+#include "nizk_sh_base.hpp"
+#include <bicycl.hpp>
 
-using namespace UTILS;
 using namespace BICYCL;
 using namespace OpenSSL;
 using namespace std;
+using namespace UTILS;
 
 namespace NIZK {
     // Forward declaration

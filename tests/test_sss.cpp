@@ -1,7 +1,7 @@
+#include "sss.hpp"
 #include <bicycl.hpp>
 #include <chrono>
 #include <iostream>
-#include <sss.hpp>
 using namespace SSS_;
 using namespace BICYCL;
 

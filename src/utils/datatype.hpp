@@ -1,18 +1,17 @@
 #ifndef DATATYPE_HPP__
 #define DATATYPE_HPP__
 
+#include "nizk_dl.hpp"
+#include "nizk_sh.hpp"
+#include "nizk_sh_ext.hpp"
+#include "sss.hpp"
 #include <bicycl.hpp>
 #include <memory>
-#include <nizk_dl.hpp>
-#include <nizk_sh.hpp>
-#include <nizk_sh_ext.hpp>
-#include <sss.hpp>
 
 using namespace BICYCL;
 using namespace std;
 using namespace NIZK;
 using namespace SSS_;
-using namespace UTILS;
 
 namespace DATATYPE {
     class EncShares {

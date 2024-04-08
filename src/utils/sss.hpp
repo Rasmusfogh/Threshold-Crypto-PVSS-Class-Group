@@ -1,7 +1,7 @@
 #ifndef SSS__
 #define SSS__
 
-#include "bicycl.hpp"
+#include <bicycl.hpp>
 #include <iostream>
 #include <memory>
 
@@ -22,20 +22,20 @@ namespace SSS_ {
         RandGen& randgen_;
 
       public:
-        const size_t k_;    // degree / threshold
-        const size_t n_;    // number of parties
-        const Mpz& q_;      // modulo
-
-        SSS(RandGen& randgen, const size_t k, const size_t n, const Mpz& q);
+        SSS(RandGen& randgen);
         unique_ptr<vector<unique_ptr<const Share>>> shareSecret(
-            const Mpz& secret) const;
+            const Mpz& secret, const size_t k, const size_t n,
+            const Mpz& mod) const;
         unique_ptr<const Mpz> reconstructSecret(
-            vector<unique_ptr<const Share>>& shares) const;
+            vector<unique_ptr<const Share>>& shares, const size_t k,
+            const Mpz& mod) const;
 
       private:
-        void generatePolynomial(const Mpz& s, vector<Mpz>& coefficients) const;
+        void generatePolynomial(const Mpz& s, vector<Mpz>& coefficients,
+            const size_t k, const size_t n, const Mpz& mod) const;
         unique_ptr<const Share> evaluatePolynomial(size_t x,
-            const vector<Mpz>& coefficients) const;
+            const vector<Mpz>& coefficients, const size_t k,
+            const Mpz& mod) const;
     };
 }    // namespace SSS_
 

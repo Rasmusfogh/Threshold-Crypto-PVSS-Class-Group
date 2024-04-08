@@ -1,26 +1,26 @@
 #ifndef QCLPVSS__
 #define QCLPVSS__
 
-#include <datatype.hpp>
+#include "datatype.hpp"
+#include "nizk_dl.hpp"
+#include "nizk_sh.hpp"
+#include "qclpvss_utils.hpp"
+#include "sss.hpp"
 #include <iostream>
 #include <memory>
-#include <nizk_dl.hpp>
-#include <nizk_sh.hpp>
-#include <qclpvss_utils.hpp>
-#include <sss.hpp>
 
 using namespace BICYCL;
 using namespace OpenSSL;
-using namespace UTILS;
 using namespace NIZK;
 using namespace std;
 using namespace SSS_;
 using namespace DATATYPE;
+using namespace UTILS;
 
 namespace QCLPVSS_ {
-    class QCLPVSS {
+    class QCLPVSS : public CL_HSMqk {
       public:
-        SecLevel& seclevel_;
+        const SecLevel& seclevel_;
         const size_t k_;
         /** number of parties. n + k <= q*/
         const size_t n_;
@@ -32,17 +32,20 @@ namespace QCLPVSS_ {
         // proof
         vector<Mpz> Vis_;
 
+        // Overwrite aliases from base class
+        using SecretKey = UTILS::SecretKey;
+        using PublicKey = UTILS::PublicKey;
+
       protected:
         SSS sss_;
-        CL_HSMqk CL_;
         HashAlgo& hash_;
         RandGen& randgen_;
 
       public:
         /** Constructor is Setup(). @p q: prime and > 2^seclevel @p k: size of
          * secret, @p t: privacy threshhold, @p n: number of parties  */
-        QCLPVSS(SecLevel&, HashAlgo&, RandGen&, Mpz& q, const size_t k,
-            const size_t n, const size_t t);
+        QCLPVSS(const SecLevel&, HashAlgo&, RandGen&, const Mpz& q,
+            const size_t k, const size_t n, const size_t t);
 
         /** @name Cryptographic functionalities
          * @{
@@ -76,8 +79,7 @@ namespace QCLPVSS_ {
         unique_ptr<vector<unique_ptr<const Share>>> createShares(
             const Mpz& secret) const;
 
-        unique_ptr<EncShares> computeEncryptedShares(
-            vector<unique_ptr<const Share>>&,
+        unique_ptr<EncShares> EncryptShares(vector<unique_ptr<const Share>>&,
             vector<unique_ptr<const PublicKey>>&) const;
 
         void computeSHNizk(vector<unique_ptr<const PublicKey>>&,

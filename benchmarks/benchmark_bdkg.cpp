@@ -23,9 +23,6 @@ static HashAlgo H(secLevel);
 static unique_ptr<BDKG> bdkg;
 
 // Global state
-static vector<unique_ptr<const SecretKey>> sks(N);
-static vector<unique_ptr<const PublicKey>> pks(N);
-static vector<unique_ptr<NizkDL>> keygen_pf(N);
 static vector<unique_ptr<EncSharesExt>> enc_sh(N);
 
 static vector<vector<shared_ptr<QFI>>> shared_Bs;
@@ -48,14 +45,6 @@ static void setup(benchmark::State& state) {
     for (auto _ : state) {
         bdkg = unique_ptr<BDKG>(
             new BDKG(secLevel, H, randgen, ec_group_, Q, K, N, T));
-
-        for (size_t i = 0; i < N; i++) {
-            sks[i] = bdkg->keyGen(randgen);
-            pks[i] = bdkg->keyGen(*sks[i]);
-            keygen_pf[i] = bdkg->keyGen(*pks[i], *sks[i]);
-            success = bdkg->verifyKey(*pks[i], *keygen_pf[i]);
-            assert(success);
-        }
     }
 
     state.counters["secLevel"] = secLevel.soundness();
@@ -70,7 +59,7 @@ static void dist(benchmark::State& state) {
         for (size_t j = 0; j < N; j++) {
 
             Mpz s_j = (randgen.random_mpz(Q));
-            enc_sh[j] = bdkg->dist(s_j, pks);
+            enc_sh[j] = bdkg->dist(s_j, bdkg->pks_);
         }
     }
 
@@ -102,7 +91,7 @@ static void compute_threshold_keypair(benchmark::State& state) {
     for (auto _ : state) {
 
         for (size_t j = 0; j < N; j++) {
-            success = enc_sh[j]->pf_->verify(pks, *enc_sh[j]->Bs_,
+            success = enc_sh[j]->pf_->verify(bdkg->pks_, *enc_sh[j]->Bs_,
                 *enc_sh[j]->Ds_, enc_sh[j]->R_);
         }
 
@@ -114,7 +103,8 @@ static void compute_threshold_keypair(benchmark::State& state) {
         unique_ptr<ECPoint> tpk = move(bdkg->compute_tpk(tpks));
         DoNotOptimize(tpk);
 
-        Mpz tsk_i = bdkg->compute_tsk_i(shared_Bs[0], shared_Rs, *sks[0]);
+        Mpz tsk_i =
+            bdkg->compute_tsk_i(shared_Bs[0], shared_Rs, *bdkg->sks_[0]);
         DoNotOptimize(tsk_i);
     }
     assert(success);
