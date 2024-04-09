@@ -11,8 +11,7 @@ NizkExtSH::NizkExtSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
 }
 
-void NizkExtSH::prove(
-    const tuple<vector<unique_ptr<const Share>>&, const Mpz&>& w,
+void NizkExtSH::prove(const Witness& w,
     const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const vector<shared_ptr<ECPoint>>& Ds,
     const QFI& R) {

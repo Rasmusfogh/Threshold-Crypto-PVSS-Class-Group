@@ -11,7 +11,7 @@ set(SRC_SOURCE_FILES
     nizk/nizk_sh_ext.cpp
     nizk/nizk_dleq_mix.cpp
     nizk/nizk_resh.cpp
-    nizk/nizk_dleq_resh.cpp
+    nizk/nizk_linear_cl_resh.cpp
     application/bdkg.cpp
 )
 

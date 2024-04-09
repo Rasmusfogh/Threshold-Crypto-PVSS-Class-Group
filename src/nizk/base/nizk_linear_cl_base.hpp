@@ -1,5 +1,5 @@
-#ifndef NIZK_DLEQ_BASE_HPP__
-#define NIZK_DLEQ_BASE_HPP__
+#ifndef NIZK_LINEAR_CL_BASE_HPP__
+#define NIZK_LINEAR_CL_BASE_HPP__
 
 #include "nizk_base.hpp"
 #include <bicycl.hpp>
@@ -9,16 +9,17 @@ using namespace BICYCL;
 
 namespace NIZK {
     template <typename Witness, typename... Statement>
-    class BaseNizkDLEQ : public BaseNizk<Witness, Statement...> {
+    class BaseLinCL : public BaseNizk<Witness, Statement...> {
 
       protected:
-        Mpz A_, C_, S_;
-        Mpz u_, c_;
+        Mpz A_, C_, S_, SCA_;
+        Mpz c_;
+        vector<Mpz> u_;
 
       public:
-        BaseNizkDLEQ(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
-            const SecLevel& seclevel)
-            : BaseNizk<Witness, Statement...>(hash, rand, cl) {
+        BaseLinCL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+            const SecLevel& seclevel, size_t u_size)
+            : BaseNizk<Witness, Statement...>(hash, rand, cl), u_(u_size) {
 
             // 2^seclevel
             Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);
@@ -26,6 +27,9 @@ namespace NIZK {
             // Compute boundary A and S
             Mpz::mul(S_, cl.Cl_DeltaK().class_number_bound(), C_);
             Mpz::mul(A_, S_, C_);
+
+            Mpz::mul(SCA_, S_, C_);
+            Mpz::add(SCA_, SCA_, A_);
         }
     };
 }    // namespace NIZK

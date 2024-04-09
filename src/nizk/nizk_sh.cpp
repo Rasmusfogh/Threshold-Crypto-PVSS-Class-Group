@@ -31,6 +31,7 @@ void NizkSH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks,
 
 bool NizkSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const QFI& R) const {
+
     init_random_oracle(pks, Bs, R, cl_.h());
 
     vector<Mpz> coeffs;

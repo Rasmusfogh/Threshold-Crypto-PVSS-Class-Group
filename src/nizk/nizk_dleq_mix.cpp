@@ -4,18 +4,10 @@ using namespace NIZK;
 
 NizkMixDLEQ::NizkMixDLEQ(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const ECGroup& ec_group)
-    : BaseNizk(hash, rand, cl), ec_group_(ec_group) {
+    : BaseLinCL(hash, rand, cl, seclevel, 2), ec_group_(ec_group) {}
 
-    // Define A_ and C_
-    Mpz S;
-    Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);
-    Mpz::mul(S, cl.Cl_DeltaK().class_number_bound(), C_);
-    Mpz::mul(A_, S, C_);
-}
-
-void NizkMixDLEQ::prove(const tuple<const Mpz&, const Mpz&>& w, const QFI& U_,
-    const QFI& M_, const QFI& R_, const QFI& V_, const QFI& B_,
-    const ECPoint& D_) {
+void NizkMixDLEQ::prove(const Witness& w, const QFI& U_, const QFI& M_,
+    const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_) {
     Mpz r = rand_.random_mpz(A_);
     Mpz d = rand_.random_mpz(cl_.q());
 
@@ -40,12 +32,12 @@ void NizkMixDLEQ::prove(const tuple<const Mpz&, const Mpz&>& w, const QFI& U_,
 
     c_ = query_random_oracle(C_);
 
-    Mpz::mul(ud_, c_, get<1>(w));
-    Mpz::add(ud_, ud_, d);
-    Mpz::mod(ud_, ud_, cl_.q());
+    Mpz::mul(u_[0], c_, get<1>(w));
+    Mpz::add(u_[0], u_[0], d);
+    Mpz::mod(u_[0], u_[0], cl_.q());
 
-    Mpz::mul(ur_, c_, get<0>(w));
-    Mpz::add(ur_, ur_, r);
+    Mpz::mul(u_[1], c_, get<0>(w));
+    Mpz::add(u_[1], u_[1], r);
 }
 
 bool NizkMixDLEQ::verify(const QFI& U_, const QFI& M_, const QFI& R_,
@@ -53,24 +45,24 @@ bool NizkMixDLEQ::verify(const QFI& U_, const QFI& M_, const QFI& R_,
     QFI temp;
 
     QFI R;
-    cl_.power_of_h(temp, ur_);
+    cl_.power_of_h(temp, u_[1]);
     cl_.Cl_Delta().nupow(R, R_, c_);
     cl_.Cl_Delta().nucompinv(R, temp, R);
 
     QFI V;
-    cl_.Cl_Delta().nupow(temp, U_, ur_);
+    cl_.Cl_Delta().nupow(temp, U_, u_[1]);
     cl_.Cl_Delta().nupow(V, V_, c_);
     cl_.Cl_Delta().nucompinv(V, temp, V);
 
     QFI B;
-    temp = cl_.power_of_f(ud_);
-    cl_.Cl_Delta().nupow(B, M_, ur_);
+    temp = cl_.power_of_f(u_[0]);
+    cl_.Cl_Delta().nupow(B, M_, u_[1]);
     cl_.Cl_Delta().nucomp(temp, temp, B);
     cl_.Cl_Delta().nupow(B, B_, c_);
     cl_.Cl_Delta().nucompinv(B, temp, B);
 
     ECPoint D(ec_group_), D_temp(ec_group_);
-    ec_group_.scal_mul_gen(D_temp, BN(ud_));
+    ec_group_.scal_mul_gen(D_temp, BN(u_[0]));
 
     BN c_bn(c_);
     c_bn.neg();

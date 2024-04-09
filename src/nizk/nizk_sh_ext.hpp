@@ -26,6 +26,9 @@ namespace NIZK {
                           const QFI&>                                    // R
     {
 
+        // Alias: Witness = (p(X), r)
+        using Witness = tuple<vector<unique_ptr<const Share>>&, const Mpz&>;
+
       protected:
         unique_ptr<NizkMixDLEQ> pf_;
 
@@ -37,8 +40,7 @@ namespace NIZK {
             const ECGroup&, const size_t n, const size_t t, const Mpz& q,
             const vector<Mpz>& Vis);
 
-        virtual void prove(
-            const tuple<vector<unique_ptr<const Share>>&, const Mpz&>& rd,
+        virtual void prove(const Witness& w,
             const vector<unique_ptr<const PublicKey>>&,
             const vector<shared_ptr<QFI>>& Bs,
             const vector<shared_ptr<ECPoint>>& Ds, const QFI& R) override;
