@@ -9,7 +9,7 @@ using namespace OpenSSL;
 using namespace std;
 
 namespace NIZK {
-    class NizkDL : public virtual BaseNizk<const SecretKey, const PublicKey> {
+    class NizkDL : public virtual BaseNizk<const SecretKey&, const PublicKey&> {
 
       protected:
         unsigned int l_;

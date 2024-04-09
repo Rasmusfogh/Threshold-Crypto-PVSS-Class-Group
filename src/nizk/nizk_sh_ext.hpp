@@ -17,13 +17,13 @@ namespace NIZK {
     // Forward declaration
     class NizkDLEQ;
 
-    class NizkExtSH
-        : public virtual BaseNizkSH<
-              pair<vector<unique_ptr<const Share>>&, Mpz>,    // p(X), r
-              const vector<unique_ptr<const PublicKey>>,      // pks
-              const vector<shared_ptr<QFI>>,                  // Bs
-              const vector<shared_ptr<ECPoint>>,              // Ds
-              const QFI>                                      // R
+    class NizkExtSH : public virtual BaseNizkSH<
+                          const tuple<vector<unique_ptr<const Share>>&,
+                              const Mpz&>&,    // p(X), r
+                          const vector<unique_ptr<const PublicKey>>&,    // pks
+                          const vector<shared_ptr<QFI>>&,                // Bs
+                          const vector<shared_ptr<ECPoint>>&,            // Ds
+                          const QFI&>                                    // R
     {
 
       protected:
@@ -38,7 +38,7 @@ namespace NIZK {
             const vector<Mpz>& Vis);
 
         virtual void prove(
-            const pair<vector<unique_ptr<const Share>>&, Mpz>& rd,
+            const tuple<vector<unique_ptr<const Share>>&, const Mpz&>& rd,
             const vector<unique_ptr<const PublicKey>>&,
             const vector<shared_ptr<QFI>>& Bs,
             const vector<shared_ptr<ECPoint>>& Ds, const QFI& R) override;

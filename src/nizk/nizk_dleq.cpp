@@ -3,15 +3,7 @@ using namespace NIZK;
 
 NizkDLEQ::NizkDLEQ(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl,
     const SecLevel& seclevel)
-    : BaseNizk(hash, randgen, cl), C_(cl.encrypt_randomness_bound()) {
-
-    // 2^seclevel
-    Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);
-
-    // Compute boundary A and S
-    Mpz::mul(S_, cl.Cl_DeltaK().class_number_bound(), C_);
-    Mpz::mul(A_, S_, C_);
-}
+    : BaseNizkDLEQ(hash, randgen, cl, seclevel) {}
 
 void NizkDLEQ::prove(const Mpz& w, const QFI& X1, const QFI& X2, const QFI& Y1,
     const QFI& Y2) {

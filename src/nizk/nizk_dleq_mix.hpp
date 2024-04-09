@@ -11,13 +11,15 @@ using namespace std;
 using namespace SSS_;
 
 namespace NIZK {
-    class NizkMixDLEQ : public virtual BaseNizk<const pair<Mpz, Mpz>,    // r, d
-                            const QFI,                                   // U
-                            const QFI,                                   // M
-                            const QFI,                                   // R
-                            const QFI,                                   // V
-                            const QFI,                                   // B
-                            const ECPoint>                               // D
+    class NizkMixDLEQ
+        : public virtual BaseNizk<const tuple<const Mpz&, const Mpz&>,    // r,
+                                                                          // d
+              const QFI&,                                                 // U
+              const QFI&,                                                 // M
+              const QFI&,                                                 // R
+              const QFI&,                                                 // V
+              const QFI&,                                                 // B
+              const ECPoint&>                                             // D
 
     {
       protected:
@@ -31,8 +33,8 @@ namespace NIZK {
         NizkMixDLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&,
             const ECGroup&);
 
-        void prove(const pair<Mpz, Mpz>& w, const QFI& X1, const QFI& X2,
-            const QFI& Y1, const QFI& Y2, const QFI& Y3,
+        void prove(const tuple<const Mpz&, const Mpz&>& w, const QFI& X1,
+            const QFI& X2, const QFI& Y1, const QFI& Y2, const QFI& Y3,
             const ECPoint& Y4) override;
 
         bool verify(const QFI& X1, const QFI& X2, const QFI& Y1, const QFI& Y2,

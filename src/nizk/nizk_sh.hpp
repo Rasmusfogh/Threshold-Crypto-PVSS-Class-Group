@@ -14,10 +14,10 @@ namespace NIZK {
     // Forward declaration
     class NizkDLEQ;
 
-    class NizkSH : public virtual BaseNizkSH<const Mpz,              // r
-                       const vector<unique_ptr<const PublicKey>>,    // pks
-                       const vector<shared_ptr<QFI>>,                // Bs
-                       const QFI>                                    // R
+    class NizkSH : public virtual BaseNizkSH<const Mpz&,              // r
+                       const vector<unique_ptr<const PublicKey>>&,    // pks
+                       const vector<shared_ptr<QFI>>&,                // Bs
+                       const QFI&>                                    // R
     {
 
       protected:

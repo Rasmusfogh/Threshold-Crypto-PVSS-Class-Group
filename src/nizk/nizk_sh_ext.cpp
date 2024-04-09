@@ -11,7 +11,8 @@ NizkExtSH::NizkExtSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
 }
 
-void NizkExtSH::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
+void NizkExtSH::prove(
+    const tuple<vector<unique_ptr<const Share>>&, const Mpz&>& w,
     const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const vector<shared_ptr<ECPoint>>& Ds,
     const QFI& R) {
@@ -51,7 +52,7 @@ void NizkExtSH::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
         Mpz e(query_random_oracle(q_));
 
         // compute d
-        Mpz::mul(d_temp, e, w.first[i]->y());
+        Mpz::mul(d_temp, e, get<0>(w)[i]->y());
         Mpz::add(d, d, d_temp);
 
         // compute B
@@ -69,7 +70,7 @@ void NizkExtSH::prove(const pair<vector<unique_ptr<const Share>>&, Mpz>& w,
 
     Mpz::mod(d, d, q_);
 
-    pair<Mpz, Mpz> witness(w.second, d);
+    auto witness = tie(get<1>(w), d);
 
     pf_ = unique_ptr<NizkMixDLEQ>(
         new NizkMixDLEQ(hash_, rand_, cl_, seclevel_, ec_group_));

@@ -13,8 +13,9 @@ NizkMixDLEQ::NizkMixDLEQ(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     Mpz::mul(A_, S, C_);
 }
 
-void NizkMixDLEQ::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
-    const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_) {
+void NizkMixDLEQ::prove(const tuple<const Mpz&, const Mpz&>& w, const QFI& U_,
+    const QFI& M_, const QFI& R_, const QFI& V_, const QFI& B_,
+    const ECPoint& D_) {
     Mpz r = rand_.random_mpz(A_);
     Mpz d = rand_.random_mpz(cl_.q());
 
@@ -39,11 +40,11 @@ void NizkMixDLEQ::prove(const pair<Mpz, Mpz>& w, const QFI& U_, const QFI& M_,
 
     c_ = query_random_oracle(C_);
 
-    Mpz::mul(ud_, c_, w.second);
+    Mpz::mul(ud_, c_, get<1>(w));
     Mpz::add(ud_, ud_, d);
     Mpz::mod(ud_, ud_, cl_.q());
 
-    Mpz::mul(ur_, c_, w.first);
+    Mpz::mul(ur_, c_, get<0>(w));
     Mpz::add(ur_, ur_, r);
 }
 

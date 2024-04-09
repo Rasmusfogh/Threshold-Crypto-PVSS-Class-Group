@@ -1,7 +1,7 @@
 #ifndef NIZK_DLEQ_HPP__
 #define NIZK_DLEQ_HPP__
 
-#include "nizk_base.hpp"
+#include "nizk_dleq_base.hpp"
 #include <bicycl.hpp>
 
 using namespace BICYCL;
@@ -9,15 +9,12 @@ using namespace OpenSSL;
 using namespace std;
 
 namespace NIZK {
-    class NizkDLEQ : public virtual BaseNizk<const Mpz,    // r
-                         const QFI,                        // g_q / h
-                         const QFI,                        // U
-                         const QFI,                        // R
-                         const QFI>                        // V
+    class NizkDLEQ : public virtual BaseNizkDLEQ<const Mpz&,    // r
+                         const QFI&,                            // g_q / h
+                         const QFI&,                            // U
+                         const QFI&,                            // R
+                         const QFI&>                            // V
     {
-      protected:
-        Mpz A_, C_, S_;
-        Mpz u_, c_;
 
       public:
         NizkDLEQ(HashAlgo&, RandGen&, const CL_HSMqk&, const SecLevel&);
