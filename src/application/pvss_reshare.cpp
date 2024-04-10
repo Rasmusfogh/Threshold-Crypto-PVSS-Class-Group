@@ -26,14 +26,11 @@ PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
 unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
     const size_t n1, const size_t t1) {
 
-    vector<unique_ptr<DecShare>> dec_shares(n0_);
-
     for (size_t j = 0; j < n0_; j++) {
-        dec_shares[j] = this->decShare(*pks[j], *sks[j], enc_shares.R,
-            *enc_shares.Bs->at(j), j);
+        unique_ptr<DecShare> dec_share = this->decShare(*pks[j], *sks[j],
+            enc_shares.R, *enc_shares.Bs->at(j), j);
 
-        auto shares =
-            this->sss_.shareSecret(dec_shares[j]->sh->y(), t1, n1, q_);
+        auto shares = this->sss_.shareSecret(dec_share->sh->y(), t1, n1, q_);
 
         auto enc_shares_j = this->EncryptShares(*shares, pks);
 

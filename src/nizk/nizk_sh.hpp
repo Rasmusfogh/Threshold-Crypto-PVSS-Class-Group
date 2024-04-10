@@ -34,6 +34,11 @@ namespace NIZK {
 
         virtual bool verify(const vector<unique_ptr<const PublicKey>>&,
             const vector<shared_ptr<QFI>>& Bs, const QFI& R) const override;
+
+      protected:
+        void computeStatement(QFI& U, QFI& V,
+            const vector<unique_ptr<const PublicKey>>& pks,
+            const vector<shared_ptr<QFI>>& Bs, const QFI& R) const;
     };
 }    // namespace NIZK
 

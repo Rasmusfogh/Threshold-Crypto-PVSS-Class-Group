@@ -15,21 +15,24 @@ NizkSH::NizkSH(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl,
 void NizkSH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const QFI& R) {
 
-    init_random_oracle(pks, Bs, R, cl_.h());
-
-    vector<Mpz> coeffs;
-    coeffs.reserve(t_);
-    generateCoefficients(coeffs, t_);
-
     QFI U, V;
-    computeUV(U, V, pks, Bs, coeffs);
+    computeStatement(U, V, pks, Bs, R);
 
-    // remember to call prove on cl.h(), U, R, V, r
     pf_ = unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, rand_, cl_, seclevel_));
     pf_->prove(r, cl_.h(), U, R, V);
 }
 
 bool NizkSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
+    const vector<shared_ptr<QFI>>& Bs, const QFI& R) const {
+
+    QFI U, V;
+    computeStatement(U, V, pks, Bs, R);
+
+    return pf_->verify(cl_.h(), U, R, V);
+}
+
+void NizkSH::computeStatement(QFI& U, QFI& V,
+    const vector<unique_ptr<const PublicKey>>& pks,
     const vector<shared_ptr<QFI>>& Bs, const QFI& R) const {
 
     init_random_oracle(pks, Bs, R, cl_.h());
@@ -38,8 +41,5 @@ bool NizkSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     coeffs.reserve(t_);
     generateCoefficients(coeffs, t_);
 
-    QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
-
-    return pf_->verify(cl_.h(), U, R, V);
 }
