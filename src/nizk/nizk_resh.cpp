@@ -22,9 +22,15 @@ void NizkResh::prove(const Witness& w,
     pf_ = unique_ptr<NizkLinCLResh>(
         new NizkLinCLResh(hash_, rand_, cl_, seclevel_));
 
-    // Witness = (r, \bar{sk})
-    auto witness = tie(get<1>(w), get<0>(w));
-    pf_->prove(witness, U, R0, B0, V, cl_.h(), pk_, R);
+    // W = (r, \bar{sk})
+    vector<Mpz> W { get<0>(w), get<1>(w) };
+
+    vector<vector<QFI>> X { vector<QFI> { U, cl_.h() },
+        vector<QFI> { R0, cl_.h() } };
+
+    vector<QFI> Y { V, B0, pk_.get(), R };
+
+    pf_->prove(W, X, Y);
 }
 
 bool NizkResh::verify(const vector<unique_ptr<const PublicKey>>& pks,
@@ -35,7 +41,12 @@ bool NizkResh::verify(const vector<unique_ptr<const PublicKey>>& pks,
     QFI U, V, R0, B0;
     computeStatement(U, V, R0, B0, pks, Bs, R, R_, B_);
 
-    return pf_->verify(U, R0, B0, V, cl_.h(), pk_, R);
+    vector<vector<QFI>> X { vector<QFI> { U, cl_.h() },
+        vector<QFI> { R0, cl_.h() } };
+
+    vector<QFI> Y { V, B0, pk_.get(), R };
+
+    return pf_->verify(X, Y);
 }
 
 void NizkResh::computeStatement(QFI& U, QFI& V, QFI& R0, QFI& B0,

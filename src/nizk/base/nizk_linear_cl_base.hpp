@@ -9,7 +9,7 @@ using namespace BICYCL;
 
 namespace NIZK {
     template <typename Witness, typename... Statement>
-    class BaseLinCL : public BaseNizk<Witness, Statement...> {
+    class BaseNizkLinCL : public BaseNizk<Witness, Statement...> {
 
       protected:
         Mpz A_, C_, S_, SCA_;
@@ -17,9 +17,9 @@ namespace NIZK {
         vector<Mpz> u_;
 
       public:
-        BaseLinCL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
-            const SecLevel& seclevel, size_t m)
-            : BaseNizk<Witness, Statement...>(hash, rand, cl), u_(m) {
+        BaseNizkLinCL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
+            const SecLevel& seclevel)
+            : BaseNizk<Witness, Statement...>(hash, rand, cl) {
 
             // 2^seclevel
             Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);

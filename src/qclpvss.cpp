@@ -72,7 +72,12 @@ unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk,
         unique_ptr<const Share>(new Share(i + 1, Mpz(this->dlog_in_F(fi))));
     dec_share->pf_ =
         unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, randgen_, *this, seclevel_));
-    dec_share->pf_->prove(sk, this->h(), R, pk.get(), Mi);
+
+    vector<Mpz> w { sk };
+    vector<vector<QFI>> X { vector<QFI> { this->h() }, vector<QFI> { R } };
+    vector<QFI> Y { pk.get(), Mi };
+
+    dec_share->pf_->prove(w, X, Y);
     return dec_share;
 }
 
@@ -89,7 +94,10 @@ bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki,
     QFI Mi(this->power_of_f(dec_share.sh_->y()));
     this->Cl_Delta().nucompinv(Mi, B, Mi);
 
-    return dec_share.pf_->verify(this->h(), R, pki.get(), Mi);
+    vector<vector<QFI>> X { vector<QFI> { this->h() }, vector<QFI> { R } };
+    vector<QFI> Y { pki.get(), Mi };
+
+    return dec_share.pf_->verify(X, Y);
 }
 
 unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::createShares(

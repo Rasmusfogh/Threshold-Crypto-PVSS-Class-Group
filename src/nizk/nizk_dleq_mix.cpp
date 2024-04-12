@@ -4,7 +4,7 @@ using namespace NIZK;
 
 NizkMixDLEQ::NizkMixDLEQ(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const ECGroup& ec_group)
-    : BaseLinCL(hash, rand, cl, seclevel, 2), ec_group_(ec_group) {}
+    : BaseNizkLinCL(hash, rand, cl, seclevel), ec_group_(ec_group) {}
 
 void NizkMixDLEQ::prove(const Witness& w, const QFI& U_, const QFI& M_,
     const QFI& R_, const QFI& V_, const QFI& B_, const ECPoint& D_) {
@@ -32,12 +32,14 @@ void NizkMixDLEQ::prove(const Witness& w, const QFI& U_, const QFI& M_,
 
     c_ = query_random_oracle(C_);
 
-    Mpz::mul(u_[0], c_, get<1>(w));
-    Mpz::add(u_[0], u_[0], d);
+    u_.reserve(2);
+    u_.emplace_back(d);
+    u_.emplace_back(r);
+
+    Mpz::addmul(u_[0], c_, get<1>(w));
     Mpz::mod(u_[0], u_[0], cl_.q());
 
-    Mpz::mul(u_[1], c_, get<0>(w));
-    Mpz::add(u_[1], u_[1], r);
+    Mpz::addmul(u_[1], c_, get<0>(w));
 }
 
 bool NizkMixDLEQ::verify(const QFI& U_, const QFI& M_, const QFI& R_,

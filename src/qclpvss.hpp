@@ -18,7 +18,7 @@ using namespace DATATYPE;
 using namespace UTILS;
 
 namespace QCLPVSS_ {
-    class QCLPVSS : protected CL_HSMqk {
+    class QCLPVSS : public CL_HSMqk {
       public:
         const SecLevel& seclevel_;
         const size_t k_;

@@ -19,7 +19,12 @@ void NizkSH::prove(const Mpz& r, const vector<unique_ptr<const PublicKey>>& pks,
     computeStatement(U, V, pks, Bs, R);
 
     pf_ = unique_ptr<NizkDLEQ>(new NizkDLEQ(hash_, rand_, cl_, seclevel_));
-    pf_->prove(r, cl_.h(), U, R, V);
+
+    vector<Mpz> w { r };
+    vector<vector<QFI>> X { vector<QFI> { cl_.h() }, vector<QFI> { U } };
+    vector<QFI> Y { R, V };
+
+    pf_->prove(w, X, Y);
 }
 
 bool NizkSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
@@ -28,7 +33,10 @@ bool NizkSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     QFI U, V;
     computeStatement(U, V, pks, Bs, R);
 
-    return pf_->verify(cl_.h(), U, R, V);
+    vector<vector<QFI>> X { vector<QFI> { cl_.h() }, vector<QFI> { U } };
+    vector<QFI> Y { R, V };
+
+    return pf_->verify(X, Y);
 }
 
 void NizkSH::computeStatement(QFI& U, QFI& V,

@@ -42,3 +42,9 @@ template <>
 void OpenSSL::HashAlgo::hash(const PublicKey& v) {
     hash(v.get());
 }
+
+template <>
+void OpenSSL::HashAlgo::hash(const vector<vector<QFI>>& v) {
+    for (const auto& _ : v)
+        hash(_);
+}

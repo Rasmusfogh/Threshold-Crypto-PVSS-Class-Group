@@ -41,10 +41,10 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
 
         auto enc_shares_j = this->EncryptShares(*shares, pks);
 
+        auto witness = tie(*sks[j], enc_shares_j->r_, *shares);
+
         unique_ptr<NizkResh> pf = unique_ptr<NizkResh>(
             new NizkResh(hash_, randgen_, *this, seclevel_, n1, t1, q_, Vis_));
-
-        auto witness = tie(*sks[j], enc_shares_j->r_, *shares);
 
         pf->prove(witness, pks, *pks[j], enc_shares.R_, *enc_shares.Bs_->at(j),
             enc_shares_j->R_, *enc_shares_j->Bs_);

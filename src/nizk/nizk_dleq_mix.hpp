@@ -11,7 +11,7 @@ using namespace std;
 using namespace SSS_;
 
 namespace NIZK {
-    class NizkMixDLEQ : public virtual BaseLinCL<
+    class NizkMixDLEQ : public virtual BaseNizkLinCL<
                             const tuple<const Mpz&, const Mpz&>&,    // r, d
                             const QFI&,                              // U
                             const QFI&,                              // M
