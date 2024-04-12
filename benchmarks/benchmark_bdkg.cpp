@@ -1,6 +1,6 @@
-#include "../src/qclpvss.hpp"
-#include "benchmark/benchmark.h"
-#include <bdkg.hpp>
+#include "bdkg.hpp"
+#include "qclpvss.hpp"
+#include <benchmark/benchmark.h>
 #include <cassert>
 #include <chrono>
 

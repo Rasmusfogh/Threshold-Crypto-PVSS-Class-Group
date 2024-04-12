@@ -1,5 +1,5 @@
-#include "../src/qclpvss.hpp"
-#include "benchmark/benchmark.h"
+#include "qclpvss.hpp"
+#include <benchmark/benchmark.h>
 #include <bicycl.hpp>
 #include <chrono>
 #include <iostream>
@@ -31,14 +31,14 @@ static void setup(benchmark::State& state) {
     Q = (randgen.random_prime(128));
 
     for (auto _ : state) {
-        sss = unique_ptr<SSS>(new SSS(randgen, T, N, Q));
+        sss = unique_ptr<SSS>(new SSS(randgen));
     }
 }
 BENCHMARK(setup)->Unit(kMillisecond);
 
 static void share(benchmark::State& state) {
     for (auto _ : state) {
-        shares = sss->shareSecret(secret);
+        shares = sss->shareSecret(secret, T, N, Q);
         DoNotOptimize(shares);
     }
 }
@@ -47,7 +47,7 @@ BENCHMARK(share)->Unit(kMillisecond);
 static void reconstruct(benchmark::State& state) {
     unique_ptr<const Mpz> s_;
     for (auto _ : state) {
-        s_ = sss->reconstructSecret(*shares);
+        s_ = sss->reconstructSecret(*shares, T, Q);
         DoNotOptimize(s_);
     }
     assert(*s_ == secret);

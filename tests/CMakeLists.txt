@@ -13,6 +13,7 @@ set (TESTS_LIST test_qclpvss
                 #test_randgen
                 #test_randgen_coeffs
                 test_bdkg
+                #test_pvss_reshare
                 )
 
 ### Automatically create target and test from TESTS_LIST

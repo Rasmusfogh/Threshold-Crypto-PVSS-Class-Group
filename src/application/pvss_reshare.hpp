@@ -17,20 +17,22 @@ namespace Application {
 
         unique_ptr<EncShares> enc_shares;
 
+        vector<Mpz> lambdas_;
+
       public:
         PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
             const Mpz& q, const size_t n, const size_t t);
-
-        using QCLPVSS::decShare;
-        using QCLPVSS::dist;
-        using QCLPVSS::keyGen;
-        using QCLPVSS::verifyKey;
 
         unique_ptr<EncShares> reshare(const EncShares&, const size_t n1,
             const size_t t1);
 
       protected:
         void generateCoefficients(vector<Mpz>& coeffs, size_t t) const;
+
+      private:
+        /* Pre-computation of lamdas */
+        void compute_lambdas(vector<Mpz>& lambdas, const size_t n,
+            const size_t t, const Mpz& q);
     };
 }    // namespace Application
 

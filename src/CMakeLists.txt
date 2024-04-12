@@ -13,6 +13,7 @@ set(SRC_SOURCE_FILES
     nizk/nizk_resh.cpp
     nizk/nizk_linear_cl_resh.cpp
     application/bdkg.cpp
+    application/pvss_reshare.cpp
 )
 
 # Create a library target for your project

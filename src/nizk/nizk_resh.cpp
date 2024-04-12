@@ -22,6 +22,7 @@ void NizkResh::prove(const Witness& w,
     pf_ = unique_ptr<NizkLinCLResh>(
         new NizkLinCLResh(hash_, rand_, cl_, seclevel_));
 
+    // Witness = (r, \bar{sk})
     auto witness = tie(get<1>(w), get<0>(w));
     pf_->prove(witness, U, R0, B0, V, cl_.h(), pk_, R);
 }
@@ -42,7 +43,7 @@ void NizkResh::computeStatement(QFI& U, QFI& V, QFI& R0, QFI& B0,
     const vector<shared_ptr<QFI>>& Bs, const QFI& R, const QFI& R_,
     const QFI& B_) const {
 
-    init_random_oracle(pks, Bs, R, cl_.h());
+    init_random_oracle(pks, Bs, R, R_, B_, cl_.h());
 
     vector<Mpz> coeffs;
     coeffs.reserve(t_);
@@ -56,10 +57,10 @@ void NizkResh::computeStatement(QFI& U, QFI& V, QFI& R0, QFI& B0,
 
     computeUVusingWis(U, V, pks, Bs, wis);
 
-    Mpz w_0, temp;
+    Mpz w_0;
     Mpz ci(this->query_random_oracle(C_));
-    Mpz::mul(temp, ci, q_);
-    Mpz::add(temp, wis[0], temp);
+    Mpz::mul(w_0, ci, q_);
+    Mpz::add(w_0, wis[0], w_0);
 
     this->cl_.Cl_Delta().nupow(R0, R_, w_0);
     this->cl_.Cl_Delta().nupow(B0, B_, w_0);

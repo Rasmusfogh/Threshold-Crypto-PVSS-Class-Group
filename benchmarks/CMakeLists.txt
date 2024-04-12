@@ -4,8 +4,9 @@ add_dependencies (benchs benchs_build)
 
 ### List of benchmarks
 set ( BENCHS_LIST benchmark_qclpvss
-                  #benchmark_sss
+                  benchmark_sss
                   benchmark_bdkg
+                  benchmark_pvss_reshare
                   )
 
 ### Automatically create target and test from TESTS_LIST

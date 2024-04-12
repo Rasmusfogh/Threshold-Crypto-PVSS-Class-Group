@@ -37,3 +37,8 @@ void OpenSSL::HashAlgo::hash(
     for (const auto& ec : v.first)
         hash(ECPointGroupCRefPair(*ec, v.second));
 }
+
+template <>
+void OpenSSL::HashAlgo::hash(const PublicKey& v) {
+    hash(v.get());
+}

@@ -18,8 +18,8 @@ namespace NIZK {
 
       public:
         BaseLinCL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
-            const SecLevel& seclevel, size_t u_size)
-            : BaseNizk<Witness, Statement...>(hash, rand, cl), u_(u_size) {
+            const SecLevel& seclevel, size_t m)
+            : BaseNizk<Witness, Statement...>(hash, rand, cl), u_(m) {
 
             // 2^seclevel
             Mpz::mulby2k(C_, 1, seclevel.soundness() - 1);

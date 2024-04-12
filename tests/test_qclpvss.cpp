@@ -78,20 +78,20 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
 
     for (size_t i = 0; i < n; i++)
-        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], enc_shares->R,
-            *enc_shares->Bs->at(i), i);
+        dec_shares[i] = pvss.decShare(*pks[i], *sks[i], enc_shares->R_,
+            *enc_shares->Bs_->at(i), i);
 
     for (const auto& dec_share : dec_shares)
-        if (dec_share->sh)
+        if (dec_share->sh_)
             rec_shares.push_back(
-                unique_ptr<const Share>(new Share(*dec_share->sh)));
+                unique_ptr<const Share>(new Share(*dec_share->sh_)));
 
     unique_ptr<const Mpz> s_rec = pvss.rec(rec_shares);
     assert(*s_rec == s);
 
     for (size_t i = 0; i < t; i++)
-        if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R,
-                *enc_shares->Bs->at(i)))
+        if (!pvss.verifyDec(*dec_shares[i], *pks[i], enc_shares->R_,
+                *enc_shares->Bs_->at(i)))
             return EXIT_FAILURE;
 
     return EXIT_SUCCESS;

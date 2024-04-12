@@ -8,9 +8,9 @@ BDKG::BDKG(SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
     : QCLPVSS(seclevel, hash, rand, q, k, n, t), ec_group_(ec_group), sks_(n),
       pks_(n), keygen_pf_(n) {
 
-    lambdas_.reserve(t);
-    generate_n(back_inserter(lambdas_), t, [] { return Mpz(1UL); });
-    compute_lambdas(lambdas_, t, q);
+    lambdas_.reserve(n);
+    generate_n(back_inserter(lambdas_), n, [] { return Mpz(1UL); });
+    compute_lambdas(lambdas_, n, t, q);
 
     for (size_t i = 0; i < n; i++) {
         sks_[i] = this->keyGen(rand);
@@ -30,22 +30,23 @@ unique_ptr<EncSharesExt> BDKG::dist(const Mpz& s,
     auto shares = this->sss_.shareSecret(s, t_, n_, q_);
     auto enc_shares = this->EncryptShares(*shares, pks);
 
-    unique_ptr<EncSharesExt> enc_shares_ext(new EncSharesExt(n_, *enc_shares));
+    unique_ptr<vector<shared_ptr<ECPoint>>> Ds(new vector<shared_ptr<ECPoint>>);
+    Ds->reserve(n_);
 
     for (size_t i = 0; i < n_; i++)
-        enc_shares_ext->Ds_->emplace_back(unique_ptr<ECPoint>(
+        Ds->emplace_back(unique_ptr<ECPoint>(
             new ECPoint(ec_group_, BN((*shares)[i]->second))));
 
-    enc_shares_ext->pf_ = unique_ptr<NizkExtSH>(new NizkExtSH(hash_, randgen_,
-        *this, seclevel_, ec_group_, n_, t_, q_, Vis_));
+    unique_ptr<NizkExtSH> pf(new NizkExtSH(hash_, randgen_, *this, seclevel_,
+        ec_group_, n_, t_, q_, Vis_));
 
     pair<vector<unique_ptr<const Share>>&, Mpz> witness(*shares,
-        enc_shares_ext->r_);
+        enc_shares->r_);
 
-    enc_shares_ext->pf_->prove(witness, pks, *enc_shares_ext->Bs_,
-        *enc_shares_ext->Ds_, enc_shares_ext->R_);
+    pf->prove(witness, pks, *enc_shares->Bs_, *Ds, enc_shares->R_);
 
-    return enc_shares_ext;
+    return unique_ptr<EncSharesExt>(
+        new EncSharesExt(*enc_shares, move(Ds), move(pf)));
 }
 
 Mpz BDKG::compute_tsk(const vector<Mpz>& tsks) const {
@@ -118,9 +119,10 @@ bool BDKG::verify_global_keypair(const Mpz& tsk, const ECPoint& tpk) const {
     return ec_group_.ec_point_eq(pk, tpk);
 }
 
-void BDKG::compute_lambdas(vector<Mpz>& lambdas, const size_t t, const Mpz& q) {
+void BDKG::compute_lambdas(vector<Mpz>& lambdas, const size_t n, const size_t t,
+    const Mpz& q) {
 
-    for (size_t i = 1; i < t + 1; i++) {
+    for (size_t i = 1; i < n + 1; i++) {
         Mpz numerator(1UL), denominator(1UL), ai(i);
 
         for (size_t k = 1; k < t + 1; k++) {

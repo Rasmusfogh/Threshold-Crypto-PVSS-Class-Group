@@ -56,9 +56,9 @@ namespace Application {
         /**@}*/
 
       private:
-        /* Pre-computation of lamdas, assuming T=[1...t+1]*/
-        void compute_lambdas(vector<Mpz>& lambdas, const size_t t,
-            const Mpz& q);
+        /* Pre-computation of lamdas */
+        void compute_lambdas(vector<Mpz>& lambdas, const size_t n,
+            const size_t t, const Mpz& q);
     };
 }    // namespace Application
 
