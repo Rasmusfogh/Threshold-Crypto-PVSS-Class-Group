@@ -66,7 +66,7 @@ void SSS::generatePolynomial(const Mpz& s, vector<Mpz>& coefficients,
     // set a_0 to the secret
     coefficients.push_back(s);
 
-    for (size_t i = 1; i < k; i++)
+    for (size_t i = 0; i < k; i++)
         coefficients.emplace_back(randgen_.random_mpz(mod));
 }
 
@@ -78,10 +78,9 @@ unique_ptr<const Share> SSS::evaluatePolynomial(size_t x,
     share->second = coefficients[0];
 
     // evaluate polynomial for degree [1... k - 1]
-    for (size_t i = 1; i < k; i++) {
+    for (size_t i = 1; i <= k; i++) {
         Mpz::pow_mod(temp, Mpz(x), Mpz(i), mod);
-        Mpz::mul(temp, temp, coefficients[i]);
-        Mpz::add(share->second, share->second, temp);
+        Mpz::addmul(share->second, temp, coefficients[i]);
     }
 
     Mpz::mod(share->second, share->second, mod);

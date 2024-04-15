@@ -16,7 +16,7 @@ static const size_t N = 10;
 static const size_t T = 5;
 static SecLevel secLevel(SECLEVEL);
 static RandGen randgen;
-static Mpz Q;    // SET Q!
+static Mpz Q;
 static HashAlgo H(secLevel);
 static unique_ptr<PVSS_Reshare> pvss_reshare;
 

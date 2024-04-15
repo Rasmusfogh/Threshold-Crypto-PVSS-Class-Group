@@ -18,12 +18,9 @@ QCLPVSS::QCLPVSS(const SecLevel& seclevel, HashAlgo& hash, RandGen& randgen,
     if (t_ + k > n_)
         throw std::invalid_argument("k + t must be less than or equal to n");
 
-    // Generate default values like this due to default values are something
-    // else if not specified otherwise
     Vis_.reserve(n);
-    generate_n(back_inserter(Vis_), n_, [] { return Mpz(1UL); });
-
-    computeFixedPolyPoints(Vis_, n_, q_);
+    generate_n(back_inserter(Vis_), n, [] { return Mpz(1UL); });
+    computeSCRAPEvis(Vis_, n, 1, q_);
 }
 
 unique_ptr<const SecretKey> QCLPVSS::keyGen(RandGen& randgen) const {
@@ -86,7 +83,7 @@ unique_ptr<const Mpz> QCLPVSS::rec(vector<unique_ptr<const Share>>& Ais) const {
     if (Ais.size() < t_ + k_)
         return nullptr;
 
-    return sss_.reconstructSecret(Ais, t_, q_);
+    return sss_.reconstructSecret(Ais, t_ + k_, q_);
 }
 
 bool QCLPVSS::verifyDec(const DecShare& dec_share, const PublicKey& pki,
@@ -135,25 +132,23 @@ unique_ptr<EncShares> QCLPVSS::EncryptShares(
 
 void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks,
     EncShares& enc_shares) const {
-    enc_shares.pf_ = unique_ptr<NizkSH>(
-        new NizkSH(hash_, randgen_, *this, seclevel_, n_, t_, q_, Vis_));
+    enc_shares.pf_ = unique_ptr<NizkSH>(new NizkSH(hash_, randgen_, *this,
+        seclevel_, n_, n_ - t_ - 2, q_, Vis_));
 
     enc_shares.pf_->prove(enc_shares.r_, pks, *enc_shares.Bs_, enc_shares.R_);
 }
 
-void QCLPVSS::computeFixedPolyPoints(vector<Mpz>& vis, const size_t n,
-    const Mpz& q) {
-    // alphas
+void QCLPVSS::computeSCRAPEvis(vector<Mpz>& vis, const size_t n,
+    const size_t offset, const Mpz& q) {
+
     for (size_t i = 0; i < n; i++) {
         for (size_t j = 0; j < n; j++) {
             if (i == j)
                 continue;
 
-            // Add one to both i and j as alphas are [1...n_]
-            Mpz sub((signed long)((i + 1) - (j + 1)));
+            Mpz sub((signed long)((i + offset) - (j + offset)));
             Mpz::mul(vis[i], vis[i], sub);
         }
-
         Mpz::mod_inverse(vis[i], vis[i], q);
     }
 }

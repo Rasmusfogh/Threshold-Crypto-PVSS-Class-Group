@@ -8,8 +8,8 @@ using namespace BICYCL;
 int main(int argc, char* argv[]) {
     Mpz seed;
     RandGen randgen;
-    size_t t_ = 500;
-    size_t n_ = 1000;
+    size_t t_ = 5;
+    size_t n_ = 10;
 
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
     unique_ptr<vector<unique_ptr<const Share>>> shares;
     unique_ptr<const Mpz> s_;
 
-    SSS shamir(randgen, t_, n_, q_);
-    shares = shamir.shareSecret(s);    // figure out how
-    s_ = shamir.reconstructSecret(*shares);
+    SSS shamir(randgen);
+    shares = shamir.shareSecret(s, t_, n_, q_);    // figure out how
+    s_ = shamir.reconstructSecret(*shares, t_ + 1, q_);
 
     if (s == *s_)
         return EXIT_SUCCESS;

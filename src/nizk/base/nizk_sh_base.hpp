@@ -30,10 +30,11 @@ namespace NIZK {
 
       protected:
         Mpz evaluatePolynomial(size_t x, const vector<Mpz>& coeffs) const {
+            // res = a0
             Mpz res(coeffs[0]), temp;
 
-            // Evaluate polynomial m*
-            for (size_t j = 1; j < t_; j++) {
+            // Evaluate polynomial m* as res = a0 + a1*x + a2*x^2 + ... + at*x^t
+            for (size_t j = 1; j <= t_; j++) {
                 Mpz::pow_mod(temp, Mpz(x), Mpz(j), q_);
                 Mpz::addmul(res, temp, coeffs[j]);
             }
@@ -96,8 +97,11 @@ namespace NIZK {
             }
         }
 
-        void generateCoefficients(vector<Mpz>& coeffs, size_t t) const {
-            for (size_t _ = 0; _ < t; _++)
+        void generateCoefficients(vector<Mpz>& coeffs) const {
+            // t_ + 1 due to generating a_0 alongside [a_1 ... a_t]
+            coeffs.reserve(t_ + 1);
+
+            for (size_t _ = 0; _ <= t_; _++)
                 coeffs.emplace_back(this->query_random_oracle(q_));
         }
     };

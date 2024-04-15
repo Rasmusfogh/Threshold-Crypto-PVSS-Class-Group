@@ -28,8 +28,7 @@ namespace QCLPVSS_ {
         const size_t t_;
         const Mpz& q_;
 
-        // fixed points used to evaluate the sharing polynomial for the sharing
-        // proof
+        // SCRAPE vi's for i \in [1 ... n]
         vector<Mpz> Vis_;
 
         // Overwrite aliases from base class
@@ -85,9 +84,11 @@ namespace QCLPVSS_ {
         void computeSHNizk(vector<unique_ptr<const PublicKey>>&,
             EncShares&) const;
 
-      private:
-        void computeFixedPolyPoints(vector<Mpz>& vis, const size_t n,
-            const Mpz& q);
+        // offset is distance from 0 from which v_i starts. If v_i is computed
+        // for i \in [1 ... n], then the offset is 1. If v_i is computed
+        // for i \in [0 ... n], then the offset is 0
+        void computeSCRAPEvis(vector<Mpz>& vis, const size_t n,
+            const size_t offset, const Mpz& q);
     };
 }    // namespace QCLPVSS_
 

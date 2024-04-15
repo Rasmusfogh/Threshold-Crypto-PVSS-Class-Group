@@ -17,6 +17,7 @@ namespace Application {
 
         unique_ptr<EncShares> enc_shares;
 
+        vector<Mpz> Vis_reshare_;
         vector<Mpz> lambdas_;
 
       public:

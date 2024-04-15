@@ -13,6 +13,10 @@ PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
     generate_n(back_inserter(lambdas_), n0, [] { return Mpz(1UL); });
     compute_lambdas(lambdas_, n0, t0, q);
 
+    Vis_reshare_.reserve(n0 + 1);
+    generate_n(back_inserter(Vis_reshare_), n0 + 1, [] { return Mpz(1UL); });
+    this->computeSCRAPEvis(Vis_reshare_, n0 + 1, 0, q_);
+
     for (size_t i = 0; i < n0_; i++) {
         sks[i] = this->keyGen(randgen_);
         pks[i] = this->keyGen(*sks[i]);
@@ -43,8 +47,8 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
 
         auto witness = tie(*sks[j], enc_shares_j->r_, *shares);
 
-        unique_ptr<NizkResh> pf = unique_ptr<NizkResh>(
-            new NizkResh(hash_, randgen_, *this, seclevel_, n1, t1, q_, Vis_));
+        unique_ptr<NizkResh> pf = unique_ptr<NizkResh>(new NizkResh(hash_,
+            randgen_, *this, seclevel_, n1, n1 - t1 - 1, q_, Vis_reshare_));
 
         pf->prove(witness, pks, *pks[j], enc_shares.R_, *enc_shares.Bs_->at(j),
             enc_shares_j->R_, *enc_shares_j->Bs_);
@@ -64,7 +68,7 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
     unique_ptr<EncShares> enc_sh_output(new EncShares(n1));
 
     QFI temp;
-    for (size_t i = 0; i < t0_; i++) {
+    for (size_t i = 0; i < t0_ + 1; i++) {
         EncSharesResh& sh = enc_sh_resh[i];
 
         this->Cl_Delta().nupow(temp, sh.R_, lambdas_[i]);
@@ -74,7 +78,7 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares,
     for (size_t i = 0; i < n1; i++) {
         EncSharesResh& sh_i = enc_sh_resh[i];
 
-        for (size_t j = 0; j < t0_; j++) {
+        for (size_t j = 0; j < t0_ + 1; j++) {
 
             this->Cl_Delta().nupow(temp, *sh_i.Bs_->at(j), lambdas_[j]);
             this->Cl_Delta().nucomp(*enc_sh_output->Bs_->at(i),

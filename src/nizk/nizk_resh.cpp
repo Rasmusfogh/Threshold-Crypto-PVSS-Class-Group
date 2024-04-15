@@ -5,7 +5,7 @@ using namespace NIZK;
 NizkResh::NizkResh(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const size_t n, const size_t t, const Mpz& q,
     const vector<Mpz>& Vis)
-    : BaseNizkSH(hash, rand, cl, seclevel, q, n, n - t - 1, Vis) {
+    : BaseNizkSH(hash, rand, cl, seclevel, q, n, t, Vis) {
 
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
 }
@@ -34,7 +34,6 @@ void NizkResh::prove(const Witness& w,
     vector<QFI> Y { VB0, pk_.get(), R };
 
     pf_->prove(W, X, Y);
-    cout << pf_->verify(X, Y) << endl;
 }
 
 bool NizkResh::verify(const vector<unique_ptr<const PublicKey>>& pks,
@@ -64,22 +63,23 @@ void NizkResh::computeStatement(QFI& U, QFI& V, QFI& R0, QFI& B0,
     init_random_oracle(pks, Bs, R, R_, B_, cl_.h());
 
     vector<Mpz> coeffs;
-    coeffs.reserve(t_);
-    generateCoefficients(coeffs, t_);
+    generateCoefficients(coeffs);
 
     vector<Mpz> wis;
     wis.reserve(n_);
 
     for (size_t i = 0; i < n_; i++) {
-        wis.emplace_back(computeWi(i - 1, coeffs));
+        wis.emplace_back(computeWi(i + 1, coeffs));
     }
 
     computeUVusingWis(U, V, pks, Bs, wis);
 
+    Mpz wi0 = computeWi(0, coeffs);
+
     // compute wi' = wi
     Mpz ci(this->query_random_oracle(C_));
-    Mpz::addmul(wis[0], ci, q_);
+    Mpz::addmul(wi0, ci, q_);
 
-    this->cl_.Cl_Delta().nupow(R0, R_, wis[0]);
-    this->cl_.Cl_Delta().nupow(B0, B_, wis[0]);
+    this->cl_.Cl_Delta().nupow(R0, R_, wi0);
+    this->cl_.Cl_Delta().nupow(B0, B_, wi0);
 }

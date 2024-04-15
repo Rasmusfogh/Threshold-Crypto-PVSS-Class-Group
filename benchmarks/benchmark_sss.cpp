@@ -47,7 +47,7 @@ BENCHMARK(share)->Unit(kMillisecond);
 static void reconstruct(benchmark::State& state) {
     unique_ptr<const Mpz> s_;
     for (auto _ : state) {
-        s_ = sss->reconstructSecret(*shares, T, Q);
+        s_ = sss->reconstructSecret(*shares, T + 1, Q);
         DoNotOptimize(s_);
     }
     assert(*s_ == secret);

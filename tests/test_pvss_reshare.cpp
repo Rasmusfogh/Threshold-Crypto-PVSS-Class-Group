@@ -27,4 +27,6 @@ int main(int argc, char* argv[]) {
     PVSS_Reshare pvss_reshare(seclevel, H, randgen, q, n, t);
 
     pvss_reshare.reshare(*pvss_reshare.enc_shares, n, t);
+
+    return EXIT_SUCCESS;
 }

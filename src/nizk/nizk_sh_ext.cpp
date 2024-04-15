@@ -5,8 +5,7 @@ using namespace NIZK;
 NizkExtSH::NizkExtSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel, const ECGroup& ec_group, const size_t n,
     const size_t t, const Mpz& q, const vector<Mpz>& Vis)
-    : BaseNizkSH(hash, rand, cl, seclevel, q, n, n - t - 2, Vis),
-      ec_group_(ec_group) {
+    : BaseNizkSH(hash, rand, cl, seclevel, q, n, t, Vis), ec_group_(ec_group) {
 
     // Set base class C boundary
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
@@ -21,8 +20,7 @@ void NizkExtSH::prove(const Witness& w,
     init_random_oracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs;
-    coeffs.reserve(t_);
-    generateCoefficients(coeffs, t_);
+    generateCoefficients(coeffs);
 
     vector<Mpz> wis;
     wis.reserve(n_);
@@ -85,8 +83,7 @@ bool NizkExtSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     init_random_oracle(pks, Bs, Ds_, R, cl_.h());
 
     vector<Mpz> coeffs;
-    coeffs.reserve(t_);
-    generateCoefficients(coeffs, t_);
+    generateCoefficients(coeffs);
 
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);

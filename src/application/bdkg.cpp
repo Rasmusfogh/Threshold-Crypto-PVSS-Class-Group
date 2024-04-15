@@ -38,7 +38,7 @@ unique_ptr<EncSharesExt> BDKG::dist(const Mpz& s,
             new ECPoint(ec_group_, BN((*shares)[i]->second))));
 
     unique_ptr<NizkExtSH> pf(new NizkExtSH(hash_, randgen_, *this, seclevel_,
-        ec_group_, n_, t_, q_, Vis_));
+        ec_group_, n_, n_ - t_ - 2, q_, Vis_));
 
     pair<vector<unique_ptr<const Share>>&, Mpz> witness(*shares,
         enc_shares->r_);

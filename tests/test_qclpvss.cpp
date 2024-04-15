@@ -29,7 +29,9 @@ int main(int argc, char* argv[]) {
     std::cout << "# Using seed = " << seed << std::endl;
     randgen.set_seed(seed);
 
-    BICYCL::Mpz q(randgen.random_prime(256));
+    ECGroup ec_group_(seclevel);
+
+    BICYCL::Mpz q(ec_group_.order());
 
     /* */
     std::cout << "# security: " << seclevel << " bits" << std::endl;
