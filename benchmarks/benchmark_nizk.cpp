@@ -44,6 +44,6 @@ static void nizk_linear_cl(benchmark::State& state) {
 
     assert(verif);
 }
-BENCHMARK(nizk_linear_cl)->Unit(kMillisecond);
+BENCHMARK(nizk_linear_cl)->Unit(kMillisecond)->Iterations(20);
 
 BENCHMARK_MAIN();

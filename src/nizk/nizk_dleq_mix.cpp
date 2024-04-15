@@ -15,7 +15,7 @@ void NizkMixDLEQ::prove(const Witness& w, const QFI& U_, const QFI& M_,
     cl_.power_of_h(R, r);
 
     QFI V;
-    cl_.Cl_Delta().nupow(V, U_, r);    // witness or random r?
+    cl_.Cl_Delta().nupow(V, U_, r);
 
     QFI B;
     cl_.Cl_Delta().nupow(B, M_, r);

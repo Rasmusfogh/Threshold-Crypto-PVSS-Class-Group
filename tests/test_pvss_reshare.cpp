@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
     RandGen randgen;
     HashAlgo H(seclevel);
 
-    size_t n(10UL);
-    size_t t(5UL);
+    size_t n(20UL);
+    size_t t(10UL);
 
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
@@ -24,9 +24,11 @@ int main(int argc, char* argv[]) {
 
     Mpz q(randgen.random_prime(256));
 
-    PVSS_Reshare pvss_reshare(seclevel, H, randgen, q, n, t);
+    PVSS_Reshare pvss_reshare(seclevel, H, randgen, q, n, t, n, t);
 
-    pvss_reshare.reshare(*pvss_reshare.enc_shares, n, t);
+    auto enc_reshare = pvss_reshare.reshare(*pvss_reshare.enc_shares);
+
+    cout << pvss_reshare.verifyResharing(*enc_reshare) << endl;
 
     return EXIT_SUCCESS;
 }

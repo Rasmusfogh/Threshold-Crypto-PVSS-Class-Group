@@ -44,5 +44,3 @@ EncSharesResh::EncSharesResh(BaseEncShares& enc_sh, unique_ptr<NizkResh> pf) {
 }
 
 DecShare::DecShare() {}
-
-KeyPair::KeyPair() {}

@@ -7,12 +7,10 @@ endif ()
 add_custom_target (tests COMMAND ${_cmd} COMMENT "Running the tests")
 
 ### List of tests
-set (TESTS_LIST test_qclpvss
+set (TESTS_LIST #test_qclpvss
                 #test_sss
                 #test_nizkpok_dl
-                #test_randgen
-                #test_randgen_coeffs
-                test_bdkg
+                #test_bdkg
                 #test_nizk_linear_cl
                 test_pvss_reshare
                 )

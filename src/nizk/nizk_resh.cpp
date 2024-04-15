@@ -19,6 +19,9 @@ void NizkResh::prove(const Witness& w,
     QFI U, V, R0, B0;
     computeStatement(U, V, R0, B0, pks, Bs, R, R_, B_);
 
+    QFI VB0;
+    cl_.Cl_Delta().nucomp(VB0, V, B0);
+
     pf_ = unique_ptr<NizkLinCLResh>(
         new NizkLinCLResh(hash_, rand_, cl_, seclevel_));
 
@@ -27,9 +30,6 @@ void NizkResh::prove(const Witness& w,
 
     vector<vector<QFI>> X { vector<QFI> { R0, U },
         vector<QFI> { cl_.h(), QFI() }, vector<QFI> { QFI(), cl_.h() } };
-
-    QFI VB0;
-    cl_.Cl_Delta().nucomp(VB0, V, B0);
 
     vector<QFI> Y { VB0, pk_.get(), R };
 
@@ -68,9 +68,8 @@ void NizkResh::computeStatement(QFI& U, QFI& V, QFI& R0, QFI& B0,
     vector<Mpz> wis;
     wis.reserve(n_);
 
-    for (size_t i = 0; i < n_; i++) {
+    for (size_t i = 0; i < n_; i++)
         wis.emplace_back(computeWi(i + 1, coeffs));
-    }
 
     computeUVusingWis(U, V, pks, Bs, wis);
 

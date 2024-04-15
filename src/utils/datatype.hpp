@@ -56,15 +56,6 @@ namespace DATATYPE {
         DecShare();
     };
 
-    class KeyPair {
-      public:
-        unique_ptr<const PublicKey> pk_;
-        unique_ptr<const SecretKey> sk_;
-        unique_ptr<NizkDL> pf_;
-
-        KeyPair();
-    };
-
 }    // namespace DATATYPE
 
 #endif

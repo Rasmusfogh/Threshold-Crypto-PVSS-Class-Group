@@ -20,15 +20,16 @@ namespace Application {
         vector<Mpz> Vis_reshare_;
         vector<Mpz> lambdas_;
 
+        Mpz secret_;
+
       public:
         PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash, RandGen& rand,
-            const Mpz& q, const size_t n, const size_t t);
-
-        unique_ptr<EncShares> reshare(const EncShares&, const size_t n1,
+            const Mpz& q, const size_t n0, const size_t t0, const size_t n1,
             const size_t t1);
 
-      protected:
-        void generateCoefficients(vector<Mpz>& coeffs, size_t t) const;
+        unique_ptr<EncShares> reshare(const EncShares&);
+
+        bool verifyResharing(const EncShares& enc_shares) const;
 
       private:
         /* Pre-computation of lamdas */

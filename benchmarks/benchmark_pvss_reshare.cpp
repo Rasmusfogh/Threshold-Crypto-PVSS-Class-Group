@@ -31,14 +31,14 @@ static void setup(benchmark::State& state) {
 
     for (auto _ : state) {
         pvss_reshare = unique_ptr<PVSS_Reshare>(
-            new PVSS_Reshare(secLevel, H, randgen, Q, N, T));
+            new PVSS_Reshare(secLevel, H, randgen, Q, N, T, N, T));
 
         pvss_reshare.reset();
         DoNotOptimize(pvss_reshare);
     }
 
     pvss_reshare = unique_ptr<PVSS_Reshare>(
-        new PVSS_Reshare(secLevel, H, randgen, Q, N, T));
+        new PVSS_Reshare(secLevel, H, randgen, Q, N, T, N, T));
 
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
@@ -49,8 +49,7 @@ BENCHMARK(setup)->Unit(kMillisecond);
 static void reshare(benchmark::State& state) {
 
     for (auto _ : state) {
-        auto enc_sh_resh =
-            pvss_reshare->reshare(*pvss_reshare->enc_shares, N, T);
+        auto enc_sh_resh = pvss_reshare->reshare(*pvss_reshare->enc_shares);
 
         DoNotOptimize(enc_sh_resh);
     }

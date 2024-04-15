@@ -13,20 +13,14 @@ int main(int argc, char* argv[]) {
     Mpz seed;
     size_t qsize = 0;
     size_t k = 1;
-    SecLevel seclevel(112);
+    SecLevel seclevel(128);
     RandGen randgen;
-
-    bool compact_variant =
-        false; /* by default the compact variant is not used */
 
     auto T = std::chrono::system_clock::now();
     seed = static_cast<unsigned long>(T.time_since_epoch().count());
-
-    /* */
-    std::cout << "# Using seed = " << seed << std::endl;
     randgen.set_seed(seed);
 
-    Mpz q(randgen.random_prime(113));
+    Mpz q(randgen.random_prime(256));
 
     /* */
     std::cout << "# security: " << seclevel << " bits" << std::endl;
@@ -46,14 +40,16 @@ int main(int argc, char* argv[]) {
 
     OpenSSL::HashAlgo H(seclevel);
 
-    size_t n(8);
+    size_t n(10);
     size_t t(5);
 
-    CL_HSMqk cl_hsm(q, k, seclevel, randgen, compact_variant);
+    CL_HSMqk cl_hsm(q, k, seclevel, randgen, false);
     SecretKey sk(cl_hsm, randgen);
     PublicKey pk(cl_hsm, sk);
 
     NizkDL pf(H, randgen, cl_hsm, seclevel);
+
+    pf.prove(sk, pk);
 
     if (pf.verify(pk))
         return EXIT_SUCCESS;

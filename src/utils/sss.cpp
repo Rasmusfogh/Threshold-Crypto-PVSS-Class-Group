@@ -49,8 +49,7 @@ unique_ptr<const Mpz> SSS::reconstructSecret(
 
         Mpz::mod_inverse(denominator, denominator, mod);
         Mpz::mul(numerator, numerator, denominator);
-        Mpz::mul(numerator, numerator, shares[j]->y());
-        Mpz::add(*s, *s, numerator);
+        Mpz::addmul(*s, numerator, shares[j]->y());
     }
 
     Mpz::mod(*s, *s, mod);
