@@ -6,6 +6,7 @@ NizkLinCL::NizkLinCL(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
     const SecLevel& seclevel)
     : BaseNizkLinCL(hash, rand, cl, seclevel) {}
 
+// Make vectors to vectors of pointers instead, and compare on nullptr
 void NizkLinCL::prove(const vector<Mpz>& w, const vector<vector<QFI>>& X,
     const vector<QFI>& Y) {
 
@@ -23,6 +24,8 @@ void NizkLinCL::prove(const vector<Mpz>& w, const vector<vector<QFI>>& X,
 
     for (size_t i = 0; i < n; i++) {
         for (size_t j = 0; j < m; j++) {
+            if (X[i][j].is_one())
+                continue;
             cl_.Cl_Delta().nupow(temp, X[i][j], r[j]);
             cl_.Cl_Delta().nucomp(T[i], T[i], temp);
         }
@@ -54,6 +57,8 @@ bool NizkLinCL::verify(const vector<vector<QFI>>& X,
 
     for (size_t i = 0; i < n; i++) {
         for (size_t j = 0; j < m; j++) {
+            if (X[i][j].is_one())
+                continue;
             cl_.Cl_Delta().nupow(temp, X[i][j], u_[j]);
             cl_.Cl_Delta().nucomp(T[i], T[i], temp);
         }

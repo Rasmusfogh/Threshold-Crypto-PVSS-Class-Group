@@ -18,7 +18,7 @@ namespace NIZK {
         Mpz C_;    // Is set from inheriting class
         const SecLevel& seclevel_;
         const Mpz& q_;
-        const size_t n_, t_, degree_;
+        const size_t n_, t_;
         const vector<Mpz>& Vis_;
 
       public:
@@ -26,14 +26,14 @@ namespace NIZK {
             const SecLevel& seclevel, const Mpz& q, const size_t n,
             const size_t t, const vector<Mpz>& Vis)
             : BaseNizk<Witness, Statement...>(hash, rand, cl), q_(q), n_(n),
-              t_(t), degree_(n - t - 1 - 1), Vis_(Vis), seclevel_(seclevel) {}
+              t_(t), Vis_(Vis), seclevel_(seclevel) {}
 
       protected:
         Mpz evaluatePolynomial(size_t x, const vector<Mpz>& coeffs) const {
             Mpz res(coeffs[0]), temp;
 
             // Evaluate polynomial m*
-            for (size_t j = 1; j < degree_; j++) {
+            for (size_t j = 1; j < t_; j++) {
                 Mpz::pow_mod(temp, Mpz(x), Mpz(j), q_);
                 Mpz::addmul(res, temp, coeffs[j]);
             }

@@ -6,7 +6,7 @@ using namespace UTILS;
 NizkSH::NizkSH(HashAlgo& hash, RandGen& randgen, const CL_HSMqk& cl,
     const SecLevel& seclevel, const size_t n, const size_t t, const Mpz& q,
     const vector<Mpz>& Vis)
-    : BaseNizkSH(hash, randgen, cl, seclevel, q, n, t, Vis) {
+    : BaseNizkSH(hash, randgen, cl, seclevel, q, n, n - t - 2, Vis) {
 
     // Set base class C boundary
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);

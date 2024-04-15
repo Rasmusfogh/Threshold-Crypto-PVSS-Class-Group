@@ -2,6 +2,7 @@
 #include "qclpvss.hpp"
 
 using namespace QCLPVSS_;
+using namespace std;
 
 int main(int argc, char* argv[]) {
 
@@ -24,11 +25,15 @@ int main(int argc, char* argv[]) {
     unique_ptr<const SecretKey> sk2 = pvss.keyGen(randgen);
     unique_ptr<const PublicKey> pk2 = pvss.keyGen(*sk2);
 
-    vector<Mpz> w { *sk1, *sk2 };
-    vector<vector<QFI>> X { vector<QFI> { pvss.h(), pvss.h() },
-        vector<QFI> { pvss.h(), pvss.h() } };
+    QFI pk12;
+    pvss.Cl_Delta().nucomp(pk12, pk1->get(), pk2->get());
 
-    vector<QFI> Y { pk1->get(), pk2->get() };
+    vector<Mpz> w { *sk1, *sk2 };
+
+    vector<vector<QFI>> X { vector<QFI> { pvss.h(), QFI() },
+        vector<QFI> { QFI(), pvss.h() }, vector<QFI> { pvss.h(), pvss.h() } };
+
+    vector<QFI> Y { pk1->get(), pk2->get(), pk12 };
 
     uut.prove(w, X, Y);
 
