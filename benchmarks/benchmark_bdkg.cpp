@@ -12,8 +12,8 @@ using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 100;
-static const size_t T = 50;
+static const size_t N = 50;
+static const size_t T = 25;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);

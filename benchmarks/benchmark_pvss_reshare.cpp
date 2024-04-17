@@ -12,13 +12,15 @@ using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 10;
-static const size_t T = 5;
+static const size_t N = 50;
+static const size_t T = 25;
 static SecLevel secLevel(SECLEVEL);
 static RandGen randgen;
 static Mpz Q;
 static HashAlgo H(secLevel);
 static unique_ptr<PVSS_Reshare> pvss_reshare;
+
+static unique_ptr<vector<EncSharesResh>> enc_sh_resh;
 
 static void setup(benchmark::State& state) {
 
@@ -49,8 +51,7 @@ BENCHMARK(setup)->Unit(kMillisecond);
 static void reshare(benchmark::State& state) {
 
     for (auto _ : state) {
-        auto enc_sh_resh = pvss_reshare->reshare(*pvss_reshare->enc_shares);
-
+        enc_sh_resh = pvss_reshare->reshare(*pvss_reshare->enc_shares);
         DoNotOptimize(enc_sh_resh);
     }
 
@@ -59,5 +60,22 @@ static void reshare(benchmark::State& state) {
     state.counters["t"] = T;
 }
 BENCHMARK(reshare)->Unit(kMillisecond);
+
+static void distReshare(benchmark::State& state) {
+
+    for (auto _ : state) {
+
+        assert(pvss_reshare->verifyReshare(*enc_sh_resh,
+            *pvss_reshare->enc_shares));
+
+        auto enc_shares = pvss_reshare->distReshare(*enc_sh_resh);
+        DoNotOptimize(enc_shares);
+    }
+
+    state.counters["secLevel"] = secLevel.soundness();
+    state.counters["n"] = N;
+    state.counters["t"] = T;
+}
+BENCHMARK(distReshare)->Unit(kMillisecond);
 
 BENCHMARK_MAIN();

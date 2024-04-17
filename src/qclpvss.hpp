@@ -79,7 +79,7 @@ namespace QCLPVSS_ {
             const Mpz& secret) const;
 
         unique_ptr<EncShares> EncryptShares(vector<unique_ptr<const Share>>&,
-            vector<unique_ptr<const PublicKey>>&) const;
+            const vector<unique_ptr<const PublicKey>>&) const;
 
         void computeSHNizk(vector<unique_ptr<const PublicKey>>&,
             EncShares&) const;

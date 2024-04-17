@@ -26,9 +26,15 @@ int main(int argc, char* argv[]) {
 
     PVSS_Reshare pvss_reshare(seclevel, H, randgen, q, n, t, n, t);
 
-    auto enc_reshare = pvss_reshare.reshare(*pvss_reshare.enc_shares);
+    auto enc_sh_resh = pvss_reshare.reshare(*pvss_reshare.enc_shares);
 
-    cout << pvss_reshare.verifyResharing(*enc_reshare) << endl;
+    if (!pvss_reshare.verifyReshare(*enc_sh_resh, *pvss_reshare.enc_shares))
+        return EXIT_FAILURE;
+
+    auto enc_shares = pvss_reshare.distReshare(*enc_sh_resh);
+
+    if (!pvss_reshare.verifyDistReshare(*enc_shares))
+        return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }

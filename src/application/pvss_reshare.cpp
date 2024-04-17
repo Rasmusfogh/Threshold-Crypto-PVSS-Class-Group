@@ -34,14 +34,13 @@ PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
     enc_shares = this->dist(secret_, pks);
 }
 
-unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares) {
+unique_ptr<vector<EncSharesResh>> PVSS_Reshare::reshare(
+    const EncShares& enc_shares) const {
 
-    vector<EncSharesResh> enc_sh_resh;
-    enc_sh_resh.reserve(n0_);
+    unique_ptr<vector<EncSharesResh>> enc_sh_resh(new vector<EncSharesResh>());
+    enc_sh_resh->reserve(t0_ + 1);
 
-    auto start = std::chrono::system_clock::now();
-
-    for (size_t j = 0; j < n0_; j++) {
+    for (size_t j = 0; j < t0_ + 1; j++) {
         unique_ptr<DecShare> dec_share = this->decShare(*pks[j], *sks[j],
             enc_shares.R_, *enc_shares.Bs_->at(j), j);
 
@@ -57,49 +56,38 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares) {
         pf->prove(witness, pks, *pks[j], enc_shares.R_, *enc_shares.Bs_->at(j),
             enc_shares_j->R_, *enc_shares_j->Bs_);
 
-        enc_sh_resh.emplace_back(EncSharesResh(*enc_shares_j, move(pf)));
+        enc_sh_resh->emplace_back(EncSharesResh(*enc_shares_j, move(pf)));
     }
 
-    auto stop = std::chrono::system_clock::now();
-    auto ms_int = duration_cast<milliseconds>(stop - start);
-    cout << "Reshare: " << ms_int.count() << endl;
+    return enc_sh_resh;
+}
 
-    start = std::chrono::system_clock::now();
+bool PVSS_Reshare::verifyReshare(const vector<EncSharesResh>& enc_sh_resh,
+    const EncShares& enc_shares) const {
 
-    for (size_t j = 0; j < n0_; j++) {
+    for (size_t j = 0; j < t0_ + 1; j++)
+        if (!enc_sh_resh[j].pf_->verify(pks, *pks[j], enc_shares.R_,
+                *enc_shares.Bs_->at(j), enc_sh_resh[j].R_, *enc_sh_resh[j].Bs_))
+            return false;
 
-        bool verified = enc_sh_resh[j].pf_->verify(pks, *pks[j], enc_shares.R_,
-            *enc_shares.Bs_->at(j), enc_sh_resh[j].R_, *enc_sh_resh[j].Bs_);
+    return true;
+}
 
-        if (!verified)
-            throw std::invalid_argument(
-                "Failed verifying proof for correct resharing.");
-    }
-
-    stop = std::chrono::system_clock::now();
-    ms_int = duration_cast<milliseconds>(stop - start);
-    cout << "Verify Reshare: " << ms_int.count() << endl;
+unique_ptr<EncShares> PVSS_Reshare::distReshare(
+    const vector<EncSharesResh>& enc_sh_resh) const {
 
     unique_ptr<EncShares> enc_sh_output(new EncShares(n1_));
 
-    start = std::chrono::system_clock::now();
-
     QFI temp;
-    for (size_t j = 0; j < t0_ + 1; j++) {
-        EncSharesResh& sh = enc_sh_resh[j];
+    size_t T = t0_ + 1;
 
-        this->Cl_Delta().nupow(temp, sh.R_, lambdas_[j]);
+    for (size_t j = 0; j < T; j++) {
+        this->Cl_Delta().nupow(temp, enc_sh_resh[j].R_, lambdas_[j]);
         this->Cl_Delta().nucomp(enc_sh_output->R_, enc_sh_output->R_, temp);
     }
 
-    stop = std::chrono::system_clock::now();
-    ms_int = duration_cast<milliseconds>(stop - start);
-    cout << "Compute R: " << ms_int.count() << endl;
-
-    start = std::chrono::system_clock::now();
-
     for (size_t i = 0; i < n1_; i++) {
-        for (size_t j = 0; j < t0_ + 1; j++) {
+        for (size_t j = 0; j < T; j++) {
             this->Cl_Delta().nupow(temp, *enc_sh_resh[j].Bs_->at(i),
                 lambdas_[j]);
             this->Cl_Delta().nucomp(*enc_sh_output->Bs_->at(i),
@@ -107,33 +95,26 @@ unique_ptr<EncShares> PVSS_Reshare::reshare(const EncShares& enc_shares) {
         }
     }
 
-    stop = std::chrono::system_clock::now();
-    ms_int = duration_cast<milliseconds>(stop - start);
-    cout << "Compute Bs: " << ms_int.count() << endl;
-
     return enc_sh_output;
 }
 
-bool PVSS_Reshare::verifyResharing(const EncShares& enc_shares) const {
+bool PVSS_Reshare::verifyDistReshare(const EncShares& enc_share) const {
 
     vector<unique_ptr<DecShare>> dec_shares(n1_);
     vector<unique_ptr<const Share>> rec_shares;
-    rec_shares.reserve(n1_);
 
-    for (size_t i = 0; i < n1_; i++) {
+    for (size_t i = 0; i < n1_; i++)
+        dec_shares[i] = this->decShare(*pks[i], *sks[i], enc_share.R_,
+            *enc_share.Bs_->at(i), i);
 
-        dec_shares[i] = this->decShare(*pks[i], *sks[i], enc_shares.R_,
-            *enc_shares.Bs_->at(i), i);
-    }
-
+    // Simulate parties reconstructing by providing their share
     for (const auto& dec_share : dec_shares)
         if (dec_share->sh_)
             rec_shares.push_back(
                 unique_ptr<const Share>(new Share(*dec_share->sh_)));
 
-    auto s_rec = this->rec(rec_shares);
-
-    return *s_rec == secret_;
+    auto secret_rec = this->sss_.reconstructSecret(rec_shares, t1_ + 1, q_);
+    return secret_ == *secret_rec;
 }
 
 void PVSS_Reshare::compute_lambdas(vector<Mpz>& lambdas, const size_t n,

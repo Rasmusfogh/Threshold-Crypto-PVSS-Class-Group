@@ -104,7 +104,7 @@ unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::createShares(
 
 unique_ptr<EncShares> QCLPVSS::EncryptShares(
     vector<unique_ptr<const Share>>& shares,
-    vector<unique_ptr<const PublicKey>>& pks) const {
+    const vector<unique_ptr<const PublicKey>>& pks) const {
     QFI f, pkr;
     unique_ptr<EncShares> enc_sh(new EncShares(n_));
 

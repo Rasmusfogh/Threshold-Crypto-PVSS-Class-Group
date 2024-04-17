@@ -1,6 +1,7 @@
 #ifndef PVSS_RESHARE_HPP__
 #define PVSS_RESHARE_HPP__
 
+#include "nizk_resh.hpp"
 #include "qclpvss.hpp"
 
 using namespace QCLPVSS_;
@@ -27,9 +28,11 @@ namespace Application {
             const Mpz& q, const size_t n0, const size_t t0, const size_t n1,
             const size_t t1);
 
-        unique_ptr<EncShares> reshare(const EncShares&);
-
-        bool verifyResharing(const EncShares& enc_shares) const;
+        unique_ptr<vector<EncSharesResh>> reshare(const EncShares&) const;
+        bool verifyReshare(const vector<EncSharesResh>&,
+            const EncShares&) const;
+        unique_ptr<EncShares> distReshare(const vector<EncSharesResh>&) const;
+        bool verifyDistReshare(const EncShares& enc_share) const;
 
       private:
         /* Pre-computation of lamdas */

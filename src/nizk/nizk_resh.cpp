@@ -28,8 +28,9 @@ void NizkResh::prove(const Witness& w,
     // W = (\bar{sk}, r)
     vector<Mpz> W { get<0>(w), get<1>(w) };
 
-    vector<vector<QFI>> X { vector<QFI> { R0, U },
-        vector<QFI> { cl_.h(), QFI() }, vector<QFI> { QFI(), cl_.h() } };
+    QFI id = cl_.Cl_Delta().one();
+    vector<vector<QFI>> X { vector<QFI> { R0, U }, vector<QFI> { cl_.h(), id },
+        vector<QFI> { id, cl_.h() } };
 
     vector<QFI> Y { VB0, pk_.get(), R };
 
@@ -44,8 +45,9 @@ bool NizkResh::verify(const vector<unique_ptr<const PublicKey>>& pks,
     QFI U, V, R0, B0;
     computeStatement(U, V, R0, B0, pks, Bs, R, R_, B_);
 
-    vector<vector<QFI>> X { vector<QFI> { R0, U },
-        vector<QFI> { cl_.h(), QFI() }, vector<QFI> { QFI(), cl_.h() } };
+    QFI id = cl_.Cl_Delta().one();
+    vector<vector<QFI>> X { vector<QFI> { R0, U }, vector<QFI> { cl_.h(), id },
+        vector<QFI> { id, cl_.h() } };
 
     QFI VB0;
     cl_.Cl_Delta().nucomp(VB0, V, B0);
