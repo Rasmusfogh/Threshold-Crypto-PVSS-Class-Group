@@ -31,3 +31,8 @@ target_include_directories (bicycl INTERFACE
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries (bicycl INTERFACE gmp::gmp OpenSSL::Crypto)
+
+if (THREADS_FOUND AND CMAKE_USE_PTHREADS_INIT)
+  target_link_libraries (bicycl INTERFACE Threads::Threads)
+  target_compile_definitions (bicycl INTERFACE BICYCL_WITH_PTHREADS)
+endif ()
