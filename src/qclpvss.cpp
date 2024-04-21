@@ -1,4 +1,5 @@
 #include "qclpvss.hpp"
+#include <thread>
 
 using namespace QCLPVSS_;
 using namespace NIZK;
@@ -105,7 +106,6 @@ unique_ptr<vector<unique_ptr<const Share>>> QCLPVSS::createShares(
 unique_ptr<EncShares> QCLPVSS::EncryptShares(
     vector<unique_ptr<const Share>>& shares,
     const vector<unique_ptr<const PublicKey>>& pks) const {
-    QFI f, pkr;
     unique_ptr<EncShares> enc_sh(new EncShares(n_));
 
     // encrypt_randomness_bound() = exponent_bound = 2^(distance_-2) times
@@ -116,16 +116,26 @@ unique_ptr<EncShares> QCLPVSS::EncryptShares(
     // Compute R
     this->power_of_h(enc_sh->R_, enc_sh->r_);
 
+    vector<thread> threads;
+
     // Compute B_i's
     for (size_t i = 0; i < n_; i++) {
-        // f^p(a_i)
-        f = this->power_of_f(shares[i]->y());
-        //(pk_i)^r
-        pks[i]->exponentiation(*this, pkr, enc_sh->r_);
-        // B_i = (pk_i)^r * f^p(a_i)
 
-        this->Cl_Delta().nucomp(*enc_sh->Bs_->at(i), pkr, f);
+        threads.push_back(thread([&, i]() {
+            QFI f, pkr;
+
+            // f^p(a_i)
+            f = this->power_of_f(shares[i]->y());
+            //(pk_i)^r
+            pks[i]->exponentiation(*this, pkr, enc_sh->r_);
+            // B_i = (pk_i)^r * f^p(a_i)
+
+            this->Cl_Delta().nucomp(*enc_sh->Bs_->at(i), pkr, f);
+        }));
     }
+
+    for (auto& th : threads)
+        th.join();
 
     return enc_sh;
 }
