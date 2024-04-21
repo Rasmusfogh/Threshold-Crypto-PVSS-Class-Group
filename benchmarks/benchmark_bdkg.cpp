@@ -23,19 +23,19 @@ static HashAlgo H(secLevel);
 static unique_ptr<BDKG> bdkg;
 
 // Global state
-static vector<unique_ptr<EncSharesExt>> enc_sh(N);
+static vector<unique_ptr<EncSharesExt>> enc_sh(T + 1);
 
-static vector<vector<shared_ptr<QFI>>> shared_Bs;
-static vector<QFI> shared_Rs;
+static vector<vector<shared_ptr<QFI>>> Bs_transpose;
+static vector<QFI> Rs_transpose;
 
 static vector<Mpz> tsks;
 static vector<ECPoint> tpks;
 
 static void setup(benchmark::State& state) {
 
-    tsks.reserve(N);
-    tpks.reserve(N);
-    generate_n(back_inserter(tpks), N, [&] { return ECPoint(ec_group_); });
+    tsks.reserve(T + 1);
+    tpks.reserve(T + 1);
+    generate_n(back_inserter(tpks), T + 1, [&] { return ECPoint(ec_group_); });
 
     auto t = std::chrono::system_clock::now();
     Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
@@ -56,7 +56,7 @@ BENCHMARK(setup)->Unit(kMillisecond);
 static void dist(benchmark::State& state) {
 
     for (auto _ : state) {
-        for (size_t j = 0; j < N; j++) {
+        for (size_t j = 0; j < T + 1; j++) {
 
             Mpz s_j = (randgen.random_mpz(Q));
             enc_sh[j] = bdkg->dist(s_j, bdkg->pks_);
@@ -71,32 +71,31 @@ BENCHMARK(dist)->Unit(kMillisecond)->Iterations(1);
 
 static void compute_threshold_keypair(benchmark::State& state) {
 
-    shared_Bs.reserve(N);
-    shared_Rs.reserve(N);
+    Bs_transpose.reserve(T + 1);
+    Rs_transpose.reserve(T + 1);
 
     // Simulate sharing of Bs and Rs between parties
-    for (size_t i = 0; i < N; i++) {
-        shared_Bs.emplace_back(vector<shared_ptr<QFI>>());
-        shared_Bs[i].reserve(N);
+    for (size_t i = 0; i < T + 1; i++) {
+        Bs_transpose.emplace_back(vector<shared_ptr<QFI>>());
+        Bs_transpose[i].reserve(T + 1);
 
-        shared_Rs.emplace_back(enc_sh[i]->R_);
-
-        for (size_t j = 0; j < N; j++)
-            shared_Bs[i].emplace_back(enc_sh[j]->Bs_->at(i));
+        for (size_t j = 0; j < T + 1; j++)
+            Bs_transpose[i].emplace_back(enc_sh[j]->Bs_->at(i));
     }
 
-    size_t Q = N;
+    for (size_t i = 0; i < T + 1; i++)
+        Rs_transpose.emplace_back(enc_sh[i]->R_);
 
     bool success;
     for (auto _ : state) {
 
-        for (size_t j = 0; j < N; j++) {
+        for (size_t j = 0; j < T + 1; j++) {
             success = enc_sh[j]->pf_->verify(bdkg->pks_, *enc_sh[j]->Bs_,
                 *enc_sh[j]->Ds_, enc_sh[j]->R_);
         }
 
-        for (size_t i = 0; i < N; i++) {
-            for (size_t j = 0; j < Q; j++)
+        for (size_t i = 0; i < T + 1; i++) {
+            for (size_t j = 0; j < T + 1; j++)
                 ec_group_.ec_add(tpks[i], tpks[i], *enc_sh[j]->Ds_->at(i));
         }
 
@@ -104,7 +103,7 @@ static void compute_threshold_keypair(benchmark::State& state) {
         DoNotOptimize(tpk);
 
         Mpz tsk_i =
-            bdkg->compute_tsk_i(shared_Bs[0], shared_Rs, *bdkg->sks_[0]);
+            bdkg->compute_tsk_i(Bs_transpose[0], Rs_transpose, *bdkg->sks_[0]);
         DoNotOptimize(tsk_i);
     }
     assert(success);

@@ -33,16 +33,16 @@ int main(int argc, char* argv[]) {
     vector<unique_ptr<EncSharesExt>> enc_sh(n);
 
     vector<Mpz> tsks;
-    tsks.reserve(n);
+    tsks.reserve(t + 1);
 
     vector<ECPoint> tpks;
-    tpks.reserve(n);
-    generate_n(back_inserter(tpks), n, [&] { return ECPoint(ec_group_); });
+    tpks.reserve(t + 1);
+    generate_n(back_inserter(tpks), t + 1, [&] { return ECPoint(ec_group_); });
 
     /********************* 1 Round DKG *************************/
 
     // parties share random secret
-    for (size_t j = 0; j < n; j++) {
+    for (size_t j = 0; j < t + 1; j++) {
         Mpz s_j = (randgen.random_mpz(q));
         enc_sh[j] = bdkg.dist(s_j, bdkg.pks_);
     }
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     auto start = std::chrono::system_clock::now();
 
     // parties verify shares
-    for (size_t j = 0; j < n; j++) {
+    for (size_t j = 0; j < t + 1; j++) {
         if (!(enc_sh[j]->pf_->verify(bdkg.pks_, *enc_sh[j]->Bs_,
                 *enc_sh[j]->Ds_, enc_sh[j]->R_))) {
             return EXIT_FAILURE;
@@ -63,32 +63,33 @@ int main(int argc, char* argv[]) {
 
     /********************* Output sharing *************************/
 
-    vector<vector<shared_ptr<QFI>>> shared_Bs;
-    shared_Bs.reserve(n);
+    vector<vector<shared_ptr<QFI>>> Bs_transpose;
+    Bs_transpose.reserve(t + 1);
 
-    vector<QFI> shared_Rs;
-    shared_Rs.reserve(n);
+    vector<QFI> Rs_transpose;
+    Rs_transpose.reserve(t + 1);
 
     // Simulate sharing of Bs and Rs between parties
-    for (size_t i = 0; i < n; i++) {
-        shared_Bs.emplace_back(vector<shared_ptr<QFI>>());
-        shared_Bs[i].reserve(n);
+    for (size_t i = 0; i < t + 1; i++) {
+        Bs_transpose.emplace_back(vector<shared_ptr<QFI>>());
+        Bs_transpose[i].reserve(t + 1);
 
-        shared_Rs.emplace_back(enc_sh[i]->R_);
-
-        for (size_t j = 0; j < n; j++)
-            shared_Bs[i].emplace_back(enc_sh[j]->Bs_->at(i));
+        for (size_t j = 0; j < t + 1; j++)
+            Bs_transpose[i].emplace_back(enc_sh[j]->Bs_->at(i));
     }
+
+    for (size_t i = 0; i < t + 1; i++)
+        Rs_transpose.emplace_back(enc_sh[i]->R_);
 
     /********************* GLOBAL OUTPUT *************************/
 
     // |Q| = n as all proofs verifies above
-    size_t Q = n;
+    size_t Q = t + 1;
 
     start = std::chrono::system_clock::now();
 
     // Compute tpks[i]
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < t + 1; i++) {
         for (size_t j = 0; j < Q; j++)
             ec_group_.ec_add(tpks[i], tpks[i], *enc_sh[j]->Ds_->at(i));
     }
@@ -112,16 +113,16 @@ int main(int argc, char* argv[]) {
 
     // Compute private key share 0
     tsks.emplace_back(
-        bdkg.compute_tsk_i(shared_Bs[0], shared_Rs, *bdkg.sks_[0]));
+        bdkg.compute_tsk_i(Bs_transpose[0], Rs_transpose, *bdkg.sks_[0]));
 
     stop = std::chrono::system_clock::now();
     ms_int = duration_cast<milliseconds>(stop - start);
     cout << "computing 1 tsk: " << ms_int.count() << endl;
 
     // Compute private key share
-    for (size_t i = 1; i < n; i++)
+    for (size_t i = 1; i < t + 1; i++)
         tsks.emplace_back(
-            bdkg.compute_tsk_i(shared_Bs[i], shared_Rs, *bdkg.sks_[i]));
+            bdkg.compute_tsk_i(Bs_transpose[i], Rs_transpose, *bdkg.sks_[i]));
 
     /********************* VERIFY OUTPUT *************************/
 

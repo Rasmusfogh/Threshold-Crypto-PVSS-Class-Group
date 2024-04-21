@@ -10,9 +10,9 @@ add_custom_target (tests COMMAND ${_cmd} COMMENT "Running the tests")
 set (TESTS_LIST #test_qclpvss
                 #test_sss
                 #test_nizkpok_dl
-                #test_bdkg
+                test_bdkg
                 #test_nizk_linear_cl
-                test_pvss_reshare
+                #test_pvss_reshare
                 )
 
 ### Automatically create target and test from TESTS_LIST

@@ -60,7 +60,7 @@ unique_ptr<DecShare> QCLPVSS::decShare(const PublicKey& pk, const SecretKey& sk,
     QFI fi, Mi;
 
     unique_ptr<DecShare> dec_share(new DecShare());
-    this->Cl_Delta().nupow(fi, R, sk);
+    this->Cl_G().nupow(fi, R, sk);
     this->Cl_Delta().nucompinv(fi, B, fi);
     this->Cl_Delta().nucompinv(Mi, B, fi);
 

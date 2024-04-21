@@ -107,11 +107,11 @@ static void verifySharing(benchmark::State& state) {
 }
 BENCHMARK(verifySharing)->Unit(kMillisecond);
 
-// Only one Ai
 static void decShare(benchmark::State& state) {
-    for (auto _ : state)
+    for (auto _ : state) {
         dec_shares[0] = pvss->decShare(*pks[0], *sks[0], enc_shares->R_,
             *enc_shares->Bs_->at(0), 0);
+    }
 
     for (size_t i = 1; i < N; i++)
         dec_shares[i] = pvss->decShare(*pks[i], *sks[i], enc_shares->R_,
@@ -147,7 +147,7 @@ BENCHMARK(rec)->Unit(kMillisecond);
 static void verifyDec(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
-        for (size_t i = 0; i < T; i++) {
+        for (size_t i = 0; i < T + 1; i++) {
             success = pvss->verifyDec(*dec_shares[i], *pks[i], enc_shares->R_,
                 *enc_shares->Bs_->at(i));
             DoNotOptimize(success);

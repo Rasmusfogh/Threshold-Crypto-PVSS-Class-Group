@@ -23,6 +23,11 @@ add_library(project ${SRC_SOURCE_FILES})
 # Link the bicycl library to your project
 target_link_libraries(project PUBLIC bicycl)
 
+if (THREADS_FOUND AND CMAKE_USE_PTHREADS_INIT)
+  target_link_libraries (project INTERFACE Threads::Threads)
+  target_compile_definitions (project INTERFACE BICYCL_WITH_PTHREADS)
+endif ()
+
 # Optionally, specify any include directories needed for your project
 target_include_directories(project PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
