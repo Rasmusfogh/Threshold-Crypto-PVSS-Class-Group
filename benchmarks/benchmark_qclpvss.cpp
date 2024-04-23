@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 1000;
+static const size_t T = 500;
 static const size_t K = 1;
 static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
@@ -40,7 +40,6 @@ static void setup(benchmark::State& state) {
     for (auto _ : state) {
         pvss =
             unique_ptr<QCLPVSS>(new QCLPVSS(secLevel, H, randgen, Q, K, N, T));
-        DoNotOptimize(pvss);
     }
 
     for (size_t i = 0; i < N; i++) {
@@ -53,27 +52,25 @@ static void setup(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(setup)->Unit(kMillisecond);
+BENCHMARK(setup)->Unit(kMillisecond)->Iterations(10);
 
 static void keyGen(benchmark::State& state) {
     for (auto _ : state) {
         unique_ptr<const SecretKey> sk = pvss->keyGen(randgen);
         unique_ptr<const PublicKey> pk = pvss->keyGen(*sk);
         unique_ptr<NizkDL> pf = pvss->keyGen(*pk, *sk);
-        DoNotOptimize(pf);
     }
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(keyGen)->Unit(kMillisecond);
+BENCHMARK(keyGen)->Unit(kMillisecond)->Iterations(10);
 
 static void verifyKey(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
         for (size_t i = 0; i < N; i++) {
             success = pvss->verifyKey(*pks[i], *keygen_pf[i]);
-            DoNotOptimize(success);
         }
     }
     assert(success);
@@ -86,26 +83,24 @@ BENCHMARK(verifyKey)->Unit(kMillisecond);
 static void dist(benchmark::State& state) {
     for (auto _ : state) {
         enc_shares = pvss->dist(secret, pks);
-        DoNotOptimize(enc_shares);
     }
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(dist)->Unit(kMillisecond);
+BENCHMARK(dist)->Unit(kMillisecond)->Iterations(10);
 
 static void verifySharing(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
         success = pvss->verifySharing(*enc_shares, pks);
-        DoNotOptimize(success);
     }
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(verifySharing)->Unit(kMillisecond);
+BENCHMARK(verifySharing)->Unit(kMillisecond)->Iterations(10);
 
 static void decShare(benchmark::State& state) {
     for (auto _ : state) {
@@ -121,7 +116,7 @@ static void decShare(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(decShare)->Unit(kMillisecond);
+BENCHMARK(decShare)->Unit(kMillisecond)->Iterations(10);
 
 static void rec(benchmark::State& state) {
     unique_ptr<const Mpz> s_rec;
@@ -134,7 +129,6 @@ static void rec(benchmark::State& state) {
 
     for (auto _ : state) {
         s_rec = pvss->rec(rec_shares);
-        DoNotOptimize(s_rec);
     }
 
     assert(*s_rec == secret);
@@ -150,7 +144,6 @@ static void verifyDec(benchmark::State& state) {
         for (size_t i = 0; i < T + 1; i++) {
             success = pvss->verifyDec(*dec_shares[i], *pks[i], enc_shares->R_,
                 *enc_shares->Bs_->at(i));
-            DoNotOptimize(success);
         }
     }
     assert(success);
@@ -158,6 +151,6 @@ static void verifyDec(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(verifyDec)->Unit(kMillisecond);
+BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(10);
 
 BENCHMARK_MAIN();

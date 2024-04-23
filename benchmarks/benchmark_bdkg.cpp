@@ -12,8 +12,8 @@ using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 250;
+static const size_t T = 125;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);
@@ -89,7 +89,7 @@ static void compute_threshold_keypair(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
 
-        for (size_t j = 0; j < T + 1; j++) {
+        for (size_t j = 0; j < T; j++) {
             success = enc_sh[j]->pf_->verify(bdkg->pks_, *enc_sh[j]->Bs_,
                 *enc_sh[j]->Ds_, enc_sh[j]->R_);
         }
@@ -111,6 +111,6 @@ static void compute_threshold_keypair(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(compute_threshold_keypair)->Unit(kMillisecond);
+BENCHMARK(compute_threshold_keypair)->Unit(kMillisecond)->Iterations(10);
 
 BENCHMARK_MAIN();

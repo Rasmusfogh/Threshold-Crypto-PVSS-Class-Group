@@ -65,7 +65,7 @@ unique_ptr<vector<EncSharesResh>> PVSS_Reshare::reshare(
 bool PVSS_Reshare::verifyReshare(const vector<EncSharesResh>& enc_sh_resh,
     const EncShares& enc_shares) const {
 
-    for (size_t j = 0; j < t0_ + 1; j++)
+    for (size_t j = 0; j < t0_; j++)
         if (!enc_sh_resh[j].pf_->verify(pks, *pks[j], enc_shares.R_,
                 *enc_shares.Bs_->at(j), enc_sh_resh[j].R_, *enc_sh_resh[j].Bs_))
             return false;

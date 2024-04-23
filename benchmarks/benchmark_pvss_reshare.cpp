@@ -61,7 +61,7 @@ static void reshare(benchmark::State& state) {
 }
 BENCHMARK(reshare)->Unit(kMillisecond);
 
-static void distReshare(benchmark::State& state) {
+static void rec(benchmark::State& state) {
 
     for (auto _ : state) {
 
@@ -76,6 +76,6 @@ static void distReshare(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(distReshare)->Unit(kMillisecond);
+BENCHMARK(rec)->Unit(kMillisecond);
 
 BENCHMARK_MAIN();
