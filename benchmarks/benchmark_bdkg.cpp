@@ -1,19 +1,14 @@
 #include "bdkg.hpp"
-#include "qclpvss.hpp"
 #include <benchmark/benchmark.h>
-#include <cassert>
 #include <chrono>
 
 using namespace benchmark;
 using namespace QCLPVSS_;
-using namespace BICYCL;
-using namespace std;
-using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 250;
-static const size_t T = 125;
+static const size_t N = 50;
+static const size_t T = 25;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);
@@ -37,7 +32,7 @@ static void setup(benchmark::State& state) {
     tpks.reserve(T + 1);
     generate_n(back_inserter(tpks), T + 1, [&] { return ECPoint(ec_group_); });
 
-    auto t = std::chrono::system_clock::now();
+    auto t = chrono::system_clock::now();
     Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
     randgen.set_seed(seed);
 

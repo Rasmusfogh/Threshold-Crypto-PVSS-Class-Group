@@ -1,14 +1,10 @@
 #include "pvss_reshare.hpp"
-#include "qclpvss.hpp"
 #include <benchmark/benchmark.h>
 #include <cassert>
 #include <chrono>
 
 using namespace benchmark;
 using namespace QCLPVSS_;
-using namespace BICYCL;
-using namespace std;
-using namespace std::chrono;
 using namespace Application;
 
 static const int SECLEVEL = 128;

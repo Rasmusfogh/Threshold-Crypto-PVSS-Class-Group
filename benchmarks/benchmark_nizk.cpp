@@ -4,7 +4,6 @@
 
 using namespace benchmark;
 using namespace QCLPVSS_;
-using namespace std;
 
 static SecLevel seclevel(128);
 static RandGen randgen;
