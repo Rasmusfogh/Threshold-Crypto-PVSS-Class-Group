@@ -1,4 +1,5 @@
 #include "nizk_dl.hpp"
+#include <thread>
 
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -27,10 +28,17 @@ void NizkDL::prove(const SecretKey& sk, const PublicKey& pk) {
     r.reserve(l_);
     vector<QFI> t(l_);
 
-    for (size_t i = 0; i < l_; i++) {
+    for (size_t i = 0; i < l_; i++)
         r.emplace_back(rand_.random_mpz(A_));
-        cl_.power_of_h(t[i], r[i]);
-    }
+
+    vector<future<void>> futures;
+
+    for (size_t i = 0; i < l_; i++)
+        futures.emplace_back(
+            pool->enqueue([&, i]() { cl_.power_of_h(t[i], r[i]); }));
+
+    for (auto& ft : futures)
+        ft.get();
 
     init_random_oracle(cl_.h(), pk.get(), t);
 
@@ -44,20 +52,25 @@ void NizkDL::prove(const SecretKey& sk, const PublicKey& pk) {
 bool NizkDL::verify(const PublicKey& x) const {
     vector<QFI> t(l_);
 
-    QFI temp;
-
     Mpz AS_;
     Mpz::add(AS_, A_, S_);
 
-    for (size_t i = 0; i < l_; i++) {
-
+    for (size_t i = 0; i < l_; i++)
         if (u_[i] > AS_)
             return false;
 
-        x.exponentiation(cl_, t[i], b_[i]);
-        cl_.power_of_h(temp, u_[i]);
-        cl_.Cl_Delta().nucompinv(t[i], temp, t[i]);
-    }
+    vector<future<void>> futures;
+
+    for (size_t i = 0; i < l_; i++)
+        futures.emplace_back(pool->enqueue([&, i]() {
+            QFI temp;
+            x.exponentiation(cl_, t[i], b_[i]);
+            cl_.power_of_h(temp, u_[i]);
+            cl_.Cl_Delta().nucompinv(t[i], temp, t[i]);
+        }));
+
+    for (auto& ft : futures)
+        ft.get();
 
     init_random_oracle(cl_.h(), x.get(), t);
 

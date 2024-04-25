@@ -43,29 +43,68 @@ void NizkExtSH::prove(const Witness& w,
     QFI U, V;
     computeUVusingWis(U, V, pks, Bs, wis);
 
-    Mpz d(0L), d_temp;
+    Mpz d(0L);
     QFI B, M, temp;
-    ECPoint D(ec_group_), D_temp(ec_group_);
+    ECPoint D(ec_group_);
 
+    vector<QFI> B_exp(t_);
+    vector<QFI> M_exp(t_);
+
+    vector<future<void>> dD_futures;
+    vector<future<void>> BM_exp_futures;
+    vector<future<void>> BM_futures;
+
+    vector<Mpz> e;
+    e.reserve(t_);
+
+    for (size_t i = 0; i < t_; i++)
+        e.emplace_back(query_random_oracle(q_));
+
+    // compute d
+    dD_futures.emplace_back(pool->enqueue([&]() {
+        Mpz d_temp;
+        for (size_t i = 0; i < t_; i++) {
+            Mpz::mul(d_temp, e[i], get<0>(w)[i]->y());
+            Mpz::add(d, d, d_temp);
+        }
+    }));
+
+    // compute D
+    dD_futures.emplace_back(pool->enqueue([&]() {
+        ECPoint D_temp(ec_group_);
+        for (size_t i = 0; i < t_; i++) {
+            ec_group_.scal_mul(D_temp, BN(e[i]), *Ds[i]);
+            ec_group_.ec_add(D, D, D_temp);
+        }
+    }));
+
+    // Compute B and M exponentiations
     for (size_t i = 0; i < t_; i++) {
-        Mpz e(query_random_oracle(q_));
 
-        // compute d
-        Mpz::mul(d_temp, e, get<0>(w)[i]->y());
-        Mpz::add(d, d, d_temp);
-
-        // compute B
-        cl_.Cl_Delta().nupow(temp, *Bs[i], e);
-        cl_.Cl_Delta().nucomp(B, B, temp);
-
-        // compute D
-        ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
-        ec_group_.ec_add(D, D, D_temp);
-
-        // compute M
-        pks[i]->exponentiation(cl_, temp, e);
-        cl_.Cl_Delta().nucomp(M, M, temp);
+        BM_exp_futures.emplace_back(pool->enqueue([&, i]() {
+            cl_.Cl_Delta().nupow(B_exp[i], *Bs[i], e[i]);
+            pks[i]->exponentiation(cl_, M_exp[i], e[i]);
+        }));
     }
+
+    for (auto& ft : BM_exp_futures)
+        ft.get();
+
+    BM_futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < t_; i++)
+            cl_.Cl_Delta().nucomp(B, B, B_exp[i]);
+    }));
+
+    BM_futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < t_; i++)
+            cl_.Cl_Delta().nucomp(M, M, M_exp[i]);
+    }));
+
+    for (auto& ft : dD_futures)
+        ft.get();
+
+    for (auto& ft : BM_futures)
+        ft.get();
 
     Mpz::mod(d, d, q_);
 
@@ -89,24 +128,57 @@ bool NizkExtSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     QFI U, V;
     computeUV(U, V, pks, Bs, coeffs);
 
+    vector<Mpz> e;
+    e.reserve(t_);
+
+    for (size_t i = 0; i < t_; i++)
+        e.emplace_back(query_random_oracle(q_));
+
+    ECPoint D(ec_group_);
     QFI B, M, temp;
-    ECPoint D(ec_group_), D_temp(ec_group_);
+    vector<QFI> B_exp(t_);
+    vector<QFI> M_exp(t_);
+
+    vector<future<void>> D_futures;
+    vector<future<void>> BM_exp_futures;
+    vector<future<void>> BM_futures;
+
+    // compute D
+    D_futures.emplace_back(pool->enqueue([&]() {
+        ECPoint D_temp(ec_group_);
+        for (size_t i = 0; i < t_; i++) {
+            ec_group_.scal_mul(D_temp, BN(e[i]), *Ds[i]);
+            ec_group_.ec_add(D, D, D_temp);
+        }
+    }));
+
+    // Compute B and M exponentiations
     for (size_t i = 0; i < t_; i++) {
 
-        Mpz e(query_random_oracle(q_));
-
-        // compute B
-        cl_.Cl_Delta().nupow(temp, *Bs[i], e);
-        cl_.Cl_Delta().nucomp(B, B, temp);
-
-        // compute D
-        ec_group_.scal_mul(D_temp, BN(e), *Ds[i]);
-        ec_group_.ec_add(D, D, D_temp);
-
-        // compute M
-        pks[i]->exponentiation(cl_, temp, e);
-        cl_.Cl_Delta().nucomp(M, M, temp);
+        BM_exp_futures.emplace_back(pool->enqueue([&, i]() {
+            cl_.Cl_Delta().nupow(B_exp[i], *Bs[i], e[i]);
+            pks[i]->exponentiation(cl_, M_exp[i], e[i]);
+        }));
     }
+
+    for (auto& ft : BM_exp_futures)
+        ft.get();
+
+    BM_futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < t_; i++)
+            cl_.Cl_Delta().nucomp(B, B, B_exp[i]);
+    }));
+
+    BM_futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < t_; i++)
+            cl_.Cl_Delta().nucomp(M, M, M_exp[i]);
+    }));
+
+    for (auto& ft : D_futures)
+        ft.get();
+
+    for (auto& ft : BM_futures)
+        ft.get();
 
     return pf_->verify(U, M, R, V, B, D);
 }

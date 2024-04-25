@@ -83,10 +83,25 @@ const Mpz BDKG::compute_tsk_i(const vector<shared_ptr<QFI>>& Bs,
     QFI B, R, fi;
 
     size_t sizeof_Q = Bs.size();
-    for (size_t i = 0; i < sizeof_Q; i++) {
-        this->Cl_Delta().nucomp(B, B, *Bs[i]);
-        this->Cl_Delta().nucomp(R, R, Rs[i]);    // always the same
-    }
+
+    vector<future<void>> futures;
+
+    ThreadPool* pool = ThreadPool::GetInstance();
+
+    futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < sizeof_Q; i++) {
+            this->Cl_Delta().nucomp(B, B, *Bs[i]);
+        }
+    }));
+
+    futures.emplace_back(pool->enqueue([&]() {
+        for (size_t i = 0; i < sizeof_Q; i++) {
+            this->Cl_Delta().nucomp(R, R, Rs[i]);    // always the same
+        }
+    }));
+
+    for (auto& ft : futures)
+        ft.get();
 
     this->Cl_Delta().nupow(fi, R, sk);
     this->Cl_Delta().nucompinv(fi, B, fi);

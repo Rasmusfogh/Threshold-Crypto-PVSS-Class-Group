@@ -78,22 +78,45 @@ unique_ptr<EncShares> PVSS_Reshare::distReshare(
 
     unique_ptr<EncShares> enc_sh_output(new EncShares(n1_));
 
-    QFI temp;
     size_t T = t0_ + 1;
 
+    ThreadPool* pool = ThreadPool::GetInstance();
+
+    vector<QFI> R_exp(T);
+
+    vector<future<void>> R_exp_futures;
+    vector<future<void>> futures;
+
     for (size_t j = 0; j < T; j++) {
-        this->Cl_Delta().nupow(temp, enc_sh_resh[j].R_, lambdas_[j]);
-        this->Cl_Delta().nucomp(enc_sh_output->R_, enc_sh_output->R_, temp);
+        R_exp_futures.emplace_back(pool->enqueue([&, j]() {
+            this->Cl_Delta().nupow(R_exp[j], enc_sh_resh[j].R_, lambdas_[j]);
+        }));
     }
 
     for (size_t i = 0; i < n1_; i++) {
-        for (size_t j = 0; j < T; j++) {
-            this->Cl_Delta().nupow(temp, *enc_sh_resh[j].Bs_->at(i),
-                lambdas_[j]);
-            this->Cl_Delta().nucomp(*enc_sh_output->Bs_->at(i),
-                *enc_sh_output->Bs_->at(i), temp);
-        }
+        futures.emplace_back(pool->enqueue([&, i]() {
+            QFI temp;
+
+            for (size_t j = 0; j < T; j++) {
+                this->Cl_Delta().nupow(temp, *enc_sh_resh[j].Bs_->at(i),
+                    lambdas_[j]);
+                this->Cl_Delta().nucomp(*enc_sh_output->Bs_->at(i),
+                    *enc_sh_output->Bs_->at(i), temp);
+            }
+        }));
     }
+
+    for (auto& ft : R_exp_futures)
+        ft.get();
+
+    futures.emplace_back(pool->enqueue([&]() {
+        for (size_t j = 0; j < T; j++)
+            this->Cl_Delta().nucomp(enc_sh_output->R_, enc_sh_output->R_,
+                R_exp[j]);
+    }));
+
+    for (auto& ft : futures)
+        ft.get();
 
     return enc_sh_output;
 }
