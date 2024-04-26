@@ -18,7 +18,7 @@ PVSS_Reshare::PVSS_Reshare(const SecLevel& seclevel, HashAlgo& hash,
 
     Vis_reshare_.reserve(n0 + 1);
     generate_n(back_inserter(Vis_reshare_), n0 + 1, [] { return Mpz(1UL); });
-    this->computeSCRAPEvis(Vis_reshare_, n0 + 1, 0, q_);
+    this->computeSCRAPEcoeffs(Vis_reshare_, n0 + 1, 0, q_);
 
     for (size_t i = 0; i < n0_; i++) {
         sks[i] = this->keyGen(randgen_);
