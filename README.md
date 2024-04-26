@@ -34,6 +34,9 @@ For Windows users it is recommended to run a [WSL](https://learn.microsoft.com/e
 # Structure
 In `./src` both `qclpvss.hpp` and `qclpvss.cpp` can be found. This PVSS is the concrete instance from [Publicly Verifiable Secret Sharing over Class Groups and Applications to DKG and YOSO](https://eprint.iacr.org/2023/1651) and is the PVSS used for the 1-Round DKG and Resharing Protocol found in `./src/application/bdkg.cpp` and `./src/application/pvss_reshare.cpp` respectively. In `.src/nizk` all NIZK proofs used throughout the above mentioned protocols can be found. Lastly, in `.src/utils` an implementation of Shamir Secret Sharing can be found, alongside datatypes, utils and lastly `openssl_hash_ext.cpp`, which overrides nescessary implementions of the OpenSSL::HashAlgo::hash template function given in the BICYCL library.
 
+## Multithreading
+For benchmarking purposes, a threading pool was utilized to compute multi-exponetiations and products of class group elements. This version can be found in the branch `multithreading`, whereas `main` contains a sequential version.
+
 ## Thanks
 A big thanks to the authors of [I want to ride my BICYCL: BICYCL Implements CryptographY in CLass groups](https://eprint.iacr.org/2022/1466)
 for providing an extensive library on class groups, which allows for cryptographic protocols on class groups such as those presented
