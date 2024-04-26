@@ -21,7 +21,7 @@ QCLPVSS::QCLPVSS(const SecLevel& seclevel, HashAlgo& hash, RandGen& randgen,
 
     Vis_.reserve(n);
     generate_n(back_inserter(Vis_), n, [] { return Mpz(1UL); });
-    computeSCRAPEvis(Vis_, n, 1, q_);
+    computeSCRAPEcoeffs(Vis_, n, 1, q_);
 }
 
 unique_ptr<const SecretKey> QCLPVSS::keyGen(RandGen& randgen) const {
@@ -148,7 +148,7 @@ void QCLPVSS::computeSHNizk(vector<unique_ptr<const PublicKey>>& pks,
     enc_shares.pf_->prove(enc_shares.r_, pks, *enc_shares.Bs_, enc_shares.R_);
 }
 
-void QCLPVSS::computeSCRAPEvis(vector<Mpz>& vis, const size_t n,
+void QCLPVSS::computeSCRAPEcoeffs(vector<Mpz>& vis, const size_t n,
     const size_t offset, const Mpz& q) {
 
     for (size_t i = 0; i < n; i++) {

@@ -87,7 +87,7 @@ namespace QCLPVSS_ {
         // offset is distance from 0 from which v_i starts. If v_i is computed
         // for i \in [1 ... n], then the offset is 1. If v_i is computed
         // for i \in [0 ... n], then the offset is 0
-        void computeSCRAPEvis(vector<Mpz>& vis, const size_t n,
+        void computeSCRAPEcoeffs(vector<Mpz>& vis, const size_t n,
             const size_t offset, const Mpz& q);
     };
 }    // namespace QCLPVSS_

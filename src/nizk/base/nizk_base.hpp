@@ -2,6 +2,7 @@
 #define NIZK_BASE_HPP__
 
 #include "qclpvss_utils.hpp"
+#include "threadpool.hpp"
 #include <bicycl.hpp>
 #include <memory>
 
@@ -19,9 +20,12 @@ namespace NIZK {
         RandGen& rand_;
         const CL_HSMqk& cl_;
 
+        ThreadPool* pool;
+
       public:
         BaseNizk(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl)
-            : hash_(hash), rand_(rand), cl_(cl) {}
+            : hash_(hash), rand_(rand), cl_(cl),
+              pool(ThreadPool::GetInstance()) {}
 
         virtual void prove(const Witness& w, const Statement&... s) = 0;
         virtual bool verify(const Statement&... s) const = 0;

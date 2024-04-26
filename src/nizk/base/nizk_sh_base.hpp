@@ -4,6 +4,7 @@
 #include "nizk_base.hpp"
 #include <bicycl.hpp>
 #include <memory>
+#include <thread>
 
 using namespace BICYCL;
 using namespace OpenSSL;
@@ -56,45 +57,97 @@ namespace NIZK {
             const vector<shared_ptr<QFI>>& Bs,
             const vector<Mpz>& coeffs) const {
             QFI exp;
-            Mpz temp;
+
+            vector<future<void>> futures;
+            vector<Mpz> wi_prime(n_);
+            vector<Mpz> c;
+            c.reserve(n_);
+
+            vector<QFI> U_exp(n_);
+            vector<QFI> V_exp(n_);
+
+            for (size_t i = 0; i < n_; i++)
+                c.emplace_back(this->query_random_oracle(C_));
 
             for (size_t i = 0; i < n_; i++) {
-                temp = computeWi(i, coeffs);
+                futures.emplace_back(this->pool->enqueue([&, i]() {
+                    wi_prime[i] = computeWi(i, coeffs);
+                    Mpz::addmul(wi_prime[i], c[i], q_);
 
-                // compute wi' = wi
-                Mpz ci(this->query_random_oracle(C_));
-                Mpz::addmul(temp, ci, q_);
-
-                // compute U
-                (*pks[i]).exponentiation(this->cl_, exp, temp);
-                this->cl_.Cl_Delta().nucomp(U_ref, U_ref, exp);
-
-                // compute V
-                this->cl_.Cl_Delta().nupow(exp, *Bs[i], temp);
-                this->cl_.Cl_Delta().nucomp(V_ref, V_ref, exp);
+                    // compute U exponents
+                    (*pks[i]).exponentiation(this->cl_, U_exp[i], wi_prime[i]);
+                    // compute V exponents
+                    this->cl_.Cl_Delta().nupow(V_exp[i], *Bs[i], wi_prime[i]);
+                }));
             }
+
+            for (auto& ft : futures)
+                ft.get();
+
+            vector<future<void>> UV_futures;
+
+            // compute U
+            UV_futures.emplace_back(this->pool->enqueue([&]() {
+                for (size_t i = 0; i < n_; i++)
+                    this->cl_.Cl_Delta().nucomp(U_ref, U_ref, U_exp[i]);
+            }));
+
+            // compute V
+            UV_futures.emplace_back(this->pool->enqueue([&]() {
+                for (size_t i = 0; i < n_; i++)
+                    this->cl_.Cl_Delta().nucomp(V_ref, V_ref, V_exp[i]);
+            }));
+
+            for (auto& ft : UV_futures)
+                ft.get();
         }
 
         void computeUVusingWis(QFI& U_ref, QFI& V_ref,
             const vector<unique_ptr<const PublicKey>>& pks,
-            const vector<shared_ptr<QFI>>& Bs, const vector<Mpz>& wis) const {
-            QFI exp;
-            Mpz temp;
+            const vector<shared_ptr<QFI>>& Bs, vector<Mpz>& wis) const {
+
+            vector<Mpz> c;
+            c.reserve(n_);
+
+            for (size_t i = 0; i < n_; i++)
+                c.emplace_back(this->query_random_oracle(C_));
+
+            vector<QFI> U_exp(n_);
+            vector<QFI> V_exp(n_);
+
+            vector<future<void>> futures;
 
             for (size_t i = 0; i < n_; i++) {
-                // compute wi' = wi
-                Mpz ci(this->query_random_oracle(C_));
-                Mpz::mul(temp, ci, q_);
-                Mpz::add(temp, wis[i], temp);
+                futures.emplace_back(this->pool->enqueue([&, i]() {
+                    // wi'
+                    Mpz::addmul(wis[i], c[i], q_);
 
-                // compute U
-                (*pks[i]).exponentiation(this->cl_, exp, temp);
-                this->cl_.Cl_Delta().nucomp(U_ref, U_ref, exp);
-
-                // compute V
-                this->cl_.Cl_Delta().nupow(exp, *Bs[i], temp);
-                this->cl_.Cl_Delta().nucomp(V_ref, V_ref, exp);
+                    // compute U exponents
+                    (*pks[i]).exponentiation(this->cl_, U_exp[i], wis[i]);
+                    // compute V exponents
+                    this->cl_.Cl_Delta().nupow(V_exp[i], *Bs[i], wis[i]);
+                }));
             }
+
+            for (auto& ft : futures)
+                ft.get();
+
+            vector<future<void>> UV_futures;
+
+            // compute U
+            UV_futures.emplace_back(this->pool->enqueue([&]() {
+                for (size_t i = 0; i < n_; i++)
+                    this->cl_.Cl_Delta().nucomp(U_ref, U_ref, U_exp[i]);
+            }));
+
+            // compute V
+            UV_futures.emplace_back(this->pool->enqueue([&]() {
+                for (size_t i = 0; i < n_; i++)
+                    this->cl_.Cl_Delta().nucomp(V_ref, V_ref, V_exp[i]);
+            }));
+
+            for (auto& ft : UV_futures)
+                ft.get();
         }
 
         void generateCoefficients(vector<Mpz>& coeffs) const {

@@ -1,7 +1,6 @@
 #ifndef BDKG_HPP__
 #define BDKG_HPP__
 
-#include "nizk_sh_ext.hpp"
 #include "qclpvss.hpp"
 
 using namespace QCLPVSS_;
