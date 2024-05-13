@@ -35,8 +35,6 @@ static void setup(benchmark::State& state) {
     Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
     randgen.set_seed(seed);
 
-    Q = (randgen.random_prime(SECLEVEL * 2));
-
     for (auto _ : state) {
         pvss =
             unique_ptr<QCLPVSS>(new QCLPVSS(secLevel, H, randgen, Q, K, N, T));
