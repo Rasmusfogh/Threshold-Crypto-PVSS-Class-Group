@@ -14,8 +14,9 @@ static const int SECLEVEL = 128;
 static const size_t N = 50;
 static const size_t T = 25;
 static const size_t K = 1;
-static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
+static ECGroup ec_group_(secLevel);
+static Mpz Q(ec_group_.order());
 static RandGen randgen;
 static HashAlgo H(secLevel);
 static unique_ptr<QCLPVSS> pvss;
@@ -33,9 +34,6 @@ static void setup(benchmark::State& state) {
     auto t = std::chrono::system_clock::now();
     Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
     randgen.set_seed(seed);
-
-    // explained in paper that q is twice of seclevel
-    Q = (randgen.random_prime(SECLEVEL * 2));
 
     for (auto _ : state) {
         pvss =
