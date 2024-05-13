@@ -11,11 +11,14 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 1500;
+static const size_t T = 1000;
 static const size_t K = 1;
-static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
+
+static ECGroup ec_group_(secLevel);
+static Mpz Q(ec_group_.order());
+
 static RandGen randgen;
 static HashAlgo H(secLevel);
 static unique_ptr<QCLPVSS> pvss;
@@ -151,6 +154,6 @@ static void verifyDec(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(2);
 
 BENCHMARK_MAIN();

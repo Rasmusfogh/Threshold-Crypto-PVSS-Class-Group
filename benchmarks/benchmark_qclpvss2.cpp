@@ -11,11 +11,12 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 200;
-static const size_t T = 100;
+static const size_t N = 2000;
+static const size_t T = 1000;
 static const size_t K = 1;
-static Mpz Q;
 static SecLevel secLevel(SECLEVEL);
+static ECGroup ec_group_(secLevel);
+static Mpz Q(ec_group_.order());
 static RandGen randgen;
 static HashAlgo H(secLevel);
 static unique_ptr<QCLPVSS> pvss;
@@ -57,28 +58,26 @@ BENCHMARK(setup)->Unit(kMillisecond);
 static void deal(benchmark::State& state) {
     for (auto _ : state) {
         enc_shares = pvss->dist(secret, pks);
-        DoNotOptimize(enc_shares);
     }
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(deal)->Unit(kMillisecond);
+BENCHMARK(deal)->Unit(kMillisecond)->Iterations(5);
 
 static void recieve(benchmark::State& state) {
     bool success;
     for (auto _ : state) {
         success = pvss->verifySharing(*enc_shares, pks);
-        DoNotOptimize(success);
 
-        DoNotOptimize(pvss->decShare(*pks[0], *sks[0], enc_shares->R_,
-            *enc_shares->Bs_->at(0), 0));
+        pvss->decShare(*pks[0], *sks[0], enc_shares->R_,
+            *enc_shares->Bs_->at(0), 0);
     }
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(recieve)->Unit(kMillisecond);
+BENCHMARK(recieve)->Unit(kMillisecond)->Iterations(5);
 
 BENCHMARK_MAIN();

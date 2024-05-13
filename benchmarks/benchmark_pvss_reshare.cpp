@@ -8,12 +8,13 @@ using namespace QCLPVSS_;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 900;
+static const size_t T = 450;
 static SecLevel secLevel(SECLEVEL);
 static RandGen randgen;
-static Mpz Q;
 static HashAlgo H(secLevel);
+static ECGroup ec_group_(secLevel);
+static Mpz Q(ec_group_.order());
 static unique_ptr<PVSS_Reshare> pvss_reshare;
 
 static unique_ptr<vector<EncSharesResh>> enc_sh_resh;
@@ -24,15 +25,9 @@ static void setup(benchmark::State& state) {
     Mpz seed(static_cast<unsigned long>(t.time_since_epoch().count()));
     randgen.set_seed(seed);
 
-    // explained in paper that q is twice of seclevel
-    Q = (randgen.random_prime(SECLEVEL * 2));
-
     for (auto _ : state) {
         pvss_reshare = unique_ptr<PVSS_Reshare>(
             new PVSS_Reshare(secLevel, H, randgen, Q, N, T, N, T));
-
-        pvss_reshare.reset();
-        DoNotOptimize(pvss_reshare);
     }
 
     pvss_reshare = unique_ptr<PVSS_Reshare>(
@@ -48,7 +43,6 @@ static void reshare(benchmark::State& state) {
 
     for (auto _ : state) {
         enc_sh_resh = pvss_reshare->reshare(*pvss_reshare->enc_shares);
-        DoNotOptimize(enc_sh_resh);
     }
 
     state.counters["secLevel"] = secLevel.soundness();
@@ -65,7 +59,6 @@ static void rec(benchmark::State& state) {
             *pvss_reshare->enc_shares));
 
         auto enc_shares = pvss_reshare->distReshare(*enc_sh_resh);
-        DoNotOptimize(enc_shares);
     }
 
     state.counters["secLevel"] = secLevel.soundness();

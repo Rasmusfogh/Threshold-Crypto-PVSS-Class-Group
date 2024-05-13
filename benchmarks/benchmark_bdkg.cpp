@@ -7,8 +7,8 @@ using namespace QCLPVSS_;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 450;
+static const size_t T = 225;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);
@@ -95,17 +95,15 @@ static void compute_threshold_keypair(benchmark::State& state) {
         }
 
         unique_ptr<ECPoint> tpk = move(bdkg->compute_tpk(tpks));
-        DoNotOptimize(tpk);
 
         Mpz tsk_i =
             bdkg->compute_tsk_i(Bs_transpose[0], Rs_transpose, *bdkg->sks_[0]);
-        DoNotOptimize(tsk_i);
     }
     assert(success);
     state.counters["secLevel"] = secLevel.soundness();
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(compute_threshold_keypair)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(compute_threshold_keypair)->Unit(kMillisecond)->Iterations(1);
 
 BENCHMARK_MAIN();
