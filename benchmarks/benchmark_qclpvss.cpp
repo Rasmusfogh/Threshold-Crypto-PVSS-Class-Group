@@ -11,8 +11,8 @@ using namespace std::chrono;
 
 static const Mpz secret(9898UL);
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 900;
+static const size_t T = 450;
 static const size_t K = 1;
 static SecLevel secLevel(SECLEVEL);
 static ECGroup ec_group_(secLevel);
@@ -149,6 +149,6 @@ static void verifyDec(benchmark::State& state) {
     state.counters["n"] = N;
     state.counters["t"] = T;
 }
-BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(10);
+BENCHMARK(verifyDec)->Unit(kMillisecond)->Iterations(2);
 
 BENCHMARK_MAIN();
