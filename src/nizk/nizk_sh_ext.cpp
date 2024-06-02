@@ -9,7 +9,6 @@ NizkExtSH::NizkExtSH(HashAlgo& hash, RandGen& rand, const CL_HSMqk& cl,
 
     // Set base class C boundary
     Mpz::mulby2k(this->C_, 1, seclevel.soundness() - 1);
-    Mpz::add(this->C_, this->C_, this->C_);    // Due to soundness error 2/C
 }
 
 void NizkExtSH::prove(const Witness& w,

@@ -8,8 +8,8 @@ using namespace QCLPVSS_;
 using namespace Application;
 
 static const int SECLEVEL = 128;
-static const size_t N = 50;
-static const size_t T = 25;
+static const size_t N = 250;
+static const size_t T = 125;
 static SecLevel secLevel(SECLEVEL);
 static RandGen randgen;
 static Mpz Q;
@@ -32,7 +32,6 @@ static void setup(benchmark::State& state) {
             new PVSS_Reshare(secLevel, H, randgen, Q, N, T, N, T));
 
         pvss_reshare.reset();
-        DoNotOptimize(pvss_reshare);
     }
 
     pvss_reshare = unique_ptr<PVSS_Reshare>(
@@ -48,7 +47,6 @@ static void reshare(benchmark::State& state) {
 
     for (auto _ : state) {
         enc_sh_resh = pvss_reshare->reshare(*pvss_reshare->enc_shares);
-        DoNotOptimize(enc_sh_resh);
     }
 
     state.counters["secLevel"] = secLevel.soundness();
@@ -65,7 +63,6 @@ static void rec(benchmark::State& state) {
             *pvss_reshare->enc_shares));
 
         auto enc_shares = pvss_reshare->distReshare(*enc_sh_resh);
-        DoNotOptimize(enc_shares);
     }
 
     state.counters["secLevel"] = secLevel.soundness();
