@@ -22,25 +22,8 @@ void NizkExtSH::prove(const Witness& w,
     vector<Mpz> coeffs;
     generateCoefficients(coeffs);
 
-    vector<Mpz> wis;
-    wis.reserve(n_);
-
-    for (size_t i = 0; i < n_; i++)
-        wis.emplace_back(computeWi(i, coeffs));
-
-    // Verification. If fails, reject
-    ECPoint inf(ec_group_), inf_temp(ec_group_);
-
-    for (size_t i = 0; i < n_; i++) {
-        ec_group_.scal_mul(inf_temp, BN(wis[i]), *Ds[i]);
-        ec_group_.ec_add(inf, inf, inf_temp);
-    }
-
-    if (!ec_group_.is_at_infinity(inf))
-        throw std::invalid_argument("Failed validating shares");
-
     QFI U, V;
-    computeUVusingWis(U, V, pks, Bs, wis);
+    computeUV(U, V, pks, Bs, coeffs);
 
     Mpz d(0L);
     QFI B, M, temp;
@@ -124,8 +107,25 @@ bool NizkExtSH::verify(const vector<unique_ptr<const PublicKey>>& pks,
     vector<Mpz> coeffs;
     generateCoefficients(coeffs);
 
+    vector<Mpz> wis;
+    wis.reserve(n_);
+
+    for (size_t i = 0; i < n_; i++)
+        wis.emplace_back(computeWi(i, coeffs));
+
+    // Verification. If fails, reject
+    ECPoint inf(ec_group_), inf_temp(ec_group_);
+
+    for (size_t i = 0; i < n_; i++) {
+        ec_group_.scal_mul(inf_temp, BN(wis[i]), *Ds[i]);
+        ec_group_.ec_add(inf, inf, inf_temp);
+    }
+
+    if (!ec_group_.is_at_infinity(inf))
+        throw std::invalid_argument("Failed validating shares");
+
     QFI U, V;
-    computeUV(U, V, pks, Bs, coeffs);
+    computeUVusingWis(U, V, pks, Bs, wis);
 
     vector<Mpz> e;
     e.reserve(t_);
