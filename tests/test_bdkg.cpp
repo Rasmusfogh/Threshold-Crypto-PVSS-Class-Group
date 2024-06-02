@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
 
     HashAlgo H(seclevel);
 
-    size_t n(10UL);
-    size_t t(5UL);
+    size_t n(50UL);
+    size_t t(25UL);
 
     BDKG bdkg(seclevel, H, randgen, ec_group_, q, 1, n, t);
 
